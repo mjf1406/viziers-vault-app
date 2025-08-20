@@ -12,6 +12,7 @@ if (!APP_ID) {
         "Missing NEXT_PUBLIC_INSTANTDB_APP_ID. Did you set it in .env.local?"
     );
 }
+console.log("APP_ID:", APP_ID);
 
 // Optional: Declare your schema!
 const schema = i.schema({

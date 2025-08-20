@@ -4,7 +4,8 @@
 
 import { id, i, init, InstaQLEntity } from "@instantdb/react";
 
-const APP_ID = process.env.NEXT_PUBLIC_INSTANTDB_APP_ID;
+// const APP_ID = process.env.NEXT_PUBLIC_INSTANTDB_APP_ID;
+const APP_ID = "319a811a-4789-48f2-a393-ad5010eb0386";
 
 if (!APP_ID) {
     throw new Error(

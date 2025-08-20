@@ -4,11 +4,11 @@
 
 import { id, i, init, InstaQLEntity } from "@instantdb/react";
 
-const APP_ID = process.env.NEXT_PUBLIC_APP_ID;
+const APP_ID = process.env.NEXT_PUBLIC_INSTANTDB_APP_ID;
 
 if (!APP_ID) {
     throw new Error(
-        "Missing NEXT_PUBLIC_APP_ID. Did you set it in .env.local?"
+        "Missing NEXT_PUBLIC_INSTANTDB_APP_ID. Did you set it in .env.local?"
     );
 }
 

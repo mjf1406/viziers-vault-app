@@ -1,51 +1,25 @@
 /** @format */
-
 "use client";
 
-import { id, i, init, InstaQLEntity } from "@instantdb/react";
-
-const APP_ID = process.env.NEXT_PUBLIC_INSTANTDB_APP_ID;
-
-if (!APP_ID) {
-    throw new Error(
-        "Missing NEXT_PUBLIC_INSTANTDB_APP_ID. Did you set it in .env.local?"
-    );
-}
-console.log("APP_ID:", APP_ID);
-
-// Optional: Declare your schema!
-const schema = i.schema({
-    entities: {
-        todos: i.entity({
-            text: i.string(),
-            done: i.boolean(),
-            createdAt: i.number(),
-        }),
-    },
-    rooms: {
-        todos: {
-            presence: i.entity({}),
-        },
-    },
-});
+import { id, InstaQLEntity } from "@instantdb/react";
+import db from "../lib/db";
+import schema from "../instant.schema";
 
 type Todo = InstaQLEntity<typeof schema, "todos">;
 
-const db = init({ appId: APP_ID, schema });
 const room = db.room("todos");
 
 function App() {
-    // Read Data
     const { isLoading, error, data } = db.useQuery({ todos: {} });
     const { peers } = db.rooms.usePresence(room);
     const numUsers = 1 + Object.keys(peers).length;
-    if (isLoading) {
-        return;
-    }
-    if (error) {
+
+    if (isLoading) return null;
+    if (error)
         return <div className="text-red-500 p-4">Error: {error.message}</div>;
-    }
+
     const { todos } = data;
+
     return (
         <div className="font-mono min-h-screen flex justify-center items-center flex-col space-y-4">
             <div className="text-xs text-gray-500">
@@ -64,8 +38,7 @@ function App() {
     );
 }
 
-// Write Data
-// ---------
+// --- Write helpers ---
 function addTodo(text: string) {
     db.transact(
         db.tx.todos[id()].update({
@@ -97,8 +70,7 @@ function toggleAll(todos: Todo[]) {
     );
 }
 
-// Components
-// ----------
+// --- Components ---
 function ChevronDownIcon() {
     return (
         <svg viewBox="0 0 20 20">

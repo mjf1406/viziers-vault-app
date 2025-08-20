@@ -4,8 +4,13 @@
 
 import { id, i, init, InstaQLEntity } from "@instantdb/react";
 
-// ID for app: Vizier's Vault
-const APP_ID = "319a811a-4789-48f2-a393-ad5010eb0386";
+const APP_ID = process.env.NEXT_PUBLIC_APP_ID;
+
+if (!APP_ID) {
+    throw new Error(
+        "Missing NEXT_PUBLIC_APP_ID. Did you set it in .env.local?"
+    );
+}
 
 // Optional: Declare your schema!
 const schema = i.schema({

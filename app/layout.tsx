@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Vizier's Vault | App",
+    title: "App | Vizier's Vault",
     description: "Generate various things for D&D 5e",
 };
 

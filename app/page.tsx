@@ -6,7 +6,7 @@ import TodosClient from "@/components/todos-client";
 
 export default function Page() {
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center p-5 justify-center">
             <ThemeToggle />
             <TodosClient />
         </div>

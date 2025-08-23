@@ -42,7 +42,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <Header />
-                    {children}
+                    <div className="min-h-screen">{children}</div>
                     <Footer />
                 </ThemeProvider>
             </body>

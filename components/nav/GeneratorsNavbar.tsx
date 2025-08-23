@@ -10,7 +10,6 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
     Menu,
     Map,
-    Sword,
     Orbit,
     Store,
     Users,
@@ -18,6 +17,9 @@ import {
     Star,
     Globe,
     Swords,
+    User,
+    Settings,
+    ChevronDown,
 } from "lucide-react";
 import {
     Sheet,
@@ -26,47 +28,61 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { useState } from "react";
+import { getAvailableTools } from "@/lib/tools";
 
-const navigationItems = [
+// Helper function to get icon component from string
+const getIconComponent = (iconName: string) => {
+    const iconMap: { [key: string]: any } = {
+        Map,
+        Orbit,
+        Store,
+        Users,
+        BookOpen,
+        Star,
+        Globe,
+        Swords,
+    };
+    return iconMap[iconName] || Map;
+};
+
+// Get tools and filter out TBD items
+const availableTools = getAvailableTools();
+
+// Separate tools into categories
+const mainTools = availableTools.filter(
+    (tool) =>
+        ![
+            "world-generator",
+            "galaxy-generator",
+            "star-system-generator",
+        ].includes(tool.id)
+);
+
+const spaceTools = availableTools.filter((tool) =>
+    ["world-generator", "galaxy-generator", "star-system-generator"].includes(
+        tool.id
+    )
+);
+
+const accountItems = [
     {
-        name: "Battle Map",
-        href: "/battle-map-generator",
-        icon: Map,
+        name: "Account",
+        href: "/account",
+        icon: User,
     },
     {
-        name: "Encounter",
-        href: "/encounter-generator",
-        icon: Swords,
-    },
-    {
-        name: "Galaxy",
-        href: "/galaxy-generator",
-        icon: Orbit,
-    },
-    {
-        name: "Magic Shop",
-        href: "/magic-shop-generator",
-        icon: Store,
-    },
-    {
-        name: "Parties",
-        href: "/parties",
-        icon: Users,
-    },
-    {
-        name: "Spellbook",
-        href: "/spellbook-generator",
-        icon: BookOpen,
-    },
-    {
-        name: "Star System",
-        href: "/star-system-generator",
-        icon: Star,
-    },
-    {
-        name: "World",
-        href: "/world-generator",
-        icon: Globe,
+        name: "Settings",
+        href: "/settings",
+        icon: Settings,
     },
 ];
 
@@ -85,28 +101,136 @@ export function GeneratorsNavbar() {
 
                 {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center space-x-4">
-                    {navigationItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                    "flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary",
-                                    pathname === item.href
-                                        ? "text-primary"
-                                        : "text-muted-foreground"
-                                )}
-                            >
-                                <Icon className="h-4 w-4" />
-                                <span>{item.name}</span>
-                            </Link>
-                        );
-                    })}
+                    {/* Main Tools - Alphabetized */}
+                    {mainTools
+                        .sort((a, b) =>
+                            a.title
+                                .replace(" Generator", "")
+                                .replace(" Management", "")
+                                .localeCompare(
+                                    b.title
+                                        .replace(" Generator", "")
+                                        .replace(" Management", "")
+                                )
+                        )
+                        .map((tool) => {
+                            const Icon = getIconComponent(tool.icon);
+                            return (
+                                <Link
+                                    key={tool.id}
+                                    href={tool.url.replace(
+                                        "https://app.viziersvault.com",
+                                        ""
+                                    )}
+                                    className={cn(
+                                        "flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary",
+                                        pathname ===
+                                            tool.url.replace(
+                                                "https://app.viziersvault.com",
+                                                ""
+                                            )
+                                            ? "text-primary"
+                                            : "text-muted-foreground"
+                                    )}
+                                >
+                                    <Icon className="h-4 w-4" />
+                                    <span>
+                                        {tool.title
+                                            .replace(" Generator", "")
+                                            .replace(" Management", "")}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+
+                    {/* Navigation Menu for Space Tools */}
+                    <NavigationMenu>
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
+                                    <Orbit className="h-4 w-4" />
+                                    <span>Universe</span>
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
+                                        {spaceTools.map((tool) => {
+                                            const Icon = getIconComponent(
+                                                tool.icon
+                                            );
+                                            return (
+                                                <NavigationMenuLink
+                                                    key={tool.id}
+                                                    asChild
+                                                >
+                                                    <Link
+                                                        href={tool.url.replace(
+                                                            "https://app.viziersvault.com",
+                                                            ""
+                                                        )}
+                                                        className="p-2 rounded-md hover:bg-accent"
+                                                    >
+                                                        <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                            <Icon className="h-4 w-4 flex-shrink-0" />
+                                                            <span>
+                                                                {tool.title
+                                                                    .replace(
+                                                                        " Generator",
+                                                                        ""
+                                                                    )
+                                                                    .replace(
+                                                                        " Management",
+                                                                        ""
+                                                                    )}
+                                                            </span>
+                                                        </div>
+                                                    </Link>
+                                                </NavigationMenuLink>
+                                            );
+                                        })}
+                                    </div>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
                 </div>
             </div>
 
             <div className="flex items-center space-x-2">
+                {/* Navigation Menu for Account */}
+                <NavigationMenu>
+                    <NavigationMenuList>
+                        <NavigationMenuItem>
+                            <NavigationMenuTrigger className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
+                                <User className="h-4 w-4" />
+                                <span className="sr-only">Account</span>
+                            </NavigationMenuTrigger>
+                            <NavigationMenuContent>
+                                <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
+                                    {accountItems.map((item) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <NavigationMenuLink
+                                                key={item.href}
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={item.href}
+                                                    className="p-2 rounded-md hover:bg-accent"
+                                                >
+                                                    <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                        <Icon className="h-4 w-4 flex-shrink-0" />
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                </Link>
+                                            </NavigationMenuLink>
+                                        );
+                                    })}
+                                </div>
+                            </NavigationMenuContent>
+                        </NavigationMenuItem>
+                    </NavigationMenuList>
+                </NavigationMenu>
+
                 <ThemeToggle />
 
                 {/* Mobile Menu */}
@@ -129,24 +253,108 @@ export function GeneratorsNavbar() {
                             <SheetTitle>Navigation</SheetTitle>
                         </SheetHeader>
                         <div className="flex flex-col space-y-4 mt-6">
-                            {navigationItems.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className={cn(
-                                            "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md",
-                                            pathname === item.href
-                                                ? "text-primary bg-accent"
-                                                : "text-muted-foreground hover:bg-accent/50"
-                                        )}
-                                    >
-                                        <Icon className="h-5 w-5" />
-                                        <span>{item.name}</span>
-                                    </Link>
-                                );
-                            })}
+                            {/* Main Tools - Alphabetized */}
+                            {mainTools
+                                .sort((a, b) =>
+                                    a.title
+                                        .replace(" Generator", "")
+                                        .replace(" Management", "")
+                                        .localeCompare(
+                                            b.title
+                                                .replace(" Generator", "")
+                                                .replace(" Management", "")
+                                        )
+                                )
+                                .map((tool) => {
+                                    const Icon = getIconComponent(tool.icon);
+                                    return (
+                                        <Link
+                                            key={tool.id}
+                                            href={tool.url.replace(
+                                                "https://app.viziersvault.com",
+                                                ""
+                                            )}
+                                            className={cn(
+                                                "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md",
+                                                pathname ===
+                                                    tool.url.replace(
+                                                        "https://app.viziersvault.com",
+                                                        ""
+                                                    )
+                                                    ? "text-primary bg-accent"
+                                                    : "text-muted-foreground hover:bg-accent/50"
+                                            )}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                            <span>
+                                                {tool.title
+                                                    .replace(" Generator", "")
+                                                    .replace(" Management", "")}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+
+                            {/* Space Tools Section */}
+                            <div className="pt-4 border-t">
+                                <h4 className="text-sm font-semibold text-muted-foreground mb-2">
+                                    Universe
+                                </h4>
+                                {spaceTools.map((tool) => {
+                                    const Icon = getIconComponent(tool.icon);
+                                    return (
+                                        <Link
+                                            key={tool.id}
+                                            href={tool.url.replace(
+                                                "https://app.viziersvault.com",
+                                                ""
+                                            )}
+                                            className={cn(
+                                                "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4",
+                                                pathname ===
+                                                    tool.url.replace(
+                                                        "https://app.viziersvault.com",
+                                                        ""
+                                                    )
+                                                    ? "text-primary bg-accent"
+                                                    : "text-muted-foreground hover:bg-accent/50"
+                                            )}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                            <span>
+                                                {tool.title
+                                                    .replace(" Generator", "")
+                                                    .replace(" Management", "")}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Account Section */}
+                            <div className="pt-4 border-t">
+                                <h4 className="text-sm font-semibold text-muted-foreground mb-2">
+                                    Account
+                                </h4>
+                                {accountItems.map((item) => {
+                                    const Icon = item.icon;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={cn(
+                                                "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4",
+                                                pathname === item.href
+                                                    ? "text-primary bg-accent"
+                                                    : "text-muted-foreground hover:bg-accent/50"
+                                            )}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                            <span>{item.name}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </SheetContent>
                 </Sheet>

@@ -9,6 +9,8 @@ export interface Tool {
         | "Alpha 2"
         | "Alpha 3"
         | "Alpha 4"
+        | "Alpha 5"
+        | "Alpha 6"
         | "Planned"
         | "TBD - A wild dream";
     icon: string;
@@ -163,7 +165,7 @@ export const tools: Tool[] = [
         title: "Star System Generator",
         description:
             "Create star systems with multiple worlds, planets, and celestial bodies.",
-        status: "TBD - A wild dream",
+        status: "Alpha 5",
         icon: "Star",
         philosophy:
             "I haven't really thought much of this one other than it'd be super cool for those Spelljammer and sci-fi campaigns.",
@@ -183,7 +185,7 @@ export const tools: Tool[] = [
         title: "Galaxy Generator",
         description:
             "Generate entire galaxies with multiple star systems and cosmic structures.",
-        status: "TBD - A wild dream",
+        status: "Alpha 6",
         icon: "Orbit",
         philosophy:
             "I just think it'd be super cool to make this with an awesome map that has a sort of super zoom from the galaxy to the star system to the planet to the continent to the region to the battle map / city / town / etc. Oh and Spelljammer and sci-fi campaigns in something like that would be dope.",

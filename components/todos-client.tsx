@@ -35,6 +35,14 @@ export default function TodosClient() {
             <div className="text-xs text-center">
                 Open another tab to see todos update in realtime!
             </div>
+            <div>
+                <db.SignedIn>
+                    <div>Signed in!</div>
+                </db.SignedIn>
+                <db.SignedOut>
+                    <div>Log in to save data to the server!</div>
+                </db.SignedOut>
+            </div>
         </div>
     );
 }

@@ -9,7 +9,7 @@ export const Footer = () => {
     return (
         <footer
             id="footer"
-            className="w-full px-4 py-24 sm:py-32"
+            className="w-full px-4 pt-24 sm:pt-32 pb-5"
         >
             <div className="p-10 bg-card border border-secondary rounded-2xl">
                 <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-12 gap-y-8">

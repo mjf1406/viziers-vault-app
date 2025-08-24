@@ -240,17 +240,25 @@ export function GeneratorsNavbar() {
                                             }
 
                                             return (
-                                                <button
-                                                    key={item.name}
-                                                    type="button"
-                                                    onClick={item.onClick}
-                                                    className="p-2 rounded-md hover:bg-accent w-full text-left"
+                                                <NavigationMenuLink
+                                                    key={item.href}
+                                                    asChild
                                                 >
-                                                    <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
-                                                        <Icon className="h-4 w-4 flex-shrink-0" />
-                                                        <span>{item.name}</span>
-                                                    </div>
-                                                </button>
+                                                    <Button
+                                                        key={item.name}
+                                                        size={"sm"}
+                                                        variant={"ghost"}
+                                                        onClick={item.onClick}
+                                                        className="p-2 rounded-md hover:bg-accent w-full text-left font-normal"
+                                                    >
+                                                        <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                            <Icon className="h-4 w-4 flex-shrink-0" />
+                                                            <span>
+                                                                {item.name}
+                                                            </span>
+                                                        </div>
+                                                    </Button>
+                                                </NavigationMenuLink>
                                             );
                                         })}
                                     </div>

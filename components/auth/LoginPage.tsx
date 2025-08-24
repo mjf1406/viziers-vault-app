@@ -17,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import GoogleCustomButton from "./GoogleCustomButton";
 
 /**
  * Hook: ensure that a userProfiles row exists for the authenticated user.
@@ -76,6 +77,9 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
+    const [oauthNonce, setOauthNonce] = useState<string>(() =>
+        crypto.randomUUID()
+    );
 
     const handleSendMagicCode = async (email: string) => {
         setIsLoading(true);
@@ -150,21 +154,46 @@ export default function LoginPage() {
 
                         {!sentEmail ? (
                             <>
-                                <GoogleLogin
-                                    onError={() =>
-                                        setError("Google login failed")
-                                    }
-                                    onSuccess={({ credential }) => {
-                                        if (!credential) {
-                                            setError(
-                                                "Google login failed: no credential returned"
-                                            );
-                                            return;
+                                <div className="w-full flex items-center justify-center google-login-wrapper">
+                                    {/* <GoogleLogin
+                                        nonce={oauthNonce}
+                                        onError={() =>
+                                            setError("Google login failed")
                                         }
-                                        const nonce = crypto.randomUUID();
-                                        handleGoogleSignIn(credential, nonce);
-                                    }}
-                                />
+                                        onSuccess={({ credential }) => {
+                                            if (!credential) {
+                                                setError(
+                                                    "Google login failed: no credential returned"
+                                                );
+                                                return;
+                                            }
+                                            // use the same nonce you passed in
+                                            handleGoogleSignIn(
+                                                credential,
+                                                oauthNonce
+                                            );
+                                            // regenerate nonce for the next attempt to avoid reuse
+                                            setOauthNonce(crypto.randomUUID());
+                                        }}
+                                    /> */}
+                                    <GoogleCustomButton
+                                        clientId={
+                                            process.env
+                                                .NEXT_PUBLIC_GOOGLE_CLIENT_ID!
+                                        }
+                                        nonce={oauthNonce}
+                                        onSuccess={(credential) => {
+                                            handleGoogleSignIn(
+                                                credential,
+                                                oauthNonce
+                                            );
+                                            setOauthNonce(crypto.randomUUID());
+                                        }}
+                                        onError={() =>
+                                            setError("Google login failed")
+                                        }
+                                    />
+                                </div>
 
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center">

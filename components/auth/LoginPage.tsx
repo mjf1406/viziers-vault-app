@@ -134,6 +134,12 @@ export default function LoginPage() {
                                                     )
                                                 }
                                                 onSuccess={({ credential }) => {
+                                                    if (!credential) {
+                                                        setError(
+                                                            "Google login failed: no credential returned"
+                                                        );
+                                                        return;
+                                                    }
                                                     const nonce =
                                                         crypto.randomUUID();
                                                     handleGoogleSignIn(

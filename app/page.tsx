@@ -1,14 +1,14 @@
 /** @format */
 // app/page.tsx
 
-import { ThemeToggle } from "@/components/theme/theme-toggle";
-import TodosClient from "@/components/todos-client";
+import AuthWrapper from "@/components/auth/AuthWrapper";
+import UserDashboard from "@/components/auth/UserDashboard";
+import PublicLanding from "@/components/PublicLanding";
 
 export default function Page() {
     return (
-        <div className="flex items-center p-5 justify-center">
-            <ThemeToggle />
-            <TodosClient />
-        </div>
+        <AuthWrapper>
+            <UserDashboard />
+        </AuthWrapper>
     );
 }

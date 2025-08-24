@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
+import db from "@/lib/db";
 
 // Helper function to get icon component from string
 const getIconComponent = (iconName: string) => {
@@ -196,40 +197,56 @@ export function GeneratorsNavbar() {
             </div>
 
             <div className="flex items-center space-x-2">
-                {/* Navigation Menu for Account */}
-                <NavigationMenu>
-                    <NavigationMenuList>
-                        <NavigationMenuItem>
-                            <NavigationMenuTrigger className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
-                                <User className="h-4 w-4" />
-                                <span className="sr-only">Account</span>
-                            </NavigationMenuTrigger>
-                            <NavigationMenuContent>
-                                <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
-                                    {accountItems.map((item) => {
-                                        const Icon = item.icon;
-                                        return (
-                                            <NavigationMenuLink
-                                                key={item.href}
-                                                asChild
-                                            >
-                                                <Link
-                                                    href={item.href}
-                                                    className="p-2 rounded-md hover:bg-accent"
+                {/* Conditional Account Navigation */}
+                <db.SignedIn>
+                    {/* Navigation Menu for Account - Authenticated Users */}
+                    <NavigationMenu>
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
+                                    <User className="h-4 w-4" />
+                                    <span className="sr-only">Account</span>
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
+                                        {accountItems.map((item) => {
+                                            const Icon = item.icon;
+                                            return (
+                                                <NavigationMenuLink
+                                                    key={item.href}
+                                                    asChild
                                                 >
-                                                    <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
-                                                        <Icon className="h-4 w-4 flex-shrink-0" />
-                                                        <span>{item.name}</span>
-                                                    </div>
-                                                </Link>
-                                            </NavigationMenuLink>
-                                        );
-                                    })}
-                                </div>
-                            </NavigationMenuContent>
-                        </NavigationMenuItem>
-                    </NavigationMenuList>
-                </NavigationMenu>
+                                                    <Link
+                                                        href={item.href}
+                                                        className="p-2 rounded-md hover:bg-accent"
+                                                    >
+                                                        <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                            <Icon className="h-4 w-4 flex-shrink-0" />
+                                                            <span>
+                                                                {item.name}
+                                                            </span>
+                                                        </div>
+                                                    </Link>
+                                                </NavigationMenuLink>
+                                            );
+                                        })}
+                                    </div>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+                </db.SignedIn>
+
+                <db.SignedOut>
+                    {/* Sign In Button - Unauthenticated Users */}
+                    <Button
+                        asChild
+                        variant="default"
+                        size="sm"
+                    >
+                        <Link href="/login">Sign In</Link>
+                    </Button>
+                </db.SignedOut>
 
                 <ThemeToggle />
 
@@ -331,30 +348,43 @@ export function GeneratorsNavbar() {
                                 })}
                             </div>
 
-                            {/* Account Section */}
-                            <div className="pt-4 border-t">
-                                <h4 className="text-sm font-semibold text-muted-foreground mb-2">
-                                    Account
-                                </h4>
-                                {accountItems.map((item) => {
-                                    const Icon = item.icon;
-                                    return (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            className={cn(
-                                                "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4",
-                                                pathname === item.href
-                                                    ? "text-primary bg-accent"
-                                                    : "text-muted-foreground hover:bg-accent/50"
-                                            )}
-                                        >
-                                            <Icon className="h-5 w-5" />
-                                            <span>{item.name}</span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
+                            {/* Conditional Account Section */}
+                            <db.SignedIn>
+                                <div className="pt-4 border-t">
+                                    <h4 className="text-sm font-semibold text-muted-foreground mb-2">
+                                        Account
+                                    </h4>
+                                    {accountItems.map((item) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                className={cn(
+                                                    "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4",
+                                                    pathname === item.href
+                                                        ? "text-primary bg-accent"
+                                                        : "text-muted-foreground hover:bg-accent/50"
+                                                )}
+                                            >
+                                                <Icon className="h-5 w-5" />
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </db.SignedIn>
+
+                            <db.SignedOut>
+                                <div className="pt-4 border-t">
+                                    <Button
+                                        asChild
+                                        className="w-full"
+                                    >
+                                        <Link href="/login">Sign In</Link>
+                                    </Button>
+                                </div>
+                            </db.SignedOut>
                         </div>
                     </SheetContent>
                 </Sheet>

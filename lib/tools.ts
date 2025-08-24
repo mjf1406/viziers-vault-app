@@ -20,6 +20,14 @@ export interface Tool {
     category: "Generator" | "Management";
     order: number;
     url: string;
+    // Mock data for dashboard
+    mockCount?: number;
+    mockRecentGenerations?: Array<{
+        id: number;
+        title: string;
+        generatedAt: string;
+        lastAccessedAt: string;
+    }>;
 }
 
 export const tools: Tool[] = [
@@ -44,6 +52,39 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 1,
         url: "https://app.viziersvault.com/magic-shop-generator",
+        mockCount: 7,
+        mockRecentGenerations: [
+            {
+                id: 5,
+                title: "Enchanted Emporium",
+                generatedAt: "2024-01-11T09:30:00Z",
+                lastAccessedAt: "2024-01-12T12:20:00Z",
+            },
+            {
+                id: 22,
+                title: "Potion Master's",
+                generatedAt: "2024-01-10T14:20:00Z",
+                lastAccessedAt: "2024-01-11T17:45:00Z",
+            },
+            {
+                id: 23,
+                title: "Scroll Scribe",
+                generatedAt: "2024-01-09T11:15:00Z",
+                lastAccessedAt: "2024-01-10T13:30:00Z",
+            },
+            {
+                id: 24,
+                title: "Wand Workshop",
+                generatedAt: "2024-01-08T16:40:00Z",
+                lastAccessedAt: "2024-01-09T10:25:00Z",
+            },
+            {
+                id: 25,
+                title: "Artifact Dealer",
+                generatedAt: "2024-01-07T13:50:00Z",
+                lastAccessedAt: "2024-01-08T15:10:00Z",
+            },
+        ],
     },
     {
         id: "spellbook-generator",
@@ -65,6 +106,39 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 2,
         url: "https://app.viziersvault.com/spellbook-generator",
+        mockCount: 5,
+        mockRecentGenerations: [
+            {
+                id: 3,
+                title: "Arcane Tome",
+                generatedAt: "2024-01-13T11:20:00Z",
+                lastAccessedAt: "2024-01-14T18:30:00Z",
+            },
+            {
+                id: 14,
+                title: "Necromancer's Grimoire",
+                generatedAt: "2024-01-12T13:45:00Z",
+                lastAccessedAt: "2024-01-13T20:15:00Z",
+            },
+            {
+                id: 15,
+                title: "Healer's Manual",
+                generatedAt: "2024-01-11T16:30:00Z",
+                lastAccessedAt: "2024-01-12T11:40:00Z",
+            },
+            {
+                id: 16,
+                title: "Elemental Spells",
+                generatedAt: "2024-01-10T09:20:00Z",
+                lastAccessedAt: "2024-01-11T14:50:00Z",
+            },
+            {
+                id: 17,
+                title: "Divine Prayers",
+                generatedAt: "2024-01-09T14:15:00Z",
+                lastAccessedAt: "2024-01-10T12:30:00Z",
+            },
+        ],
     },
     {
         id: "encounter-generator",
@@ -87,6 +161,39 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 3,
         url: "https://app.viziersvault.com/encounter-generator",
+        mockCount: 8,
+        mockRecentGenerations: [
+            {
+                id: 2,
+                title: "Goblin Ambush",
+                generatedAt: "2024-01-14T16:45:00Z",
+                lastAccessedAt: "2024-01-15T09:15:00Z",
+            },
+            {
+                id: 10,
+                title: "Bandit Raid",
+                generatedAt: "2024-01-13T12:30:00Z",
+                lastAccessedAt: "2024-01-14T10:20:00Z",
+            },
+            {
+                id: 11,
+                title: "Dragon Attack",
+                generatedAt: "2024-01-12T15:20:00Z",
+                lastAccessedAt: "2024-01-13T08:45:00Z",
+            },
+            {
+                id: 12,
+                title: "Undead Horde",
+                generatedAt: "2024-01-11T18:10:00Z",
+                lastAccessedAt: "2024-01-12T14:30:00Z",
+            },
+            {
+                id: 13,
+                title: "Merchant Ambush",
+                generatedAt: "2024-01-10T10:45:00Z",
+                lastAccessedAt: "2024-01-11T16:20:00Z",
+            },
+        ],
     },
     {
         id: "party-management",
@@ -109,6 +216,8 @@ export const tools: Tool[] = [
         category: "Management",
         order: 4,
         url: "https://app.viziersvault.com/parties",
+        mockCount: 0,
+        mockRecentGenerations: [],
     },
     {
         id: "battle-map-generator",
@@ -132,6 +241,39 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 5,
         url: "https://app.viziersvault.com/battle-map-generator",
+        mockCount: 12,
+        mockRecentGenerations: [
+            {
+                id: 1,
+                title: "Ancient Ruins",
+                generatedAt: "2024-01-15T10:30:00Z",
+                lastAccessedAt: "2024-01-15T14:20:00Z",
+            },
+            {
+                id: 6,
+                title: "Dragon's Lair",
+                generatedAt: "2024-01-14T08:15:00Z",
+                lastAccessedAt: "2024-01-14T16:30:00Z",
+            },
+            {
+                id: 7,
+                title: "Forest Clearing",
+                generatedAt: "2024-01-13T14:20:00Z",
+                lastAccessedAt: "2024-01-13T19:45:00Z",
+            },
+            {
+                id: 8,
+                title: "Underground Cavern",
+                generatedAt: "2024-01-12T11:30:00Z",
+                lastAccessedAt: "2024-01-12T17:20:00Z",
+            },
+            {
+                id: 9,
+                title: "Castle Courtyard",
+                generatedAt: "2024-01-11T09:45:00Z",
+                lastAccessedAt: "2024-01-11T15:10:00Z",
+            },
+        ],
     },
     {
         id: "world-generator",
@@ -159,6 +301,27 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 6,
         url: "https://app.viziersvault.com/world-generator",
+        mockCount: 3,
+        mockRecentGenerations: [
+            {
+                id: 4,
+                title: "Floating Islands",
+                generatedAt: "2024-01-12T13:10:00Z",
+                lastAccessedAt: "2024-01-13T15:45:00Z",
+            },
+            {
+                id: 18,
+                title: "Desert Kingdom",
+                generatedAt: "2024-01-11T10:30:00Z",
+                lastAccessedAt: "2024-01-12T13:20:00Z",
+            },
+            {
+                id: 19,
+                title: "Frozen Wasteland",
+                generatedAt: "2024-01-10T15:45:00Z",
+                lastAccessedAt: "2024-01-11T09:15:00Z",
+            },
+        ],
     },
     {
         id: "star-system-generator",
@@ -179,6 +342,8 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 7,
         url: "https://app.viziersvault.com/star-system-generator",
+        mockCount: 0,
+        mockRecentGenerations: [],
     },
     {
         id: "galaxy-generator",
@@ -199,6 +364,21 @@ export const tools: Tool[] = [
         category: "Generator",
         order: 8,
         url: "https://app.viziersvault.com/galaxy-generator",
+        mockCount: 2,
+        mockRecentGenerations: [
+            {
+                id: 20,
+                title: "Andromeda Sector",
+                generatedAt: "2024-01-11T12:20:00Z",
+                lastAccessedAt: "2024-01-12T16:30:00Z",
+            },
+            {
+                id: 21,
+                title: "Pleiades Cluster",
+                generatedAt: "2024-01-10T08:45:00Z",
+                lastAccessedAt: "2024-01-11T11:20:00Z",
+            },
+        ],
     },
 ];
 
@@ -221,4 +401,9 @@ export const getAvailableTools = (): Tool[] => {
 
 export const getToolsInOrder = (): Tool[] => {
     return tools.sort((a, b) => a.order - b.order);
+};
+
+// New helper function to get tools with mock data for dashboard
+export const getToolsWithMockData = (): Tool[] => {
+    return getAvailableTools().filter((tool) => tool.mockCount !== undefined);
 };

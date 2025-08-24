@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/nav/Footer";
+import GoogleClientProvider from "@/components/auth/GoogleClientProvider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -35,16 +36,19 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <Header />
-                    <div className="min-h-screen">{children}</div>
-                    <Footer />
-                </ThemeProvider>
+                <GoogleClientProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <Header />
+                        <div className="min-h-screen">{children}</div>
+                        <Footer />
+                    </ThemeProvider>
+                </GoogleClientProvider>
+                ;
             </body>
         </html>
     );

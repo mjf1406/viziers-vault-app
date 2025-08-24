@@ -2,6 +2,7 @@
 
 "use client";
 
+import React, { useEffect, useState } from "react";
 import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,82 +22,101 @@ import {
     Globe,
     Star,
     Store,
-    Clock,
-    Plus,
     Table,
+    Plus,
+    Swords,
+    Orbit,
+    Users,
 } from "lucide-react";
-import { getToolsWithMockData } from "@/lib/tools";
+
+type Tool = {
+    id: string;
+    title: string;
+    icon: string;
+    slug?: string;
+};
+
+type Generation = {
+    id: string | number;
+    type: string;
+    title: string;
+    description?: string;
+    generatedAt: string;
+    lastAccessedAt: string;
+    preview?: string;
+    toolId?: string;
+};
 
 export default function UserDashboard() {
     const user = db.useUser();
 
-    const handleSignOut = () => {
-        db.auth.signOut();
-    };
+    const [tools, setTools] = useState<Tool[] | null>(null);
+    const [recent, setRecent] = useState<Generation[] | null>(null);
+    const [perToolRecent, setPerToolRecent] = useState<Record<
+        string,
+        Generation[]
+    > | null>(null);
 
-    // Mock recent generations data - in a real app, this would come from your database
-    const allRecentGenerations = [
-        {
-            id: 1,
-            type: "battle-map",
-            title: "Ancient Ruins",
-            description: "Underground temple with hidden passages",
-            generatedAt: "2024-01-15T10:30:00Z",
-            lastAccessedAt: "2024-01-15T14:20:00Z",
-            preview: "Map Preview",
-        },
-        {
-            id: 2,
-            type: "encounter",
-            title: "Goblin Ambush",
-            description: "Forest encounter with 5 enemies",
-            generatedAt: "2024-01-14T16:45:00Z",
-            lastAccessedAt: "2024-01-15T09:15:00Z",
-            preview: "CR 3",
-        },
-        {
-            id: 3,
-            type: "spellbook",
-            title: "Arcane Tome",
-            description: "15 spells, 3 cantrips",
-            generatedAt: "2024-01-13T11:20:00Z",
-            lastAccessedAt: "2024-01-14T18:30:00Z",
-            preview: "Rare",
-        },
-        {
-            id: 4,
-            type: "world",
-            title: "Floating Islands",
-            description: "The floating islands of Aetheria",
-            generatedAt: "2024-01-12T13:10:00Z",
-            lastAccessedAt: "2024-01-13T15:45:00Z",
-            preview: "High Magic",
-        },
-        {
-            id: 5,
-            type: "magic-shop",
-            title: "Enchanted Emporium",
-            description: "Madame Mystique's shop",
-            generatedAt: "2024-01-11T09:30:00Z",
-            lastAccessedAt: "2024-01-12T12:20:00Z",
-            preview: "Trusted",
-        },
-    ];
+    useEffect(() => {
+        let mounted = true;
 
-    // Get tools with mock data from tools.ts
-    const toolsWithMockData = getToolsWithMockData();
+        async function load() {
+            try {
+                const [toolsRes, recentRes] = await Promise.all([
+                    fetch("/api/tools").then((r) => (r.ok ? r.json() : [])),
+                    fetch("/api/generations/recent?limit=5").then((r) =>
+                        r.ok ? r.json() : []
+                    ),
+                ]);
 
-    // Helper function to get icon component from string
+                if (!mounted) return;
+
+                setTools(toolsRes || []);
+                setRecent(recentRes || []);
+
+                const perTool: Record<string, Generation[]> = {};
+                await Promise.all(
+                    (toolsRes || []).map(async (tool: Tool) => {
+                        try {
+                            const res = await fetch(
+                                `/api/tools/${encodeURIComponent(
+                                    tool.id
+                                )}/recent?limit=5`
+                            );
+                            perTool[tool.id] = res.ok ? await res.json() : [];
+                        } catch {
+                            perTool[tool.id] = [];
+                        }
+                    })
+                );
+
+                if (!mounted) return;
+                setPerToolRecent(perTool);
+            } catch (err) {
+                console.error("Failed to load dashboard data", err);
+                setTools([]);
+                setRecent([]);
+                setPerToolRecent({});
+            }
+        }
+
+        load();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
     const getIconComponent = (iconName: string) => {
         const iconMap: { [key: string]: any } = {
             Map,
             Store,
             BookOpen,
-            Swords: Sword,
+            Swords,
+            Sword,
             Globe,
             Star,
-            Orbit: Star, // Using Star as fallback for Orbit
-            Users: User,
+            Orbit,
+            Users,
         };
         return iconMap[iconName] || Map;
     };
@@ -111,7 +131,7 @@ export default function UserDashboard() {
     };
 
     return (
-        <div className="container mx-auto py-6 space-y-8">
+        <div className="container mx-auto py-6 space-y-4">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div className="space-y-1">
@@ -122,17 +142,6 @@ export default function UserDashboard() {
                         Your personal RPG toolkit dashboard
                     </p>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <ThemeToggle />
-                    <Button
-                        variant="outline"
-                        onClick={handleSignOut}
-                        className="flex items-center space-x-2"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        <span>Sign Out</span>
-                    </Button>
-                </div>
             </div>
 
             {/* All Recent Generations Table */}
@@ -142,70 +151,106 @@ export default function UserDashboard() {
                         <Table className="h-5 w-5" />
                         <span>5 Most Recently Accessed Generations</span>
                     </CardTitle>
-                    <CardDescription>
-                        Your latest creations across all generators
-                    </CardDescription>
+                    <CardDescription>Your latest creations</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b">
-                                    <th className="text-left p-2 font-medium">
-                                        Title
-                                    </th>
-                                    <th className="text-left p-2 font-medium">
-                                        Type
-                                    </th>
-                                    <th className="text-left p-2 font-medium">
-                                        Generated
-                                    </th>
-                                    <th className="text-left p-2 font-medium">
-                                        Last Accessed
-                                    </th>
-                                    <th className="text-left p-2 font-medium">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {allRecentGenerations.slice(0, 5).map((gen) => (
-                                    <tr
-                                        key={gen.id}
-                                        className="border-b hover:bg-muted/50"
-                                    >
-                                        <td className="p-2 font-medium">
-                                            {gen.title}
-                                        </td>
-                                        <td className="p-2 capitalize">
-                                            {gen.type.replace("-", " ")}
-                                        </td>
-                                        <td className="p-2 text-muted-foreground">
-                                            {formatDate(gen.generatedAt)}
-                                        </td>
-                                        <td className="p-2 text-muted-foreground">
-                                            {formatDate(gen.lastAccessedAt)}
-                                        </td>
-                                        <td className="p-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
+                        {recent === null ? (
+                            <div className="p-4 text-sm text-muted-foreground">
+                                Loading...
+                            </div>
+                        ) : recent.length === 0 ? (
+                            <div className="p-6">
+                                <div className="text-sm text-muted-foreground mb-3">
+                                    No recent generations yet — try creating
+                                    something new.
+                                </div>
+                                <div className="grid grid-cols-6 gap-4">
+                                    {(tools || []).map((t) => {
+                                        const Icon = getIconComponent(t.icon);
+                                        return (
+                                            <div
+                                                key={t.id}
+                                                className="flex flex-col items-center justify-center
+                                   text-center p-3 border rounded"
                                             >
-                                                View
-                                            </Button>
-                                        </td>
+                                                <Icon className="h-6 w-6 mb-2" />
+                                                <div className="text-xs text-muted-foreground">
+                                                    {t.title.replace(
+                                                        " Generator",
+                                                        ""
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b">
+                                        <th className="text-left p-2 font-medium">
+                                            Title
+                                        </th>
+                                        <th className="text-left p-2 font-medium">
+                                            Type
+                                        </th>
+                                        <th className="text-left p-2 font-medium">
+                                            Generated
+                                        </th>
+                                        <th className="text-left p-2 font-medium">
+                                            Last Accessed
+                                        </th>
+                                        <th className="text-left p-2 font-medium">
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {recent.map((gen) => (
+                                        <tr
+                                            key={gen.id}
+                                            className="border-b hover:bg-muted/50"
+                                        >
+                                            <td className="p-2 font-medium">
+                                                {gen.title}
+                                            </td>
+                                            <td className="p-2 capitalize">
+                                                {gen.type.replace("-", " ")}
+                                            </td>
+                                            <td className="p-2 text-muted-foreground">
+                                                {formatDate(gen.generatedAt)}
+                                            </td>
+                                            <td className="p-2 text-muted-foreground">
+                                                {formatDate(gen.lastAccessedAt)}
+                                            </td>
+                                            <td className="p-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                >
+                                                    View
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Generator Cards with Recent Content Tables */}
+            {/* Generator Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {toolsWithMockData.map((tool) => {
+                {(tools || []).map((tool) => {
                     const Icon = getIconComponent(tool.icon);
+                    const recentForTool =
+                        perToolRecent && perToolRecent[tool.id]
+                            ? perToolRecent[tool.id]
+                            : [];
+
                     return (
                         <Card key={tool.id}>
                             <CardHeader>
@@ -219,19 +264,18 @@ export default function UserDashboard() {
                                         </span>
                                     </div>
                                     <span className="text-sm font-normal text-muted-foreground">
-                                        {tool.mockCount}
+                                        {recentForTool.length}
                                     </span>
                                 </CardTitle>
                                 <CardDescription>
-                                    {tool.mockCount && tool.mockCount > 0
+                                    {recentForTool.length > 0
                                         ? `5 most recently accessed ${tool.title.toLowerCase()}`
                                         : `No ${tool.title.toLowerCase()} yet`}
                                 </CardDescription>
                             </CardHeader>
+
                             <CardContent className="space-y-3">
-                                {tool.mockCount &&
-                                tool.mockCount > 0 &&
-                                tool.mockRecentGenerations ? (
+                                {recentForTool.length > 0 ? (
                                     <div className="space-y-2">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-xs">
@@ -249,7 +293,7 @@ export default function UserDashboard() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {tool.mockRecentGenerations.map(
+                                                    {recentForTool.map(
                                                         (gen) => (
                                                             <tr
                                                                 key={gen.id}
@@ -279,21 +323,32 @@ export default function UserDashboard() {
                                             variant="outline"
                                             size="sm"
                                         >
-                                            View All {tool.mockCount}
+                                            View All {recentForTool.length}
                                         </Button>
                                     </div>
                                 ) : (
-                                    <Button
-                                        className="w-full"
-                                        variant="outline"
-                                    >
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Create First{" "}
-                                        {tool.title
-                                            .replace(" Generator", "")
-                                            .replace(" Management", "")
-                                            .slice(0, -1)}
-                                    </Button>
+                                    <div className="flex flex-col items-center justify-center py-6">
+                                        <Icon className="h-8 w-8 mb-3 text-muted-foreground" />
+                                        <div className="text-sm mb-3 text-muted-foreground">
+                                            No{" "}
+                                            {tool.title.replace(
+                                                " Generator",
+                                                ""
+                                            )}{" "}
+                                            yet
+                                        </div>
+                                        <Button
+                                            className="w-full"
+                                            variant="outline"
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Create First{" "}
+                                            {tool.title
+                                                .replace(" Generator", "")
+                                                .replace(" Management", "")
+                                                .slice(0, -1)}
+                                        </Button>
+                                    </div>
                                 )}
                             </CardContent>
                         </Card>
@@ -322,7 +377,7 @@ export default function UserDashboard() {
                             variant="outline"
                             className="h-20 flex-col space-y-2"
                         >
-                            <Sword className="h-5 w-5" />
+                            <Swords className="h-5 w-5" />
                             <span className="text-sm">New Encounter</span>
                         </Button>
                         <Button

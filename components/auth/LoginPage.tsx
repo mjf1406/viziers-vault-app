@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -16,17 +16,66 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-// Replace these with your actual Google OAuth credentials
-const GOOGLE_CLIENT_ID =
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "REPLACE_ME";
-const GOOGLE_CLIENT_NAME =
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME ?? "REPLACE_ME";
+/**
+ * Hook: ensure that a userProfiles row exists for the authenticated user.
+ * Runs inside React component lifecycle so it can call hooks safely.
+ */
+function useEnsureUserProfile() {
+    const { user } = db.useAuth();
+
+    useEffect(() => {
+        if (!user?.id) return;
+
+        const rowId = user.id;
+        let cancelled = false;
+
+        const createProfile = async () => {
+            try {
+                // Attempt to create the profile; if it already exists the SDK may throw.
+                await db.transact(
+                    db.tx.userProfiles[rowId]
+                        .create({
+                            joined: new Date(),
+                            premium: false,
+                        })
+                        .link({ $user: user.id })
+                );
+            } catch (err: any) {
+                // ignore "already exists" type errors, but log others for debugging
+                // Adjust detection depending on your DB SDK's error shape if needed
+                if (err.message.includes("Creating entities that exist")) {
+                    console.warn(err);
+                } else {
+                    console.error(
+                        "useEnsureUserProfile: create profile error:",
+                        err
+                    );
+                    throw err;
+                }
+            }
+        };
+
+        createProfile();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.id]);
+}
+
+// Replace with your environment variable
+const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
 
 export default function LoginPage() {
+    // call hook at top-level of component so it's valid
+    useEnsureUserProfile();
+
     const [sentEmail, setSentEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const router = useRouter();
 
     const handleSendMagicCode = async (email: string) => {
         setIsLoading(true);
@@ -36,7 +85,7 @@ export default function LoginPage() {
             await db.auth.sendMagicCode({ email });
             setSentEmail(email);
         } catch (err: any) {
-            setError(err.body?.message || "Failed to send magic code");
+            setError(err?.body?.message || "Failed to send magic code");
         } finally {
             setIsLoading(false);
         }
@@ -48,8 +97,12 @@ export default function LoginPage() {
 
         try {
             await db.auth.signInWithMagicCode({ email: sentEmail, code });
+
+            // user profile creation will run in useEnsureUserProfile when auth state updates
+            router.push("/");
         } catch (err: any) {
-            setError(err.body?.message || "Invalid code");
+            console.error("Magic Link Verification error:", err);
+            setError(err?.body?.message || "Invalid code");
         } finally {
             setIsLoading(false);
         }
@@ -65,125 +118,80 @@ export default function LoginPage() {
                 idToken: credential,
                 nonce,
             });
+
+            // user profile creation will run in useEnsureUserProfile when auth state updates
+            router.push("/");
         } catch (err: any) {
-            setError(err.body?.message || "Google sign-in failed");
+            console.error("Google sign-in error:", err);
+            setError(err?.body?.message || "Google sign-in failed");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-                <div className="absolute inset-0 bg-zinc-900" />
-                <div className="relative z-20 flex items-center text-lg font-medium">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2 h-6 w-6"
-                    >
-                        <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-                    </svg>
-                    Vizier's Vault
-                </div>
-                <div className="relative z-20 mt-auto">
-                    <blockquote className="space-y-2">
-                        <p className="text-lg">
-                            "This library has saved me countless hours of work
-                            and helped me deliver stunning designs to my clients
-                            faster than ever before."
-                        </p>
-                        <footer className="text-sm">Sofia Davis</footer>
-                    </blockquote>
-                </div>
-            </div>
-            <div className="lg:p-8">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <Card>
-                        <CardHeader className="space-y-1">
-                            <CardTitle className="text-2xl text-center">
-                                Welcome to Vizier's Vault
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                Sign in to access your account
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid gap-4">
-                            {error && (
-                                <div className="p-3 text-sm border border-destructive/50 text-destructive rounded-md bg-destructive/10">
-                                    {error}
+        <div className="container relative min-h-screen flex-col items-center justify-center flex w-full mx-auto">
+            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                <Card>
+                    <CardHeader className="space-y-1">
+                        <CardTitle className="text-2xl text-center">
+                            Welcome to Vizier's Vault
+                        </CardTitle>
+                        <CardDescription className="text-center">
+                            Sign in to access your account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4">
+                        {error && (
+                            <div className="p-3 text-sm border border-destructive/50 text-destructive rounded-md bg-destructive/10">
+                                {error}
+                            </div>
+                        )}
+
+                        {!sentEmail ? (
+                            <>
+                                <GoogleLogin
+                                    onError={() =>
+                                        setError("Google login failed")
+                                    }
+                                    onSuccess={({ credential }) => {
+                                        if (!credential) {
+                                            setError(
+                                                "Google login failed: no credential returned"
+                                            );
+                                            return;
+                                        }
+                                        const nonce = crypto.randomUUID();
+                                        handleGoogleSignIn(credential, nonce);
+                                    }}
+                                />
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <Separator className="w-full" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                            Or continue with
+                                        </span>
+                                    </div>
                                 </div>
-                            )}
 
-                            {!sentEmail ? (
-                                <>
-                                    {/* Google OAuth */}
-                                    <div className="grid gap-4">
-                                        <GoogleOAuthProvider
-                                            clientId={GOOGLE_CLIENT_ID}
-                                        >
-                                            <GoogleLogin
-                                                onError={() =>
-                                                    setError(
-                                                        "Google login failed"
-                                                    )
-                                                }
-                                                onSuccess={({ credential }) => {
-                                                    if (!credential) {
-                                                        setError(
-                                                            "Google login failed: no credential returned"
-                                                        );
-                                                        return;
-                                                    }
-                                                    const nonce =
-                                                        crypto.randomUUID();
-                                                    handleGoogleSignIn(
-                                                        credential,
-                                                        nonce
-                                                    );
-                                                }}
-                                                theme="outline"
-                                                size="large"
-                                                text="signin_with"
-                                                shape="rectangular"
-                                                width="100%"
-                                            />
-                                        </GoogleOAuthProvider>
-                                    </div>
-
-                                    <div className="relative">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <Separator className="w-full" />
-                                        </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-background px-2 text-muted-foreground">
-                                                Or continue with
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Magic Link Form */}
-                                    <MagicLinkForm
-                                        onSendEmail={handleSendMagicCode}
-                                        isLoading={isLoading}
-                                    />
-                                </>
-                            ) : (
-                                <MagicCodeForm
-                                    sentEmail={sentEmail}
-                                    onVerifyCode={handleVerifyMagicCode}
-                                    onBack={() => setSentEmail("")}
+                                <MagicLinkForm
+                                    onSendEmail={handleSendMagicCode}
                                     isLoading={isLoading}
                                 />
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
+                            </>
+                        ) : (
+                            <MagicCodeForm
+                                sentEmail={sentEmail}
+                                onVerifyCode={handleVerifyMagicCode}
+                                onBack={() => setSentEmail("")}
+                                isLoading={isLoading}
+                            />
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
@@ -200,8 +208,9 @@ function MagicLinkForm({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (email.trim()) {
-            onSendEmail(email.trim());
+        const trimmed = email.trim();
+        if (trimmed) {
+            onSendEmail(trimmed);
         }
     };
 
@@ -258,8 +267,9 @@ function MagicCodeForm({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (code.trim()) {
-            onVerifyCode(code.trim());
+        const trimmed = code.trim();
+        if (trimmed) {
+            onVerifyCode(trimmed);
         }
     };
 

@@ -20,6 +20,7 @@ import {
     User,
     Settings,
     ChevronDown,
+    LogOut,
 } from "lucide-react";
 import {
     Sheet,
@@ -84,6 +85,12 @@ const accountItems = [
         name: "Settings",
         href: "/settings",
         icon: Settings,
+    },
+    // Action item (no href) — will call db.auth.signOut()
+    {
+        name: "Sign Out",
+        icon: LogOut,
+        onClick: () => db.auth.signOut(),
     },
 ];
 
@@ -211,23 +218,39 @@ export function GeneratorsNavbar() {
                                     <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
                                         {accountItems.map((item) => {
                                             const Icon = item.icon;
-                                            return (
-                                                <NavigationMenuLink
-                                                    key={item.href}
-                                                    asChild
-                                                >
-                                                    <Link
-                                                        href={item.href}
-                                                        className="p-2 rounded-md hover:bg-accent"
+                                            if (item.href) {
+                                                return (
+                                                    <NavigationMenuLink
+                                                        key={item.href}
+                                                        asChild
                                                     >
-                                                        <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
-                                                            <Icon className="h-4 w-4 flex-shrink-0" />
-                                                            <span>
-                                                                {item.name}
-                                                            </span>
-                                                        </div>
-                                                    </Link>
-                                                </NavigationMenuLink>
+                                                        <Link
+                                                            href={item.href}
+                                                            className="p-2 rounded-md hover:bg-accent"
+                                                        >
+                                                            <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                                <Icon className="h-4 w-4 flex-shrink-0" />
+                                                                <span>
+                                                                    {item.name}
+                                                                </span>
+                                                            </div>
+                                                        </Link>
+                                                    </NavigationMenuLink>
+                                                );
+                                            }
+
+                                            return (
+                                                <button
+                                                    key={item.name}
+                                                    type="button"
+                                                    onClick={item.onClick}
+                                                    className="p-2 rounded-md hover:bg-accent w-full text-left"
+                                                >
+                                                    <div className="flex items-center justify-center space-x-2 whitespace-nowrap">
+                                                        <Icon className="h-4 w-4 flex-shrink-0" />
+                                                        <span>{item.name}</span>
+                                                    </div>
+                                                </button>
                                             );
                                         })}
                                     </div>
@@ -356,6 +379,22 @@ export function GeneratorsNavbar() {
                                     </h4>
                                     {accountItems.map((item) => {
                                         const Icon = item.icon;
+                                        if (item.onClick) {
+                                            return (
+                                                <button
+                                                    key={item.name}
+                                                    type="button"
+                                                    onClick={item.onClick}
+                                                    className={cn(
+                                                        "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4 text-muted-foreground hover:bg-accent/50"
+                                                    )}
+                                                >
+                                                    <Icon className="h-5 w-5" />
+                                                    <span>{item.name}</span>
+                                                </button>
+                                            );
+                                        }
+
                                         return (
                                             <Link
                                                 key={item.href}

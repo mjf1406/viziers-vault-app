@@ -13,15 +13,75 @@ const _schema = i.schema({
         $users: i.entity({
             email: i.string().unique().indexed().optional(),
             premium: i.boolean(),
+            joined: i.date(),
         }),
-        "dnd5e-magicItems": i.entity({}),
+        settings: i.entity({}),
+        userProfiles: i.entity({
+            joined: i.date().optional(),
+            premium: i.boolean().optional(),
+        }),
+
+        dnd5e_magicItems: i.entity({}),
+        dnd5e_spells: i.entity({}),
+        dnd5e_bestiary: i.entity({}),
+
         todos: i.entity({
             createdAt: i.number().optional(),
             done: i.boolean().optional(),
             text: i.string().optional(),
         }),
+
+        battleMaps: i.entity({}),
+        parties: i.entity({}),
+        encounters: i.entity({}),
+        spellbooks: i.entity({}),
+        magicShops: i.entity({}),
+        worlds: i.entity({}),
+        starSystems: i.entity({}),
+        galaxies: i.entity({}),
     },
-    links: {},
+    links: {
+        // example links (if you already have these, keep or merge with yours)
+        // profileUser: { forward: { on:'profiles', has:'one', label:'$user' }, reverse: { on:'$users', has:'one', label:'profile' } },
+
+        // One-to-many from $users -> each new entity
+        battleMapsUser: {
+            forward: { on: "battleMaps", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "battleMaps" },
+        },
+        partiesUser: {
+            forward: { on: "parties", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "parties" },
+        },
+        encountersUser: {
+            forward: { on: "encounters", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "encounters" },
+        },
+        spellbooksUser: {
+            forward: { on: "spellbooks", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "spellbooks" },
+        },
+        magicShopsUser: {
+            forward: { on: "magicShops", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "magicShops" },
+        },
+        worldsUser: {
+            forward: { on: "worlds", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "worlds" },
+        },
+        starSystemsUser: {
+            forward: { on: "starSystems", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "starSystems" },
+        },
+        galaxiesUser: {
+            forward: { on: "galaxies", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "galaxies" },
+        },
+        userProfilesUser: {
+            forward: { on: "userProfiles", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "one", label: "profile" },
+        },
+    },
     rooms: {
         todos: {
             presence: i.entity({}),

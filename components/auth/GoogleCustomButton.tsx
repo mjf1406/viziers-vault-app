@@ -72,14 +72,10 @@ export default function GoogleShadcnGoogleButton({
                 throw new Error("Google Identity SDK not ready");
             }
 
-            // show spinner while waiting for the prompt moment
             setIsPrompting(true);
 
-            // pass a moment callback to prompt() so we know when the UI shows / is skipped
             (window as any).google.accounts.id.prompt((notification: any) => {
                 try {
-                    // If the prompt UI displayed (One Tap shown in top-right),
-                    // stop the spinner
                     if (
                         typeof notification.isDisplayed === "function" &&
                         notification.isDisplayed()
@@ -88,7 +84,6 @@ export default function GoogleShadcnGoogleButton({
                         return;
                     }
 
-                    // If not displayed or skipped/dismissed, also stop spinner
                     if (
                         (typeof notification.isNotDisplayed === "function" &&
                             notification.isNotDisplayed()) ||
@@ -100,7 +95,6 @@ export default function GoogleShadcnGoogleButton({
                         setIsPrompting(false);
                     }
                 } catch (e) {
-                    // ensure spinner is cleared on unexpected errors
                     setIsPrompting(false);
                 }
             });
@@ -144,7 +138,6 @@ export default function GoogleShadcnGoogleButton({
 
             <span className="flex-1 text-left">Sign in with Google</span>
 
-            {/* simple inline spinner on the right while prompting */}
             {isPrompting && (
                 <span className="flex-none w-5 h-5 ml-2">
                     <svg

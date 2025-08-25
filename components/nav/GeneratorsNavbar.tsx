@@ -41,7 +41,6 @@ import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
 
-// Helper function to get icon component from string
 const getIconComponent = (iconName: string) => {
     const iconMap: { [key: string]: any } = {
         Map,
@@ -56,10 +55,8 @@ const getIconComponent = (iconName: string) => {
     return iconMap[iconName] || Map;
 };
 
-// Get tools and filter out TBD items
 const availableTools = getAvailableTools();
 
-// Separate tools into categories
 const mainTools = availableTools.filter(
     (tool) =>
         ![
@@ -86,7 +83,6 @@ const accountItems = [
         href: "/settings",
         icon: Settings,
     },
-    // Action item (no href) — will call db.auth.signOut()
     {
         name: "Sign Out",
         icon: LogOut,
@@ -218,8 +214,6 @@ export function GeneratorsNavbar() {
                                     <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
                                         {accountItems.map((item) => {
                                             const Icon = item.icon;
-                                            // Use a stable unique key (item.name)
-                                            // and avoid repeating keys on inner elements.
                                             if (item.href) {
                                                 return (
                                                     <NavigationMenuLink

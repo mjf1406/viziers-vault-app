@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/nav/Footer";
 import GoogleClientProvider from "@/components/auth/GoogleClientProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
                     >
                         <Header />
                         <div className="min-h-screen">{children}</div>
+                        <Toaster richColors />
                         <Footer />
                     </ThemeProvider>
                 </GoogleClientProvider>

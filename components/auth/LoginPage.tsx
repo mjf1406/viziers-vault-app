@@ -19,10 +19,6 @@ import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
 
-/**
- * Hook: ensure that a userProfiles row exists for the authenticated user.
- * Runs inside React component lifecycle so it can call hooks safely.
- */
 function useEnsureUserProfile() {
     const { user } = db.useAuth();
 
@@ -34,7 +30,6 @@ function useEnsureUserProfile() {
 
         const createProfile = async () => {
             try {
-                // Attempt to create the profile; if it already exists the SDK may throw.
                 await db.transact(
                     db.tx.userProfiles[rowId]
                         .create({
@@ -44,8 +39,6 @@ function useEnsureUserProfile() {
                         .link({ $user: user.id })
                 );
             } catch (err: any) {
-                // ignore "already exists" type errors, but log others for debugging
-                // Adjust detection depending on your DB SDK's error shape if needed
                 if (err.message.includes("Creating entities that exist")) {
                     console.warn(err);
                 } else {
@@ -66,11 +59,9 @@ function useEnsureUserProfile() {
     }, [user?.id]);
 }
 
-// Replace with your environment variable
 const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
 
 export default function LoginPage() {
-    // call hook at top-level of component so it's valid
     useEnsureUserProfile();
 
     const [sentEmail, setSentEmail] = useState("");
@@ -101,8 +92,6 @@ export default function LoginPage() {
 
         try {
             await db.auth.signInWithMagicCode({ email: sentEmail, code });
-
-            // user profile creation will run in useEnsureUserProfile when auth state updates
             router.push("/");
         } catch (err: any) {
             console.error("Magic Link Verification error:", err);
@@ -122,8 +111,6 @@ export default function LoginPage() {
                 idToken: credential,
                 nonce,
             });
-
-            // user profile creation will run in useEnsureUserProfile when auth state updates
             router.push("/");
         } catch (err: any) {
             console.error("Google sign-in error:", err);
@@ -155,27 +142,6 @@ export default function LoginPage() {
                         {!sentEmail ? (
                             <>
                                 <div className="w-full flex items-center justify-center google-login-wrapper">
-                                    {/* <GoogleLogin
-                                        nonce={oauthNonce}
-                                        onError={() =>
-                                            setError("Google login failed")
-                                        }
-                                        onSuccess={({ credential }) => {
-                                            if (!credential) {
-                                                setError(
-                                                    "Google login failed: no credential returned"
-                                                );
-                                                return;
-                                            }
-                                            // use the same nonce you passed in
-                                            handleGoogleSignIn(
-                                                credential,
-                                                oauthNonce
-                                            );
-                                            // regenerate nonce for the next attempt to avoid reuse
-                                            setOauthNonce(crypto.randomUUID());
-                                        }}
-                                    /> */}
                                     <GoogleCustomButton
                                         clientId={
                                             process.env

@@ -2,8 +2,10 @@
 
 # InstantDB CLI Commands
 
-## Publish Schema
+## Push Schema
 
 npx instant-cli@latest push schema
 
-## SOMETHING
+## Push Permissions
+
+npx instant-cli@latest push perms

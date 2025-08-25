@@ -2,6 +2,8 @@
 
 // Docs: https://www.instantdb.com/docs/modeling-data
 
+// instant.schema.ts
+
 import { i } from "@instantdb/react";
 
 const _schema = i.schema({
@@ -32,7 +34,13 @@ const _schema = i.schema({
         }),
 
         battleMaps: i.entity({}),
-        parties: i.entity({}),
+        parties: i.entity({
+            name: i.string(),
+            pcs: i.json(), // [{l: 1, q: 3}] - this means there are 3 level one PCs
+            createdAt: i.date(),
+            updatedAt: i.date().optional(),
+            creatorId: i.string(),
+        }),
         encounters: i.entity({}),
         spellbooks: i.entity({}),
         magicShops: i.entity({}),
@@ -80,6 +88,10 @@ const _schema = i.schema({
         userProfilesUser: {
             forward: { on: "userProfiles", has: "one", label: "$user" },
             reverse: { on: "$users", has: "one", label: "profile" },
+        },
+        partiesFiles: {
+            forward: { on: "parties", has: "one", label: "$files" },
+            reverse: { on: "$files", has: "one", label: "party" },
         },
     },
     rooms: {

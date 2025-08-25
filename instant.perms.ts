@@ -20,8 +20,8 @@ const rules = {
         allow: {
             view: "isAuthenticated",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isAuthenticated",
+            delete: "isAuthenticated",
         },
         bind: commonBind,
     },

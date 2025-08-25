@@ -21,6 +21,7 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { tx } from "@instantdb/react";
 
 export default function PartiesGrid({
     onEdit,
@@ -100,9 +101,47 @@ export default function PartiesGrid({
 
     const handleDelete = async (id: string) => {
         try {
-            await db.transact(db.tx.parties[id].delete());
-            toast.success("Party deleted");
-        } catch {
+            const party = parties.find((x) => x.id === id);
+            const pFiles = party?.["$files"] ?? party?.$files;
+            const fileIds: string[] = [];
+
+            if (pFiles) {
+                if (Array.isArray(pFiles)) {
+                    for (const f of pFiles) {
+                        if (f?.id) fileIds.push(f.id);
+                        else if (f?.key) fileIds.push(f.key);
+                        else {
+                            console.warn(
+                                "Unrecognized file object when deleting party:",
+                                f
+                            );
+                        }
+                    }
+                } else {
+                    const f = pFiles;
+                    if (f?.id) fileIds.push(f.id);
+                    else if (f?.key) fileIds.push(f.key);
+                    else
+                        console.warn(
+                            "Unrecognized file object when deleting party:",
+                            f
+                        );
+                }
+            }
+
+            const txOps: any[] = [];
+
+            txOps.push(tx.parties[id].delete());
+
+            for (const fid of fileIds) {
+                txOps.push(tx.$files[fid].delete());
+            }
+
+            await db.transact(txOps);
+
+            toast.success("Party and associated files deleted");
+        } catch (err) {
+            console.error("Delete party failed:", err);
             toast.error("Delete failed");
         }
     };

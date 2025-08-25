@@ -218,10 +218,12 @@ export function GeneratorsNavbar() {
                                     <div className="w-auto max-w-[600px] p-2 flex gap-2 flex-wrap items-start">
                                         {accountItems.map((item) => {
                                             const Icon = item.icon;
+                                            // Use a stable unique key (item.name)
+                                            // and avoid repeating keys on inner elements.
                                             if (item.href) {
                                                 return (
                                                     <NavigationMenuLink
-                                                        key={item.href}
+                                                        key={item.name}
                                                         asChild
                                                     >
                                                         <Link
@@ -241,11 +243,10 @@ export function GeneratorsNavbar() {
 
                                             return (
                                                 <NavigationMenuLink
-                                                    key={item.href}
+                                                    key={item.name}
                                                     asChild
                                                 >
                                                     <Button
-                                                        key={item.name}
                                                         size={"sm"}
                                                         variant={"ghost"}
                                                         onClick={item.onClick}
@@ -405,7 +406,7 @@ export function GeneratorsNavbar() {
 
                                         return (
                                             <Link
-                                                key={item.href}
+                                                key={item.name}
                                                 href={item.href}
                                                 className={cn(
                                                     "flex items-center space-x-3 text-sm font-medium transition-colors hover:text-primary p-2 rounded-md ml-4",

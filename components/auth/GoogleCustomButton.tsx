@@ -17,6 +17,7 @@ export default function GoogleShadcnGoogleButton({
     onError,
 }: Props) {
     const [ready, setReady] = useState(false);
+    const [isPrompting, setIsPrompting] = useState(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -27,7 +28,6 @@ export default function GoogleShadcnGoogleButton({
                     (window as any).google.accounts.id.initialize({
                         client_id: clientId,
                         callback: (res: any) => {
-                            // Google returns { credential: "<id_token>" } here when initialized
                             if (res?.credential) {
                                 onSuccess(res.credential);
                             } else {
@@ -40,7 +40,6 @@ export default function GoogleShadcnGoogleButton({
                     setReady(true);
                     return true;
                 } catch (e) {
-                    // still mark ready if google.accounts.id exists
                     setReady(Boolean((window as any).google?.accounts?.id));
                     return false;
                 }
@@ -60,7 +59,6 @@ export default function GoogleShadcnGoogleButton({
             s.onload = () => initGsi();
             document.head.appendChild(s);
         } else {
-            // poll until the SDK is ready
             const t = setInterval(() => {
                 if (initGsi()) clearInterval(t);
             }, 150);
@@ -68,20 +66,54 @@ export default function GoogleShadcnGoogleButton({
         }
     }, [clientId, nonce, onSuccess, onError]);
 
+    const handleClick = () => {
+        try {
+            if (!(window as any).google?.accounts?.id) {
+                throw new Error("Google Identity SDK not ready");
+            }
+
+            // show spinner while waiting for the prompt moment
+            setIsPrompting(true);
+
+            // pass a moment callback to prompt() so we know when the UI shows / is skipped
+            (window as any).google.accounts.id.prompt((notification: any) => {
+                try {
+                    // If the prompt UI displayed (One Tap shown in top-right),
+                    // stop the spinner
+                    if (
+                        typeof notification.isDisplayed === "function" &&
+                        notification.isDisplayed()
+                    ) {
+                        setIsPrompting(false);
+                        return;
+                    }
+
+                    // If not displayed or skipped/dismissed, also stop spinner
+                    if (
+                        (typeof notification.isNotDisplayed === "function" &&
+                            notification.isNotDisplayed()) ||
+                        (typeof notification.isSkippedMoment === "function" &&
+                            notification.isSkippedMoment()) ||
+                        (typeof notification.isDismissedMoment === "function" &&
+                            notification.isDismissedMoment())
+                    ) {
+                        setIsPrompting(false);
+                    }
+                } catch (e) {
+                    // ensure spinner is cleared on unexpected errors
+                    setIsPrompting(false);
+                }
+            });
+        } catch (err) {
+            setIsPrompting(false);
+            onError?.(err);
+        }
+    };
+
     return (
         <Button
-            onClick={() => {
-                try {
-                    if (!(window as any).google?.accounts?.id) {
-                        throw new Error("Google Identity SDK not ready");
-                    }
-                    // open the GSI prompt / popup — callback will receive id_token as above
-                    (window as any).google.accounts.id.prompt();
-                } catch (err) {
-                    onError?.(err);
-                }
-            }}
-            disabled={!ready}
+            onClick={handleClick}
+            disabled={!ready || isPrompting}
             variant={"outline"}
             className="w-full flex items-center gap-3 px-4 py-2 rounded-full"
         >
@@ -111,6 +143,31 @@ export default function GoogleShadcnGoogleButton({
             </span>
 
             <span className="flex-1 text-left">Sign in with Google</span>
+
+            {/* simple inline spinner on the right while prompting */}
+            {isPrompting && (
+                <span className="flex-none w-5 h-5 ml-2">
+                    <svg
+                        className="animate-spin w-4 h-4"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                        />
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                    </svg>
+                </span>
+            )}
         </Button>
     );
 }

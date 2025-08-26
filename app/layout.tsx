@@ -4,10 +4,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { Header } from "@/components/Header";
 import { Footer } from "@/components/nav/Footer";
 import GoogleClientProvider from "@/components/auth/GoogleClientProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/nav/app-sidebar";
+import { Header } from "@/components/Header";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -44,13 +46,17 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <Header />
-                        <div className="min-h-screen">{children}</div>
-                        <Toaster richColors />
-                        <Footer />
+                        <SidebarProvider>
+                            <AppSidebar />
+                            <div>
+                                <Header />
+                                <main className="w-full">{children}</main>
+                                <Toaster richColors />
+                                <Footer />
+                            </div>
+                        </SidebarProvider>
                     </ThemeProvider>
                 </GoogleClientProvider>
-                ;
             </body>
         </html>
     );

@@ -27,6 +27,7 @@ import {
     Swords,
     Orbit,
     Users,
+    LayoutDashboard,
 } from "lucide-react";
 
 type Tool = {
@@ -131,27 +132,20 @@ export default function UserDashboard() {
     };
 
     return (
-        <div className="container mx-auto py-6 space-y-4">
+        <div className="container mx-auto p-4 xl:p-10 space-y-4 min-h-dvh">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        Welcome back, {user.email?.split("@")[0]}!
-                    </h1>
-                    <p className="text-muted-foreground">
-                        Your personal RPG toolkit dashboard
-                    </p>
-                </div>
+                <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">
+                    <LayoutDashboard /> My Dashboard
+                </h1>
             </div>
 
             {/* All Recent Generations Table */}
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                        <Table className="h-5 w-5" />
-                        <span>5 Most Recently Accessed Generations</span>
+                        My Latest Creations
                     </CardTitle>
-                    <CardDescription>Your latest creations</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">

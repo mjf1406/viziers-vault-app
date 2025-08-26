@@ -14,13 +14,12 @@ const _schema = i.schema({
         }),
         $users: i.entity({
             email: i.string().unique().indexed().optional(),
-            premium: i.boolean(),
-            joined: i.date(),
         }),
         settings: i.entity({}),
         userProfiles: i.entity({
             joined: i.date().optional(),
             premium: i.boolean().optional(),
+            name: i.string().optional(),
         }),
 
         dnd5e_magicItems: i.entity({}),
@@ -49,9 +48,6 @@ const _schema = i.schema({
         galaxies: i.entity({}),
     },
     links: {
-        // example links (if you already have these, keep or merge with yours)
-        // profileUser: { forward: { on:'profiles', has:'one', label:'$user' }, reverse: { on:'$users', has:'one', label:'profile' } },
-
         // One-to-many from $users -> each new entity
         battleMapsUser: {
             forward: { on: "battleMaps", has: "one", label: "$user" },
@@ -92,6 +88,10 @@ const _schema = i.schema({
         partiesFiles: {
             forward: { on: "parties", has: "one", label: "$files" },
             reverse: { on: "$files", has: "one", label: "party" },
+        },
+        userProfilesFiles: {
+            forward: { on: "userProfiles", has: "one", label: "$files" },
+            reverse: { on: "$files", has: "one", label: "avatar" },
         },
     },
     rooms: {

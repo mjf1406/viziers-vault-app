@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,9 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
+import { makeUploadCandidate } from "@/lib/image";
+import { uploadImage } from "@/lib/storage";
+import { v4 as uuidv4 } from "uuid";
 
 function useEnsureUserProfile() {
     const { user } = db.useAuth();
@@ -26,7 +28,6 @@ function useEnsureUserProfile() {
         if (!user?.id) return;
 
         const rowId = user.id;
-        let cancelled = false;
 
         const createProfile = async () => {
             try {
@@ -40,6 +41,7 @@ function useEnsureUserProfile() {
                 );
             } catch (err: any) {
                 if (err.message.includes("Creating entities that exist")) {
+                    // already created elsewhere — fine
                     console.warn(err);
                 } else {
                     console.error(
@@ -51,11 +53,7 @@ function useEnsureUserProfile() {
             }
         };
 
-        createProfile();
-
-        return () => {
-            cancelled = true;
-        };
+        void createProfile();
     }, [user?.id]);
 }
 
@@ -63,14 +61,19 @@ const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
 
 export default function LoginPage() {
     useEnsureUserProfile();
+    const { user } = db.useAuth();
 
     const [sentEmail, setSentEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
-    const [oauthNonce, setOauthNonce] = useState<string>(() =>
-        crypto.randomUUID()
-    );
+    const [oauthNonce, setOauthNonce] = useState<string>(() => uuidv4());
+
+    // pending profile info returned from Google button (name + picture url).
+    const [pendingGoogleProfile, setPendingGoogleProfile] = useState<{
+        name?: string;
+        picture?: string | null;
+    } | null>(null);
 
     const handleSendMagicCode = async (email: string) => {
         setIsLoading(true);
@@ -101,9 +104,17 @@ export default function LoginPage() {
         }
     };
 
-    const handleGoogleSignIn = async (credential: string, nonce: string) => {
+    // Sign in with id token. If profileInfo exists we stash it and wait for the
+    // `user` auth state to arrive; the effect below will perform fetch + upload
+    // and create/update userProfiles linking the uploaded file.
+    const handleGoogleSignIn = async (
+        credential: string,
+        nonce: string,
+        profileInfo?: { name?: string; picture?: string | null } | null
+    ) => {
         setIsLoading(true);
         setError("");
+        if (profileInfo) setPendingGoogleProfile(profileInfo);
 
         try {
             await db.auth.signInWithIdToken({
@@ -111,14 +122,136 @@ export default function LoginPage() {
                 idToken: credential,
                 nonce,
             });
-            router.push("/");
+
+            // If there's no profileInfo to apply, redirect immediately.
+            if (!profileInfo) {
+                router.push("/");
+                setIsLoading(false);
+            }
+            // otherwise leave isLoading true and let the effect handle completion
         } catch (err: any) {
             console.error("Google sign-in error:", err);
             setError(err?.body?.message || "Google sign-in failed");
-        } finally {
+            // clear pending profile so it won't be applied accidentally
+            setPendingGoogleProfile(null);
             setIsLoading(false);
+        } finally {
+            setOauthNonce(uuidv4());
         }
     };
+
+    // When auth arrives and we have pending profile info, fetch the picture,
+    // upload it, then update/create userProfiles and link the uploaded file.
+    useEffect(() => {
+        if (!user?.id || !pendingGoogleProfile) return;
+        let cancelled = false;
+
+        const applyProfile = async () => {
+            setIsLoading(true);
+            const uid = user.id;
+            const info = pendingGoogleProfile;
+
+            let uploadedFileId: string | null = null;
+
+            // 1) fetch & upload avatar (if present)
+            if (info.picture) {
+                try {
+                    const resp = await fetch(info.picture, { mode: "cors" });
+                    if (resp.ok) {
+                        const blob = await resp.blob();
+                        const ext =
+                            (blob.type && blob.type.split("/")[1]) || "jpg";
+                        const filename = `${uid}-avatar.${ext}`;
+                        const file = new File([blob], filename, {
+                            type: blob.type || "image/jpeg",
+                        });
+
+                        const candidate = await makeUploadCandidate(file);
+                        const safeName = (candidate.name || filename).replace(
+                            /\s+/g,
+                            "-"
+                        );
+                        const path = `avatars/${uid}-avatar-${Date.now()}-${safeName}`;
+
+                        uploadedFileId = await uploadImage(
+                            (candidate as any).blobOrFile ?? file,
+                            path,
+                            (candidate as any).type
+                                ? { contentType: (candidate as any).type }
+                                : undefined
+                        );
+
+                        // debug: make sure uploadImage returned something sensible
+                        console.debug("avatar upload result:", {
+                            uploadedFileId,
+                            path,
+                        });
+                    } else {
+                        console.warn(
+                            "Failed to fetch Google picture:",
+                            resp.status
+                        );
+                    }
+                } catch (err) {
+                    console.error("Avatar fetch/upload failed:", err);
+                    // proceed without avatar
+                }
+            }
+
+            // 2) Ensure userProfiles row exists (create if missing)
+            try {
+                await db.transact(
+                    db.tx.userProfiles[uid]
+                        .create({
+                            joined: new Date(),
+                            premium: false,
+                        })
+                        .link({ $user: uid })
+                );
+            } catch (err: any) {
+                // ignore "already exists" errors, surface others
+                if (!err?.message?.includes?.("Creating entities that exist")) {
+                    console.error("Failed to ensure userProfiles row:", err);
+                }
+            }
+
+            // 3) Update name if provided
+            if (info.name) {
+                try {
+                    await db.transact(
+                        db.tx.userProfiles[uid].update({ name: info.name })
+                    );
+                } catch (err) {
+                    console.error("Failed to update profile name:", err);
+                }
+            }
+
+            // 4) Link avatar in a dedicated transaction (safer)
+            if (uploadedFileId) {
+                try {
+                    await db.transact(
+                        db.tx.userProfiles[uid]
+                            .update({})
+                            .link({ $files: uploadedFileId })
+                    );
+                } catch (err) {
+                    console.error("Failed to link avatar to profile:", err);
+                }
+            }
+
+            if (!cancelled) {
+                setPendingGoogleProfile(null);
+                router.push("/");
+            }
+            if (!cancelled) setIsLoading(false);
+        };
+
+        void applyProfile();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.id, pendingGoogleProfile, router]);
 
     return (
         <div className="container relative min-h-screen flex-col items-center justify-center flex w-full mx-auto">
@@ -148,12 +281,13 @@ export default function LoginPage() {
                                                 .NEXT_PUBLIC_GOOGLE_CLIENT_ID!
                                         }
                                         nonce={oauthNonce}
-                                        onSuccess={(credential) => {
-                                            handleGoogleSignIn(
+                                        // GoogleCustomButton now calls onSuccess(idToken, { name?, picture? })
+                                        onSuccess={(credential, info) => {
+                                            void handleGoogleSignIn(
                                                 credential,
-                                                oauthNonce
+                                                oauthNonce,
+                                                info ?? null
                                             );
-                                            setOauthNonce(crypto.randomUUID());
                                         }}
                                         onError={() =>
                                             setError("Google login failed")

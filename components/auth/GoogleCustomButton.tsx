@@ -1,16 +1,20 @@
 /** @format */
 
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+
+type ProfileInfo = { name?: string; picture?: string | null };
 
 type Props = {
     clientId: string;
     nonce: string;
-    onSuccess: (idToken: string) => void;
+    onSuccess: (idToken: string, info?: ProfileInfo | null) => void;
     onError?: (err?: any) => void;
 };
 
-export default function GoogleShadcnGoogleButton({
+export default function GoogleCustomButton({
     clientId,
     nonce,
     onSuccess,
@@ -29,7 +33,7 @@ export default function GoogleShadcnGoogleButton({
                         client_id: clientId,
                         callback: (res: any) => {
                             if (res?.credential) {
-                                onSuccess(res.credential);
+                                handleCredential(res.credential);
                             } else {
                                 onError?.(res);
                             }
@@ -65,6 +69,51 @@ export default function GoogleShadcnGoogleButton({
             return () => clearInterval(t);
         }
     }, [clientId, nonce, onSuccess, onError]);
+
+    // decode JWT payload (base64url)
+    const decodeJwtPayload = (token: string): any | null => {
+        try {
+            const parts = token.split(".");
+            if (parts.length < 2) return null;
+            const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+            const padded = payload.padEnd(
+                Math.ceil(payload.length / 4) * 4,
+                "="
+            );
+            const decoded = atob(padded);
+            const json = decodeURIComponent(
+                decoded
+                    .split("")
+                    .map(
+                        (c) =>
+                            "%" +
+                            ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+                    )
+                    .join("")
+            );
+            return JSON.parse(json);
+        } catch (e) {
+            console.error("Failed to decode JWT payload", e);
+            return null;
+        }
+    };
+
+    const handleCredential = async (credential: string) => {
+        setIsPrompting(true);
+        try {
+            const payload = decodeJwtPayload(credential);
+            const name: string | undefined = payload?.name;
+            const picture: string | undefined = payload?.picture;
+            // return token + decoded profile info (no upload here)
+            onSuccess(credential, { name, picture });
+        } catch (err) {
+            console.error("Error handling Google credential", err);
+            // still deliver the token at minimum
+            onSuccess(credential);
+        } finally {
+            setIsPrompting(false);
+        }
+    };
 
     const handleClick = () => {
         try {

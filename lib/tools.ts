@@ -3,6 +3,7 @@
 export interface Tool {
     id: string;
     title: string;
+    header: string;
     description: string;
     status:
         | "Alpha 1"
@@ -34,6 +35,7 @@ export const tools: Tool[] = [
     {
         id: "magic-shop-generator",
         title: "Magic Shop Generator",
+        header: "My Magic Shops",
         description:
             "Generate magic shops based on city population, wealth, and magic level.",
         status: "Alpha 1",
@@ -89,6 +91,7 @@ export const tools: Tool[] = [
     {
         id: "spellbook-generator",
         title: "Spellbook Generator",
+        header: "My Spellbooks",
         description:
             "Create wizard spellbooks by selecting level, schools of magic, and probability settings.",
         status: "Alpha 1",
@@ -143,6 +146,7 @@ export const tools: Tool[] = [
     {
         id: "encounter-generator",
         title: "Encounter Generator",
+        header: "My Encounters",
         description:
             "Generate balanced encounters based on party composition, biome, and travel conditions.",
         status: "Alpha 2",
@@ -198,6 +202,7 @@ export const tools: Tool[] = [
     {
         id: "party-management",
         title: "Party Management",
+        header: "My Parties",
         description:
             "Manage party composition, balance, and progress tracking.",
         status: "Alpha 2",
@@ -222,6 +227,7 @@ export const tools: Tool[] = [
     {
         id: "battle-map-generator",
         title: "Battle Map Generator",
+        header: "My Battle Maps",
         description:
             "Create battle maps with geographical features, weather, and customizable grid settings.",
         status: "Alpha 3",
@@ -278,6 +284,7 @@ export const tools: Tool[] = [
     {
         id: "world-generator",
         title: "World Generator",
+        header: "My Worlds",
         description:
             "Generate complete hex worlds with weather simulation, fog of war, and party tracking.",
         status: "Alpha 4",
@@ -326,6 +333,7 @@ export const tools: Tool[] = [
     {
         id: "star-system-generator",
         title: "Star System Generator",
+        header: "My Star Systems",
         description:
             "Create star systems with multiple worlds, planets, and celestial bodies.",
         status: "Alpha 5",
@@ -348,6 +356,7 @@ export const tools: Tool[] = [
     {
         id: "galaxy-generator",
         title: "Galaxy Generator",
+        header: "My Galaxies",
         description:
             "Generate entire galaxies with multiple star systems and cosmic structures.",
         status: "Alpha 6",

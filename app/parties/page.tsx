@@ -29,7 +29,7 @@ export default function PartiesPage() {
     };
 
     return (
-        <div className="space-y-6 p-4 xl:p-10">
+        <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">
                     <Users />

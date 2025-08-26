@@ -19,7 +19,6 @@ import {
     Swords,
     User,
     Settings,
-    ChevronDown,
     LogOut,
 } from "lucide-react";
 import {
@@ -133,7 +132,7 @@ export function GeneratorsNavbar() {
                                                 "https://app.viziersvault.com",
                                                 ""
                                             )
-                                            ? "text-primary"
+                                            ? "bg-muted px-3 py-2 rounded-lg"
                                             : "text-muted-foreground"
                                     )}
                                 >

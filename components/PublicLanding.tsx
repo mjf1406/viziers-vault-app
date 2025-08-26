@@ -98,7 +98,7 @@ export default function PublicLanding() {
     };
 
     return (
-        <div className="container mx-auto py-6 space-y-8 relative">
+        <div className="container mx-auto p-4 xl:p-10 space-y-4 min-h-dvh">
             {/* Premium Features Floating Card */}
             <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-transparent h-32 pointer-events-none z-10" />

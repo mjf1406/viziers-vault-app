@@ -147,7 +147,7 @@ export default function PartiesGrid({
     };
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {parties.map((p) => {
                 const isPending = pendingIds.has(p.id);
                 return (

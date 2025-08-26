@@ -1,11 +1,65 @@
 /** @format */
 
-import { GeneratorsNavbar } from "@/components/nav/GeneratorsNavbar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
+import { Home } from "lucide-react";
 
 export function Header() {
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <GeneratorsNavbar />
+        <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+            <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+                <SidebarTrigger className="-ml-1" />
+                <Separator
+                    orientation="vertical"
+                    className="mx-2 data-[orientation=vertical]:h-4"
+                />
+                <div className="ml-auto flex justify-center items-center">
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="https://github.com/mjf1406/viziers-vault-app"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <IconBrandGithub />
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="#"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <IconBrandDiscord />
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="https://www.viziersvault.com"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <Home />
+                        </a>
+                    </Button>
+                </div>
+            </div>
         </header>
     );
 }

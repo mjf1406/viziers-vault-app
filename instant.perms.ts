@@ -9,10 +9,14 @@ import type { InstantRules } from "@instantdb/react";
 const commonBind = [
     "isAuthenticated",
     "auth.id != null",
-    "isOwner",
+    "isCreator",
     "auth.id != null && auth.id == data.creatorId",
-    "isStillOwner",
+    "isStillCreator",
     "auth.id != null && auth.id == newData.creatorId",
+    "isOwner",
+    "auth.id != null && auth.id == data.id",
+    "isStillOwner",
+    "auth.id != null && auth.id == newData.id",
 ];
 
 const rules = {
@@ -56,6 +60,7 @@ const rules = {
         allow: {
             view: "isAuthenticated",
             create: "isAuthenticated",
+            // update: "isAuthenticated",
             update: "isOwner && isStillOwner",
             delete: "isOwner",
         },
@@ -95,73 +100,73 @@ const rules = {
     // -----------------------------
     battleMaps: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     parties: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     encounters: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     spellbooks: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     magicShops: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     worlds: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     starSystems: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },
     galaxies: {
         allow: {
-            view: "isOwner",
+            view: "isCreator",
             create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
         },
         bind: commonBind,
     },

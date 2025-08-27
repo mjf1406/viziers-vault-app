@@ -4,14 +4,11 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Plus, Users } from "lucide-react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import AddPartyDialog from "./components/AddPartyDialog";
 import PartiesGrid from "./components/PartiesGrid";
 
 export default function PartiesPage() {
-    const [addOpen, setAddOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingParty, setEditingParty] = useState<any | null>(null);
     const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
@@ -36,41 +33,34 @@ export default function PartiesPage() {
                     My Parties
                 </h1>
 
-                <Dialog
-                    open={addOpen}
-                    onOpenChange={setAddOpen}
-                >
-                    <DialogTrigger asChild>
-                        <Button>
-                            <Plus className="w-4 h-4" />
-                            Add Party
-                        </Button>
-                    </DialogTrigger>
+                {/* Create dialog using the new trigger props, hide text on mobile */}
+                <AddPartyDialog
+                    mode="create"
+                    triggerText="Add Party"
+                    triggerIcon={<Plus className="w-12 h-12 md:w-4 md:h-4" />}
+                    hideTriggerTextOnMobile={true}
+                    onClose={() => {}}
+                    addPending={addPending}
+                    removePending={removePending}
+                    fixedTrigger={true}
+                />
 
-                    <AddPartyDialog
-                        mode="create"
-                        onClose={() => setAddOpen(false)}
-                        addPending={addPending}
-                        removePending={removePending}
-                    />
-                </Dialog>
-
-                {/* Edit dialog: opened programmatically from grid */}
-                <Dialog
+                {/* Edit dialog: opened programmatically from grid (controlled) */}
+                <AddPartyDialog
+                    mode="edit"
+                    initial={editingParty}
                     open={editOpen}
-                    onOpenChange={(v) => setEditOpen(v)}
-                >
-                    <AddPartyDialog
-                        mode="edit"
-                        initial={editingParty}
-                        onClose={() => {
-                            setEditOpen(false);
-                            setEditingParty(null);
-                        }}
-                        addPending={addPending}
-                        removePending={removePending}
-                    />
-                </Dialog>
+                    onOpenChange={(v) => {
+                        setEditOpen(v);
+                        if (!v) setEditingParty(null);
+                    }}
+                    onClose={() => {
+                        setEditOpen(false);
+                        setEditingParty(null);
+                    }}
+                    addPending={addPending}
+                    removePending={removePending}
+                />
             </div>
 
             <PartiesGrid

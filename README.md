@@ -8,7 +8,8 @@
 
 ## To-do List
 
--   switch all dialogs to the Responsive Dialog example from https://ui.shadcn.com/docs/components/drawer
+-   switch all dialogs to the Responsive Dialog example from https://ui.shadcn.com/docs/components/drawer.
+    -   This is kidn of a mess, I think.
 
 ## Change Log
 

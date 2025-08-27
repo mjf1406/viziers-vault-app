@@ -10,11 +10,6 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import db from "@/lib/db";
 import { uploadImage } from "@/lib/storage";
-import {
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import { id as genId } from "@instantdb/react";
 import Link from "next/link";
 import usePartyForm from "../hooks/usePartyForm";
@@ -22,6 +17,30 @@ import { makeUploadCandidate } from "@/lib/image";
 import { buildCreatePartyOps, buildUpdatePartyOps } from "../tx/partyTx";
 import IconPicker from "./IconPicker";
 import LevelsEditor from "./LevelsEditor";
+import ResponsiveDialog from "@/components/ui/responsive-dialog";
+
+type AddPartyDialogProps = {
+    mode: "create" | "edit";
+    initial?: any | null;
+    onClose?: () => void;
+    addPending: (id: string) => void;
+    removePending: (id: string) => void;
+
+    // New trigger API (both optional)
+    triggerText?: string;
+    triggerIcon?: React.ReactNode;
+    triggerClassName?: string;
+
+    // optional dialog controls (useful if parent wants to control open)
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean) => void;
+
+    // responsive dialog options
+    fixedTrigger?: boolean;
+    hideTitleOnMobile?: boolean;
+    hideTriggerTextOnMobile?: boolean;
+};
 
 export default function AddPartyDialog({
     mode,
@@ -29,15 +48,30 @@ export default function AddPartyDialog({
     onClose,
     addPending,
     removePending,
-}: {
-    mode: "create" | "edit";
-    initial?: any | null;
-    onClose?: () => void;
-    addPending: (id: string) => void;
-    removePending: (id: string) => void;
-}) {
+    // new trigger props
+    triggerText,
+    triggerIcon,
+    triggerClassName,
+    // dialog controls
+    open,
+    defaultOpen,
+    onOpenChange,
+    // responsive options
+    fixedTrigger = false,
+    hideTitleOnMobile = false,
+    hideTriggerTextOnMobile = false,
+}: AddPartyDialogProps) {
     const { user } = db.useAuth();
     const [isUploading, setIsUploading] = useState(false);
+    const [openLocal, setOpenLocal] = useState<boolean>(false);
+
+    const isControlled = typeof open !== "undefined";
+    const dialogOpen = isControlled ? open : openLocal;
+    const setDialogOpen = (v: boolean) => {
+        if (!isControlled) setOpenLocal(v);
+        onOpenChange?.(v);
+        if (!isControlled && !v) onClose?.();
+    };
 
     const {
         partyName,
@@ -78,7 +112,6 @@ export default function AddPartyDialog({
         if (mode === "edit" && initial) {
             const pid = initial.id ?? initial._id ?? initial.partyId;
             addPending(pid);
-            toast.success("Updating party...");
 
             try {
                 let newFileId: string | null = null;
@@ -101,6 +134,7 @@ export default function AddPartyDialog({
                         toast.error("Icon upload failed");
                         removePending(pid);
                         setIsUploading(false);
+
                         return;
                     }
                 }
@@ -114,14 +148,14 @@ export default function AddPartyDialog({
                     newFileId
                 );
 
+                setDialogOpen(false);
                 await db.transact(ops);
-                toast.success("Party updated");
                 clearForm();
                 removePending(pid);
-                onClose?.();
             } catch (err) {
                 removePending(initial.id ?? initial._id ?? initial.partyId);
                 toast.error("Update failed");
+                setDialogOpen(true);
             } finally {
                 setIsUploading(false);
             }
@@ -129,7 +163,6 @@ export default function AddPartyDialog({
             // create
             const newId = genId();
             addPending(newId);
-            toast.success("Creating party...");
 
             try {
                 let newFileId: string | null = null;
@@ -171,29 +204,37 @@ export default function AddPartyDialog({
                     newFileId
                 );
 
+                setDialogOpen(false);
                 await db.transact(ops);
-                toast.success("Party created");
                 clearForm();
                 removePending(newId);
-                onClose?.();
             } catch (err: any) {
                 console.error("db.transact error", err);
                 toast.error("Create failed");
                 removePending(newId);
+                setDialogOpen(true);
             } finally {
                 setIsUploading(false);
             }
         }
     };
 
-    return (
-        <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-                <DialogTitle>
-                    {mode === "edit" ? "Edit Party" : "Create New Party"}
-                </DialogTitle>
-            </DialogHeader>
+    const title = mode === "edit" ? "Edit Party" : "Create New Party";
 
+    return (
+        <ResponsiveDialog
+            triggerText={triggerText}
+            triggerIcon={triggerIcon}
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            triggerClassName={triggerClassName}
+            defaultOpen={defaultOpen}
+            contentClassName="sm:max-w-md p-5"
+            title={title}
+            fixedTrigger={fixedTrigger}
+            hideTitleOnMobile={hideTitleOnMobile}
+            hideTriggerTextOnMobile={hideTriggerTextOnMobile}
+        >
             <form
                 onSubmit={(e) => void submit(e)}
                 className="space-y-4"
@@ -296,6 +337,6 @@ export default function AddPartyDialog({
                     </Button>
                 </div>
             </form>
-        </DialogContent>
+        </ResponsiveDialog>
     );
 }

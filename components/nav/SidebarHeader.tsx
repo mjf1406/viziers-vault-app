@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
-import { Home } from "lucide-react";
+import { Home, Newspaper, ScrollText } from "lucide-react";
 import { ThemeToggle } from "../theme/theme-toggle";
 
 export function SidebarHeader() {
@@ -17,6 +17,48 @@ export function SidebarHeader() {
                     className="mx-2 data-[orientation=vertical]:h-4"
                 />
                 <div className="ml-auto flex justify-center items-center">
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="/"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <Home />
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="/blog"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <Newspaper />
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="/docs"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <ScrollText />
+                        </a>
+                    </Button>
                     <Button
                         variant="ghost"
                         asChild
@@ -43,20 +85,6 @@ export function SidebarHeader() {
                             target="_blank"
                         >
                             <IconBrandDiscord />
-                        </a>
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        asChild
-                        size="icon"
-                        className="hidden sm:flex"
-                    >
-                        <a
-                            href="https://www.viziersvault.com"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            <Home />
                         </a>
                     </Button>
                     <ThemeToggle />

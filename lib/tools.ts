@@ -17,7 +17,7 @@ export interface Tool {
     icon: string;
     philosophy: string;
     features: string[];
-    connections: string[];
+    integrations: string[];
     category: "Generator" | "Management";
     order: number;
     url: string;
@@ -50,10 +50,10 @@ export const tools: Tool[] = [
             "Permalink generation (Premium)",
             "Data persistence (Premium)",
         ],
-        connections: ["World Generator"],
+        integrations: ["World Generator"],
         category: "Generator",
         order: 1,
-        url: "https://app.viziersvault.com/app/magic-shop-generator",
+        url: "/app/magic-shop-generator",
         mockCount: 7,
         mockRecentGenerations: [
             {
@@ -105,10 +105,10 @@ export const tools: Tool[] = [
             "Wizard progression examples",
             "Educational tool for new players",
         ],
-        connections: [],
+        integrations: [],
         category: "Generator",
         order: 2,
-        url: "https://app.viziersvault.com/app/spellbook-generator",
+        url: "/app/spellbook-generator",
         mockCount: 5,
         mockRecentGenerations: [
             {
@@ -161,10 +161,10 @@ export const tools: Tool[] = [
             "Multiple encounter generation",
             "Environmental storytelling",
         ],
-        connections: ["Party Management", "Battle Map Generator"],
+        integrations: ["Party Management", "Battle Map Generator"],
         category: "Generator",
         order: 3,
-        url: "https://app.viziersvault.com/app/encounter-generator",
+        url: "/app/encounter-generator",
         mockCount: 8,
         mockRecentGenerations: [
             {
@@ -217,10 +217,10 @@ export const tools: Tool[] = [
             "World view integration",
             "Encounter balancing",
         ],
-        connections: ["Encounter Generator", "World Generator"],
+        integrations: [],
         category: "Management",
         order: 4,
-        url: "https://app.viziersvault.com/app/parties",
+        url: "/app/parties",
         mockCount: 0,
         mockRecentGenerations: [],
     },
@@ -243,10 +243,10 @@ export const tools: Tool[] = [
             "VTT export compatibility",
             "Automatic encounter mapping",
         ],
-        connections: ["Encounter Generator"],
+        integrations: [],
         category: "Generator",
         order: 5,
-        url: "https://app.viziersvault.com/app/battle-map-generator",
+        url: "/app/battle-map-generator",
         mockCount: 12,
         mockRecentGenerations: [
             {
@@ -299,7 +299,7 @@ export const tools: Tool[] = [
             "2D and 3D world views",
             "Automatic encounter generation",
         ],
-        connections: [
+        integrations: [
             "Battle Map Generator",
             "Encounter Generator",
             "Magic Shop Generator",
@@ -307,7 +307,7 @@ export const tools: Tool[] = [
         ],
         category: "Generator",
         order: 6,
-        url: "https://app.viziersvault.com/app/world-generator",
+        url: "/app/world-generator",
         mockCount: 3,
         mockRecentGenerations: [
             {
@@ -346,10 +346,10 @@ export const tools: Tool[] = [
             "Orbital mechanics",
             "System-wide exploration",
         ],
-        connections: ["World Generator"],
+        integrations: ["World Generator"],
         category: "Generator",
         order: 7,
-        url: "https://app.viziersvault.com/app/star-system-generator",
+        url: "/app/star-system-generator",
         mockCount: 0,
         mockRecentGenerations: [],
     },
@@ -369,10 +369,10 @@ export const tools: Tool[] = [
             "Galaxy-wide exploration",
             "Interstellar travel mechanics",
         ],
-        connections: ["Star System Generator"],
+        integrations: ["Star System Generator"],
         category: "Generator",
         order: 8,
-        url: "https://app.viziersvault.com/app/galaxy-generator",
+        url: "/app/galaxy-generator",
         mockCount: 2,
         mockRecentGenerations: [
             {

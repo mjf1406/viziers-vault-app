@@ -4,29 +4,29 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronsDownIcon } from "lucide-react";
 import Link from "next/link";
 import { getAvailableTools } from "@/lib/tools";
+import LogoTextOnly from "@/components/brand/logo";
 
 export const FooterSection = () => {
     return (
         <footer
             id="footer"
-            className="section-container py-24 sm:py-32"
+            className="w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-8"
         >
             <div className="p-10 bg-card border border-secondary rounded-2xl">
                 <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-x-12 gap-y-8">
                     <div className="col-span-full xl:col-span-2">
-                        <Link
-                            href="#"
-                            className="flex font-bold items-center"
-                        >
-                            <ChevronsDownIcon className="w-9 h-9 mr-2 bg-gradient-to-tr from-primary via-primary/70 to-primary rounded-lg border border-secondary" />
-
-                            <h3 className="text-2xl">Vizier&apos;s Vault</h3>
-                        </Link>
+                        <LogoTextOnly />
                         <p className="text-muted-foreground mt-2">
                             D&D 5e content generators for game masters and
                             players.
                         </p>
                     </div>
+                    <Link
+                        href="/"
+                        className="text-lg font-bold text-primary hover:text-primary/80 transition-colors"
+                    >
+                        Vizier's Vault
+                    </Link>
 
                     <div className="flex flex-col gap-2">
                         <h3 className="font-bold text-lg">Tools</h3>
@@ -46,7 +46,7 @@ export const FooterSection = () => {
                         <h3 className="font-bold text-lg">Resources</h3>
                         <div>
                             <Link
-                                href="https://www.viziersvault.com/"
+                                href="/"
                                 target="_blank"
                                 className="opacity-60 hover:opacity-100"
                             >
@@ -55,7 +55,7 @@ export const FooterSection = () => {
                         </div>
                         <div>
                             <Link
-                                href="https://resources.viziersvault.com/Docs"
+                                href="/docs"
                                 target="_blank"
                                 className="opacity-60 hover:opacity-100"
                             >
@@ -64,7 +64,7 @@ export const FooterSection = () => {
                         </div>
                         <div>
                             <Link
-                                href="https://resources.viziersvault.com/Blog"
+                                href="/blog"
                                 target="_blank"
                                 className="opacity-60 hover:opacity-100"
                             >
@@ -77,7 +77,7 @@ export const FooterSection = () => {
                         <h3 className="font-bold text-lg">Support</h3>
                         <div>
                             <Link
-                                href="#contact"
+                                href="/web/contact"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Contact Us
@@ -86,7 +86,7 @@ export const FooterSection = () => {
 
                         <div>
                             <Link
-                                href="#faq"
+                                href="/web/faq"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 FAQ
@@ -95,7 +95,7 @@ export const FooterSection = () => {
 
                         <div>
                             <Link
-                                href="#contact"
+                                href="/web/contact"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Feedback
@@ -138,7 +138,7 @@ export const FooterSection = () => {
                         <h3 className="font-bold text-lg">Legal</h3>
                         <div>
                             <Link
-                                href="#"
+                                href="/web/privacy-policy"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Privacy Policy
@@ -147,7 +147,7 @@ export const FooterSection = () => {
 
                         <div>
                             <Link
-                                href="#"
+                                href="/web/terms-of-service"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Terms of Service
@@ -156,7 +156,7 @@ export const FooterSection = () => {
 
                         <div>
                             <Link
-                                href="#"
+                                href="/web/cookie-policy"
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Cookie Policy

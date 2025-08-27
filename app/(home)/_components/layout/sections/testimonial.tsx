@@ -82,7 +82,7 @@ export const TestimonialSection = () => {
     return (
         <section
             id="testimonials"
-            className="section-container py-24 sm:py-32"
+            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32"
         >
             <div className="text-center mb-8">
                 <h2 className="text-lg text-primary text-center mb-2 tracking-wider">

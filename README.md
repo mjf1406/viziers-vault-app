@@ -2,6 +2,10 @@
 
 # Vizier's Vault App
 
+## Goals
+
+-   get all pages to under 14 kB in size because of (this blog post)[https://endtimes.dev/why-your-website-should-be-under-14kb-in-size/]
+
 ## To-do List
 
 -   switch all dialogs to the Responsive Dialog example from https://ui.shadcn.com/docs/components/drawer

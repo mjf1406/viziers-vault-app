@@ -55,7 +55,7 @@ export const FAQSection = () => {
     return (
         <section
             id="faq"
-            className="section-container md:w-[700px] py-24 sm:py-32"
+            className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32"
         >
             <div className="text-center mb-8">
                 <h2 className="text-lg text-primary text-center mb-2 tracking-wider">

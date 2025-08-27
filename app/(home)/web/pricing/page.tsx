@@ -1,12 +1,7 @@
 /** @format */
 
-import { BenefitsSection } from "./_components/layout/sections/benefits";
-import { ContactSection } from "./_components/layout/sections/contact";
-import { FeaturesSection } from "./_components/layout/sections/features";
-import { FooterSection } from "./_components/layout/sections/footer";
-import { HeroSection } from "./_components/layout/sections/hero";
-import { ServicesSection } from "./_components/layout/sections/services";
-import { TeamSection } from "./_components/layout/sections/team";
+import { FooterSection } from "../../_components/layout/sections/footer";
+import { PricingSection } from "../../_components/layout/sections/pricing";
 
 export const metadata = {
     title: "Vizier's Vault - D&D 5e Tools",
@@ -37,13 +32,10 @@ export const metadata = {
     },
 };
 
-export default function HomePage() {
+export default function PricingPage() {
     return (
         <>
-            <HeroSection />
-            <FeaturesSection />
-            <ServicesSection />
-            <BenefitsSection />
+            <PricingSection />
             <FooterSection />
         </>
     );

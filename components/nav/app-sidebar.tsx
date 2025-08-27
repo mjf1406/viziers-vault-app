@@ -41,6 +41,7 @@ import { useEffect, useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
 import { NavUser } from "./NavUser";
+import LogoTextOnly from "../brand/logo";
 
 type InstantUser = {
     email?: string | null;
@@ -83,12 +84,7 @@ export function AppSidebar() {
         >
             {/* Top: site name (site name only here per your request) */}
             <SidebarHeader className="px-4 py-4 flex items-center justify-between">
-                <Link
-                    href="/"
-                    className="text-lg font-bold text-primary hover:text-primary/80 transition-colors"
-                >
-                    Vizier's Vault
-                </Link>
+                <LogoTextOnly />
             </SidebarHeader>
 
             <Separator />

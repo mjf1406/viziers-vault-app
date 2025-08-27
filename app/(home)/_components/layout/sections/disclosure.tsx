@@ -38,7 +38,7 @@ export const DisclosureSection = () => {
     return (
         <section
             id="disclosure"
-            className="section-container py-24 sm:py-32"
+            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32"
         >
             <div className="text-center mb-12">
                 <h2 className="text-lg text-primary mb-2 tracking-wider">
@@ -64,7 +64,7 @@ export const DisclosureSection = () => {
                                 <Icon
                                     name={item.icon as keyof typeof icons}
                                     size={24}
-                                    color="hsl(var(--primary))"
+                                    color="var(--primary)"
                                     className="text-primary"
                                 />
                             </div>

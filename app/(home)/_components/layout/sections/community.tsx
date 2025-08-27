@@ -17,7 +17,7 @@ export const CommunitySection = () => {
             className="py-12 "
         >
             <hr className="border-secondary" />
-            <div className="section-container py-20 sm:py-20">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-20">
                 <div className="lg:w-[60%] mx-auto">
                     <Card className="bg-background border-none shadow-none text-center flex flex-col items-center justify-center">
                         <CardHeader>

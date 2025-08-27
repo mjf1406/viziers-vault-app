@@ -11,7 +11,7 @@ import Link from "next/link";
 export const HeroSection = () => {
     const { theme } = useTheme();
     return (
-        <section className="section-container w-full">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid place-items-center lg:max-w-screen-xl gap-8 mx-auto py-20 md:py-32">
                 <div className="text-center space-y-8">
                     <Badge
@@ -47,11 +47,7 @@ export const HeroSection = () => {
                             asChild
                             className="w-5/6 md:w-1/4 font-bold group/arrow"
                         >
-                            <Link
-                                href={
-                                    "https://app.viziersvault.com/app/dashbaord"
-                                }
-                            >
+                            <Link href={"/app/dashboard"}>
                                 Get Started
                                 <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
                             </Link>
@@ -62,7 +58,7 @@ export const HeroSection = () => {
                             variant="secondary"
                             className="w-5/6 md:w-1/4 font-bold"
                         >
-                            <Link href="#features">View All Tools</Link>
+                            <Link href="#features">Learn more</Link>
                         </Button>
                     </div>
                 </div>

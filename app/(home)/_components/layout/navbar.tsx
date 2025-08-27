@@ -1,7 +1,7 @@
 /** @format */
 
 "use client";
-import { ChevronsDown, Github, Menu } from "lucide-react";
+import { ChevronsDown, Github, Home, Menu } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import {
@@ -21,6 +21,8 @@ import {
 } from "@radix-ui/react-navigation-menu";
 import { Separator } from "@radix-ui/react-separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
+import LogoTextOnly from "@/components/brand/logo";
 
 interface RouteProps {
     href: string;
@@ -29,40 +31,32 @@ interface RouteProps {
 
 const routeList: RouteProps[] = [
     {
-        href: "#features",
-        label: "Tools",
+        href: "/blog",
+        label: "Blog",
     },
     {
-        href: "#integration",
-        label: "Integration",
+        href: "/web/contact",
+        label: "Contact",
     },
     {
-        href: "#philosophy",
-        label: "Philosophy",
+        href: "/docs",
+        label: "Docs",
     },
     {
-        href: "#pricing",
-        label: "Pricing",
-    },
-    {
-        href: "#team",
-        label: "Team",
-    },
-    {
-        href: "#disclosure",
-        label: "Disclosure",
-    },
-    {
-        href: "#community",
-        label: "Community",
-    },
-    {
-        href: "#faq",
+        href: "/web/faq",
         label: "FAQ",
     },
     {
-        href: "#contact",
-        label: "Contact",
+        href: "/web/philosophy",
+        label: "Philosophy",
+    },
+    {
+        href: "/web/pricing",
+        label: "Pricing",
+    },
+    {
+        href: "/web/team",
+        label: "Team",
     },
 ];
 
@@ -71,15 +65,9 @@ export const Navbar = () => {
     return (
         <header className="shadow-inner bg-opacity-15 w-full sticky top-5 z-40 border-b border-secondary bg-card">
             <div className="max-w-7xl mx-auto px-4 flex justify-between items-center p-2">
-                <Link
-                    href="/"
-                    className="font-bold text-lg flex items-center"
-                >
-                    <ChevronsDown className="bg-gradient-to-tr border-secondary from-primary via-primary/70 to-primary rounded-lg w-9 h-9 mr-2 border text-white" />
-                    Vizier&apos;s Vault
-                </Link>
+                <LogoTextOnly />
                 {/* <!-- Mobile --> */}
-                <div className="flex items-center lg:hidden">
+                <div className="flex items-center md:hidden">
                     <Sheet
                         open={isOpen}
                         onOpenChange={setIsOpen}
@@ -125,6 +113,34 @@ export const Navbar = () => {
 
                             <SheetFooter className="flex-col sm:flex-col justify-start items-start">
                                 <Separator className="mb-2" />
+                                <Button
+                                    variant="ghost"
+                                    asChild
+                                    size="icon"
+                                    className="hidden sm:flex"
+                                >
+                                    <a
+                                        href="https://github.com/mjf1406/viziers-vault-app"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        <IconBrandGithub />
+                                    </a>
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    asChild
+                                    size="icon"
+                                    className="hidden sm:flex"
+                                >
+                                    <a
+                                        href="#"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
+                                    >
+                                        <IconBrandDiscord />
+                                    </a>
+                                </Button>
 
                                 <ThemeToggle />
                             </SheetFooter>
@@ -133,7 +149,7 @@ export const Navbar = () => {
                 </div>
 
                 {/* <!-- Desktop --> */}
-                <NavigationMenu className="hidden lg:block mx-auto">
+                <NavigationMenu className="hidden md:block mx-auto">
                     <NavigationMenuList>
                         <NavigationMenuItem>
                             {routeList.map(({ href, label }) => (
@@ -153,7 +169,36 @@ export const Navbar = () => {
                     </NavigationMenuList>
                 </NavigationMenu>
 
-                <div className="hidden lg:flex">
+                <div className="hidden md:flex">
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="https://github.com/mjf1406/viziers-vault-app"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <IconBrandGithub />
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        size="icon"
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="#"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <IconBrandDiscord />
+                        </a>
+                    </Button>
+
                     <ThemeToggle />
                 </div>
             </div>

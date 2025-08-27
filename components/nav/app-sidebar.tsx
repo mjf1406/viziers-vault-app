@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
     Sidebar,
     SidebarHeader,
@@ -25,19 +24,9 @@ import {
     Star,
     Globe,
     Swords,
-    User,
-    Settings,
-    LogOut,
-    ChevronDown,
     LayoutDashboard,
 } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
 import { NavUser } from "./NavUser";
@@ -95,7 +84,7 @@ export function AppSidebar() {
                     <nav className="flex flex-col space-y-1">
                         {/* Dashboard link */}
                         <Link
-                            href="/"
+                            href="/app/dashboard"
                             aria-current={pathname === "/" ? "page" : undefined}
                             className={cn(
                                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",

@@ -63,7 +63,7 @@ export default function LevelsEditor({
                     </div>
                     <Button
                         type="button"
-                        variant="outline"
+                        variant="destructive"
                         size="sm"
                         onClick={() => removeLevel(idx)}
                         className="mt-5"

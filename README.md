@@ -8,6 +8,11 @@
 
 ## Change Log
 
+### 2025/08/27
+
+-   made the delete level button destructive in LevelEditor.tsx
+-   moved the theme toggle to Header.tsx
+
 ### 2025/08/26
 
 -   added avatar, name, and email to user info

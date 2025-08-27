@@ -1,24 +1,20 @@
 /** @format */
 
 import type { Metadata } from "next";
-import "./globals.css";
 
 export const metadata: Metadata = {
-    title: "App | Vizier's Vault",
+    title: "Docs | Vizier's Vault",
     description: "Generate various things for D&D 5e",
 };
 
-export default function RootLayout({
+export default function Layout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <html
-            lang="en"
-            suppressHydrationWarning
-        >
-            {children}
-        </html>
+        <body className="antialiased">
+            <main className="w-full">{children}</main>
+        </body>
     );
 }

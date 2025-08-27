@@ -12,7 +12,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
     LogOut,
     User,

@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
     IconCreditCard,
@@ -11,8 +11,6 @@ import {
     IconNotification,
     IconUserCircle,
     IconSettings,
-    IconSun,
-    IconMoon,
 } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,7 +29,6 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
-import { useTheme } from "next-themes";
 import db from "@/lib/db";
 import { Separator } from "../ui/separator";
 
@@ -52,19 +49,6 @@ export function NavUser({ user: initialUser }: NavUserProps) {
     const displayName = userInfo?.profile?.name ?? "Account";
     const displayEmail = userInfo?.email ?? "";
     const avatarSrc = userInfo?.profile?.$files?.url ?? undefined;
-
-    // theme handling (next-themes)
-    const { theme, setTheme, resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-    const currentTheme = mounted
-        ? resolvedTheme ?? theme ?? "light"
-        : undefined;
-    const themeLabel = mounted
-        ? currentTheme!.charAt(0).toUpperCase() + currentTheme?.slice(1)
-        : "Theme";
 
     return (
         <SidebarMenu>
@@ -172,28 +156,6 @@ export function NavUser({ user: initialUser }: NavUserProps) {
                                     <IconNotification className="mr-2 h-4 w-4" />
                                     Notifications
                                 </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuSeparator />
-
-                            {/* Theme as a regular menu item */}
-                            <DropdownMenuItem
-                                className="flex items-center"
-                                onSelect={() => {
-                                    // toggle between dark and light
-                                    const next =
-                                        currentTheme === "dark"
-                                            ? "light"
-                                            : "dark";
-                                    setTheme(next);
-                                }}
-                            >
-                                {currentTheme === "light" ? (
-                                    <IconSun className="mr-2 h-4 w-4" />
-                                ) : (
-                                    <IconMoon className="mr-2 h-4 w-4" />
-                                )}
-                                {themeLabel}
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
 

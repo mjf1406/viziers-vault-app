@@ -26,7 +26,7 @@ export function ThemeToggle() {
 
     return (
         <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={toggle}
             aria-pressed={mounted ? isDark : undefined}

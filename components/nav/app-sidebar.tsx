@@ -85,10 +85,14 @@ export function AppSidebar() {
                         {/* Dashboard link */}
                         <Link
                             href="/app/dashboard"
-                            aria-current={pathname === "/" ? "page" : undefined}
+                            aria-current={
+                                pathname === "/app/dashboard"
+                                    ? "page"
+                                    : undefined
+                            }
                             className={cn(
                                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                                pathname === "/"
+                                pathname === "/app/dashboard"
                                     ? "bg-muted text-primary"
                                     : "text-muted-foreground hover:bg-accent/50"
                             )}

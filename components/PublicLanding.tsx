@@ -154,7 +154,9 @@ export default function PublicLanding() {
                                 size="lg"
                                 className="w-full md:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                             >
-                                <Link href="/login">Subscribe to Premium</Link>
+                                <Link href="/app/login">
+                                    Subscribe to Premium
+                                </Link>
                             </Button>
                         </CardContent>
                     </Card>

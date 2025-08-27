@@ -269,7 +269,7 @@ export function GeneratorsNavbar() {
                         variant="default"
                         size="sm"
                     >
-                        <Link href="/login">Sign In</Link>
+                        <Link href="/app/login">Sign In</Link>
                     </Button>
                 </db.SignedOut>
 
@@ -422,7 +422,7 @@ export function GeneratorsNavbar() {
                                         asChild
                                         className="w-full"
                                     >
-                                        <Link href="/login">Sign In</Link>
+                                        <Link href="/app/login">Sign In</Link>
                                     </Button>
                                 </div>
                             </db.SignedOut>

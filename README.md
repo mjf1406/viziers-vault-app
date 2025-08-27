@@ -10,6 +10,7 @@
 
 -   switch all dialogs to the Responsive Dialog example from https://ui.shadcn.com/docs/components/drawer.
     -   This is kidn of a mess, I think.
+    -   adding this made /parties go from ~8 kB to ~18 kB, so I need to optimize it somehow.
 
 ## Change Log
 

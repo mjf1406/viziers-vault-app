@@ -95,7 +95,7 @@ export default function LoginPage() {
 
         try {
             await db.auth.signInWithMagicCode({ email: sentEmail, code });
-            router.push("/");
+            router.push("/app/dashboard");
         } catch (err: any) {
             console.error("Magic Link Verification error:", err);
             setError(err?.body?.message || "Invalid code");
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
             // If there's no profileInfo to apply, redirect immediately.
             if (!profileInfo) {
-                router.push("/");
+                router.push("/app/dashboard");
                 setIsLoading(false);
             }
             // otherwise leave isLoading true and let the effect handle completion
@@ -241,7 +241,7 @@ export default function LoginPage() {
 
             if (!cancelled) {
                 setPendingGoogleProfile(null);
-                router.push("/");
+                router.push("/app/dashboard");
             }
             if (!cancelled) setIsLoading(false);
         };

@@ -47,7 +47,11 @@ export const HeroSection = () => {
                             asChild
                             className="w-5/6 md:w-1/4 font-bold group/arrow"
                         >
-                            <Link href={"https://app.viziersvault.com"}>
+                            <Link
+                                href={
+                                    "https://app.viziersvault.com/app/dashbaord"
+                                }
+                            >
                                 Get Started
                                 <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
                             </Link>

@@ -53,7 +53,7 @@ export const tools: Tool[] = [
         connections: ["World Generator"],
         category: "Generator",
         order: 1,
-        url: "https://app.viziersvault.com/magic-shop-generator",
+        url: "https://app.viziersvault.com/app/magic-shop-generator",
         mockCount: 7,
         mockRecentGenerations: [
             {
@@ -108,7 +108,7 @@ export const tools: Tool[] = [
         connections: [],
         category: "Generator",
         order: 2,
-        url: "https://app.viziersvault.com/spellbook-generator",
+        url: "https://app.viziersvault.com/app/spellbook-generator",
         mockCount: 5,
         mockRecentGenerations: [
             {
@@ -164,7 +164,7 @@ export const tools: Tool[] = [
         connections: ["Party Management", "Battle Map Generator"],
         category: "Generator",
         order: 3,
-        url: "https://app.viziersvault.com/encounter-generator",
+        url: "https://app.viziersvault.com/app/encounter-generator",
         mockCount: 8,
         mockRecentGenerations: [
             {
@@ -220,7 +220,7 @@ export const tools: Tool[] = [
         connections: ["Encounter Generator", "World Generator"],
         category: "Management",
         order: 4,
-        url: "https://app.viziersvault.com/parties",
+        url: "https://app.viziersvault.com/app/parties",
         mockCount: 0,
         mockRecentGenerations: [],
     },
@@ -246,7 +246,7 @@ export const tools: Tool[] = [
         connections: ["Encounter Generator"],
         category: "Generator",
         order: 5,
-        url: "https://app.viziersvault.com/battle-map-generator",
+        url: "https://app.viziersvault.com/app/battle-map-generator",
         mockCount: 12,
         mockRecentGenerations: [
             {
@@ -307,7 +307,7 @@ export const tools: Tool[] = [
         ],
         category: "Generator",
         order: 6,
-        url: "https://app.viziersvault.com/world-generator",
+        url: "https://app.viziersvault.com/app/world-generator",
         mockCount: 3,
         mockRecentGenerations: [
             {
@@ -349,7 +349,7 @@ export const tools: Tool[] = [
         connections: ["World Generator"],
         category: "Generator",
         order: 7,
-        url: "https://app.viziersvault.com/star-system-generator",
+        url: "https://app.viziersvault.com/app/star-system-generator",
         mockCount: 0,
         mockRecentGenerations: [],
     },
@@ -372,7 +372,7 @@ export const tools: Tool[] = [
         connections: ["Star System Generator"],
         category: "Generator",
         order: 8,
-        url: "https://app.viziersvault.com/galaxy-generator",
+        url: "https://app.viziersvault.com/app/galaxy-generator",
         mockCount: 2,
         mockRecentGenerations: [
             {

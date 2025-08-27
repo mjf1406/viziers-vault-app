@@ -8,7 +8,6 @@ import { AppSidebar } from "@/components/nav/app-sidebar";
 import { SidebarHeader } from "@/components/nav/SidebarHeader";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { FooterSection } from "../(home)/_components/layout/sections/footer";
-import { Footer } from "@/components/nav/Footer";
 
 export const metadata: Metadata = {
     title: "App | Vizier's Vault",

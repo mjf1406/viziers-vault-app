@@ -8,9 +8,7 @@
 
 ## To-do List
 
--   switch all dialogs to the Responsive Dialog example from https://ui.shadcn.com/docs/components/drawer.
-    -   This is kidn of a mess, I think.
-    -   adding this made /parties go from ~8 kB to ~18 kB, so I need to optimize it somehow.
+-   create a features JSOHN for use in benefits.tsx and services.tsx, which can also be used in PricingSection in pricing.tsx
 
 ## Change Log
 

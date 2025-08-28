@@ -39,7 +39,7 @@ const plans: PlanProps[] = [
             "CSV export only",
             "VTT export",
             "Image export",
-            "Community support",
+            "Community support on Discord",
         ],
     },
     {
@@ -50,11 +50,37 @@ const plans: PlanProps[] = [
             "Full access to all features with data persistence and advanced capabilities.",
         buttonText: "Start 4-month free Trial",
         benefitList: [
+            "Everything in Free, plus:",
             "All generators (current and future)",
             "Create custom worlds and cities",
             "Permalink generation",
             "Data persistence and export",
             "Free 4-month trial included",
+        ],
+    },
+    {
+        title: "Beta Access",
+        popular: 0,
+        price: 5,
+        description:
+            "Full access to all features with data persistence and advanced capabilities.",
+        buttonText: "Subscribe to Beta",
+        benefitList: [
+            "Everything in Premium, plus:",
+            "Access to Beta features",
+        ],
+    },
+    {
+        title: "Alpha Access",
+        popular: 0,
+        price: 10,
+        description:
+            "Full access to all features with data persistence and advanced capabilities.",
+        buttonText: "Subscribe to Alpha",
+        benefitList: [
+            "Everything in Beta Access, plus:",
+            "Access to Alpha features",
+            "Voting power for new features on Discord",
         ],
     },
 ];
@@ -137,7 +163,7 @@ export const PricingSection = () => {
                                     }
                                     className="w-full"
                                 >
-                                    <Link href="https://app.viziersvault.com/">
+                                    <Link href="https://www.viziersvault.com/account">
                                         {buttonText}
                                     </Link>
                                 </Button>

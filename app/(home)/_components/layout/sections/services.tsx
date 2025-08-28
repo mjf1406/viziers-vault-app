@@ -1,12 +1,14 @@
 /** @format */
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 
 enum ProService {
     YES = 1,
@@ -28,6 +30,11 @@ const serviceList: ServiceProps[] = [
         title: "Access Anywhere",
         description:
             "All things you have ever generated and all of your settings are saved in the cloud for you to use on any computer.",
+        pro: 1,
+    },
+    {
+        title: "Feature Voting Power",
+        description: "Vote for the next feature on Discord.",
         pro: 1,
     },
     {

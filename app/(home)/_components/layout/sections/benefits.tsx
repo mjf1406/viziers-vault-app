@@ -1,8 +1,10 @@
 /** @format */
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { icons } from "lucide-react";
+import Link from "next/link";
 
 interface BenefitsProps {
     icon: string;
@@ -87,6 +89,17 @@ export const BenefitsSection = () => {
                         </Card>
                     ))}
                 </div>
+            </div>
+            <div className="w-full mx-auto flex justify-center mt-10 space-x-4">
+                <Button asChild>
+                    <Link href={"/app/account"}>Sign up now</Link>
+                </Button>
+                <Button
+                    variant="outline"
+                    asChild
+                >
+                    <Link href={"/app/dashboard"}>Go to the app</Link>
+                </Button>
             </div>
         </section>
     );

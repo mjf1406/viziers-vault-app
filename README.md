@@ -16,10 +16,15 @@
 
 ### 2025/08/28
 
+-   stuff
+
+#### 18:35
+
 -   AddPartyDialog is now regular shadcn dialog
 -   added icons to items in the navbar that have a different nav element (basically indicating you're going to a different part of the site that behave differently)
 -   renamed /philosophy to /about
 -   added NameExplanation section to the about page
+-   added plan (free vs premium) to user info in NavUser.tsx
 
 ### 2025/08/27
 

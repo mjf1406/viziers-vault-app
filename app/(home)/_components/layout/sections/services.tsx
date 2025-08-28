@@ -61,11 +61,11 @@ export const ServicesSection = () => {
             </h2>
 
             <h2 className="text-3xl md:text-4xl text-center font-bold mb-4">
-                Advanced Capabilities
+                Vizier&apos;s Vault Capabilities
             </h2>
             <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground mb-8">
-                Professional features designed to streamline your D&D campaign
-                preparation and management.
+                Features designed to streamline your D&D campaign preparation
+                and management.
             </h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 

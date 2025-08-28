@@ -46,9 +46,11 @@ export function NavUser({ user: initialUser }: NavUserProps) {
     const query = { $users: { profile: { $files: {} } } };
     const { isLoading, error, data } = db.useQuery(query);
     const userInfo = data?.$users[0];
+    console.log("🚀 ~ NavUser ~ userInfo:", userInfo);
     const displayName = userInfo?.profile?.name ?? "Account";
     const displayEmail = userInfo?.email ?? "";
     const avatarSrc = userInfo?.profile?.$files?.url ?? undefined;
+    const plan = userInfo?.profile?.premium ? "Premium" : "Free";
 
     return (
         <SidebarMenu>
@@ -59,7 +61,7 @@ export function NavUser({ user: initialUser }: NavUserProps) {
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <Avatar className="h-8 w-8 rounded-lg grayscale">
+                            <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage
                                     src={avatarSrc}
                                     alt={displayName}
@@ -76,7 +78,8 @@ export function NavUser({ user: initialUser }: NavUserProps) {
                                     {displayName}
                                 </span>
                                 <span className="text-muted-foreground truncate text-xs">
-                                    {displayEmail}
+                                    {/* {displayEmail} */}
+                                    {plan}
                                 </span>
                             </div>
 
@@ -109,7 +112,8 @@ export function NavUser({ user: initialUser }: NavUserProps) {
                                         {displayName}
                                     </span>
                                     <span className="text-muted-foreground truncate text-xs">
-                                        {displayEmail}
+                                        {/* {displayEmail} */}
+                                        {plan}
                                     </span>
                                 </div>
                             </div>

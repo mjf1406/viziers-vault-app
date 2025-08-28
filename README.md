@@ -9,6 +9,7 @@
 ## To-do List
 
 -   create a features JSOHN for use in benefits.tsx and services.tsx, which can also be used in PricingSection in pricing.tsx
+-   make the login page show better loading state
 
 ## Change Log
 

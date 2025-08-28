@@ -29,8 +29,12 @@ export default function Layout({
                 disableTransitionOnChange
             >
                 <Navbar />
-
-                {children}
+                <div
+                    vaul-drawer-wrapper=""
+                    className="bg-background"
+                >
+                    {children}
+                </div>
             </ThemeProvider>
         </body>
     );

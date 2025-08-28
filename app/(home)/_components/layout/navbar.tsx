@@ -1,7 +1,13 @@
 /** @format */
 
 "use client";
-import { ChevronsDown, Github, Home, Menu } from "lucide-react";
+import {
+    AppWindow,
+    ChevronsDown,
+    Menu,
+    Newspaper,
+    ScrollText,
+} from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import {
@@ -27,16 +33,23 @@ import LogoTextOnly from "@/components/brand/logo";
 interface RouteProps {
     href: string;
     label: string;
+    icon?: React.ReactNode;
 }
 
 const routeList: RouteProps[] = [
     {
+        href: "/web/about",
+        label: "About",
+    },
+    {
         href: "/app/dashboard",
         label: "App",
+        icon: <AppWindow className="w-4 h-4 mr-2" />,
     },
     {
         href: "/blog",
         label: "Blog",
+        icon: <Newspaper className="w-4 h-4 mr-2" />,
     },
     {
         href: "/web/contact",
@@ -45,14 +58,11 @@ const routeList: RouteProps[] = [
     {
         href: "/docs",
         label: "Docs",
+        icon: <ScrollText className="w-4 h-4 mr-2" />,
     },
     {
         href: "/web/faq",
         label: "FAQ",
-    },
-    {
-        href: "/web/philosophy",
-        label: "Philosophy",
     },
     {
         href: "/web/pricing",
@@ -100,80 +110,83 @@ export const Navbar = () => {
                                     </SheetTitle>
                                 </SheetHeader>
 
-                                <div className="flex flex-col gap-2">
-                                    {routeList.map(({ href, label }) => (
+                                <div className="flex flex-col gap-2 px-4">
+                                    {routeList.map(({ href, label, icon }) => (
                                         <Button
                                             key={href}
                                             onClick={() => setIsOpen(false)}
                                             asChild
                                             variant="ghost"
-                                            className="justify-start text-base"
+                                            className="justify-start text-base w-full"
                                         >
-                                            <Link href={href}>{label}</Link>
+                                            <Link
+                                                href={href}
+                                                className="flex items-center"
+                                            >
+                                                {icon ?? null}
+                                                <span>{label}</span>
+                                            </Link>
                                         </Button>
                                     ))}
                                 </div>
                             </div>
 
-                            <SheetFooter className="flex-col sm:flex-col justify-start items-start">
-                                <Separator className="mb-2" />
-                                <Button
-                                    variant="ghost"
-                                    asChild
-                                    size="icon"
-                                    className="hidden sm:flex"
-                                >
-                                    <a
-                                        href="https://github.com/mjf1406/viziers-vault-app"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
+                            <SheetFooter className="flex-col sm:flex-col justify-start items-start px-4">
+                                <Separator className="mb-2 w-full" />
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        asChild
+                                        size="icon"
+                                        className="hidden sm:flex"
                                     >
-                                        <IconBrandGithub />
-                                    </a>
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    asChild
-                                    size="icon"
-                                    className="hidden sm:flex"
-                                >
-                                    <a
-                                        href="#"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
+                                        <a
+                                            href="https://github.com/mjf1406/viziers-vault-app"
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                        >
+                                            <IconBrandGithub />
+                                        </a>
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        asChild
+                                        size="icon"
+                                        className="hidden sm:flex"
                                     >
-                                        <IconBrandDiscord />
-                                    </a>
-                                </Button>
+                                        <a
+                                            href="#"
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                        >
+                                            <IconBrandDiscord />
+                                        </a>
+                                    </Button>
 
-                                <ThemeToggle />
+                                    <ThemeToggle />
+                                </div>
                             </SheetFooter>
                         </SheetContent>
                     </Sheet>
                 </div>
 
                 {/* <!-- Desktop --> */}
-                <NavigationMenu className="hidden md:block mx-auto">
-                    <NavigationMenuList>
-                        <NavigationMenuItem>
-                            {routeList.map(({ href, label }) => (
-                                <NavigationMenuLink
-                                    key={href}
-                                    asChild
-                                >
-                                    <Link
-                                        href={href}
-                                        className="text-base px-2"
-                                    >
-                                        {label}
-                                    </Link>
-                                </NavigationMenuLink>
-                            ))}
-                        </NavigationMenuItem>
-                    </NavigationMenuList>
-                </NavigationMenu>
+                <nav className="hidden md:flex mx-auto">
+                    <div className="flex">
+                        {routeList.map(({ href, label, icon }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className="text-base px-2 flex items-center hover:bg-muted py-1 rounded-md"
+                            >
+                                {icon}
+                                <span>{label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </nav>
 
-                <div className="hidden md:flex">
+                <div className="hidden md:flex items-center gap-2">
                     <Button
                         variant="ghost"
                         asChild

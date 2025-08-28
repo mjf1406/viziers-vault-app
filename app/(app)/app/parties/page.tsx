@@ -13,11 +13,18 @@ export default function PartiesPage() {
     const [editingParty, setEditingParty] = useState<any | null>(null);
     const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
 
-    const addPending = (id: string) => setPendingIds((s) => new Set(s).add(id));
+    const addPending = (id: string) =>
+        setPendingIds((s) => {
+            const next = new Set(s);
+            next.add(id);
+            return next;
+        });
+
     const removePending = (id: string) =>
         setPendingIds((s) => {
-            s.delete(id);
-            return new Set(s);
+            const next = new Set(s);
+            next.delete(id);
+            return next;
         });
 
     const openForEdit = (party: any) => {
@@ -33,34 +40,36 @@ export default function PartiesPage() {
                     My Parties
                 </h1>
 
-                {/* Create dialog using the new trigger props, hide text on mobile */}
+                {/* Create dialog (uncontrolled trigger inside component) */}
                 <AddPartyDialog
                     mode="create"
                     triggerText="Add Party"
                     triggerIcon={<Plus className="w-12 h-12 md:w-4 md:h-4" />}
                     hideTriggerTextOnMobile={true}
-                    onClose={() => {}}
                     addPending={addPending}
                     removePending={removePending}
                     fixedTrigger={true}
                 />
 
-                {/* Edit dialog: opened programmatically from grid (controlled) */}
-                <AddPartyDialog
-                    mode="edit"
-                    initial={editingParty}
-                    open={editOpen}
-                    onOpenChange={(v) => {
-                        setEditOpen(v);
-                        if (!v) setEditingParty(null);
-                    }}
-                    onClose={() => {
-                        setEditOpen(false);
-                        setEditingParty(null);
-                    }}
-                    addPending={addPending}
-                    removePending={removePending}
-                />
+                {/* Edit dialog: render only when a party is selected for edit */}
+                {editingParty && (
+                    <AddPartyDialog
+                        key={editingParty.id ?? "edit-" + String(Date.now())}
+                        mode="edit"
+                        initial={editingParty}
+                        open={editOpen}
+                        onOpenChange={(v) => {
+                            setEditOpen(v);
+                            if (!v) setEditingParty(null);
+                        }}
+                        onClose={() => {
+                            setEditOpen(false);
+                            setEditingParty(null);
+                        }}
+                        addPending={addPending}
+                        removePending={removePending}
+                    />
+                )}
             </div>
 
             <PartiesGrid

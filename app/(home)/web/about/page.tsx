@@ -2,6 +2,7 @@
 
 import { DisclosureSection } from "../../_components/layout/sections/disclosure";
 import { FooterSection } from "../../_components/layout/sections/footer";
+import { NameExplanationSection } from "../../_components/layout/sections/name-explanation";
 import { PhilosophySection } from "../../_components/layout/sections/philosophy";
 
 export const metadata = {
@@ -36,6 +37,7 @@ export const metadata = {
 export default function PhilosophyPage() {
     return (
         <>
+            <NameExplanationSection />
             <PhilosophySection />
             <DisclosureSection />
             <FooterSection />

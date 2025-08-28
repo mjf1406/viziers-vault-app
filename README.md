@@ -14,6 +14,13 @@
 
 ## Change Log
 
+### 2025/08/28
+
+-   AddPartyDialog is now regular shadcn dialog
+-   added icons to items in the navbar that have a different nav element (basically indicating you're going to a different part of the site that behave differently)
+-   renamed /philosophy to /about
+-   added NameExplanation section to the about page
+
 ### 2025/08/27
 
 -   made the delete level button destructive in LevelEditor.tsx

@@ -21,12 +21,6 @@ export const FooterSection = () => {
                             players.
                         </p>
                     </div>
-                    <Link
-                        href="/"
-                        className="text-lg font-bold text-primary hover:text-primary/80 transition-colors"
-                    >
-                        Vizier's Vault
-                    </Link>
 
                     <div className="flex flex-col gap-2">
                         <h3 className="font-bold text-lg">Tools</h3>

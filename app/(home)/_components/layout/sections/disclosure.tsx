@@ -91,22 +91,6 @@ export const DisclosureSection = () => {
                     </Card>
                 ))}
             </div>
-
-            <div className="text-center mt-12">
-                <div className="bg-muted/50 rounded-lg p-6 max-w-3xl mx-auto">
-                    <h3 className="text-lg font-semibold mb-3">
-                        Our Commitment
-                    </h3>
-                    <p className="text-muted-foreground">
-                        We believe in leveraging the best of both worlds: AI for
-                        tasks that benefit from automation, while preserving
-                        human creativity and expertise for the core elements
-                        that make Vizier&apos;s Vault unique. All algorithms,
-                        game mechanics, and artistic decisions are made by me, a
-                        TTRPG GM and player, and freelancers.
-                    </p>
-                </div>
-            </div>
         </section>
     );
 };

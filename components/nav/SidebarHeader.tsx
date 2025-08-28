@@ -9,7 +9,17 @@ import { ThemeToggle } from "../theme/theme-toggle";
 
 export function SidebarHeader() {
     return (
-        <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+        <header
+            className="fixed bottom-0 left-0 right-0 z-40
+                       md:static md:bottom-auto
+                       h-[var(--header-height)] md:h-[var(--header-height)]
+                       shrink-0 flex items-center gap-2
+                       border-t md:border-b
+                       bg-background/60 backdrop-blur-sm
+                       transition-[width,height] ease-linear
+                       group-has-data-[collapsible=icon]/sidebar-wrapper:md:h-[var(--header-height)]
+                       pb-[env(safe-area-inset-bottom)]"
+        >
             <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
                 <SidebarTrigger className="-ml-1" />
                 <Separator

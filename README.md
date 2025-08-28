@@ -16,7 +16,12 @@
 
 ### 2025/08/28
 
--   stuff
+#### 19:29
+
+-   SidebarHeader is now fixed at the bottom of the screen on mobile
+-   the links in app-sidebar.tsx now are in the footer of the sidebar on mobile
+-   sidebar now closes when you click a link on mobile
+-   add party button is now a floating action button on mobile
 
 #### 18:35
 

@@ -11,6 +11,7 @@ import {
     SidebarHeader,
     SidebarContent,
     SidebarFooter,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -26,18 +27,10 @@ import {
     Swords,
     LayoutDashboard,
 } from "lucide-react";
-import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
 import { NavUser } from "./NavUser";
 import LogoTextOnly from "../brand/logo";
-
-type InstantUser = {
-    email?: string | null;
-    name?: string | null;
-    avatar_url?: string | null;
-    // add other fields from your $users entity if needed
-};
 
 const getIconComponent = (iconName: string) => {
     const iconMap: { [key: string]: any } = {
@@ -58,11 +51,19 @@ const stripSuffix = (title: string) =>
 
 export function AppSidebar() {
     const pathname = usePathname();
-    const [user, setUser] = useState<InstantUser | null>(null);
+    const { toggleSidebar } = useSidebar();
     const availableTools = getAvailableTools().slice();
     const allTools = availableTools.sort((a, b) =>
         stripSuffix(a.title).localeCompare(stripSuffix(b.title))
     );
+
+    // Close sidebar only on mobile (< md which is 768px in Tailwind)
+    const handleLinkClick = () => {
+        if (typeof window === "undefined") return;
+        if (window.innerWidth < 768) {
+            toggleSidebar?.();
+        }
+    };
 
     return (
         <Sidebar
@@ -71,18 +72,15 @@ export function AppSidebar() {
                 "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
             }
         >
-            {/* Top: site name (site name only here per your request) */}
             <SidebarHeader className="px-4 py-4 flex items-center justify-between">
                 <LogoTextOnly />
             </SidebarHeader>
 
             <Separator />
 
-            {/* Scrollable tool list (alphabetical) */}
             <SidebarContent className="flex-1 px-2 py-4">
-                <ScrollArea className="h-full">
-                    <nav className="flex flex-col space-y-1">
-                        {/* Dashboard link */}
+                <ScrollArea className="h-full [&>div>div]:flex [&>div>div]:flex-col [&>div>div]:h-full">
+                    <nav className="flex flex-col h-full justify-end md:justify-start space-y-1">
                         <Link
                             href="/app/dashboard"
                             aria-current={
@@ -90,6 +88,7 @@ export function AppSidebar() {
                                     ? "page"
                                     : undefined
                             }
+                            onClick={handleLinkClick}
                             className={cn(
                                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                                 pathname === "/app/dashboard"
@@ -103,7 +102,6 @@ export function AppSidebar() {
 
                         <Separator />
 
-                        {/* Dynamic tool links */}
                         {allTools.map((tool) => {
                             const Icon = getIconComponent(tool.icon);
                             const href = tool.url.replace(
@@ -116,6 +114,7 @@ export function AppSidebar() {
                                     key={tool.id}
                                     href={href}
                                     aria-current={isActive ? "page" : undefined}
+                                    onClick={handleLinkClick}
                                     className={cn(
                                         "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                                         isActive
@@ -134,7 +133,6 @@ export function AppSidebar() {
                 </ScrollArea>
             </SidebarContent>
 
-            {/* Bottom: fancy account card with dropdown (includes ThemeToggle inside) */}
             <SidebarFooter className="px-4 py-4 border-t">
                 <db.SignedIn>
                     <NavUser />
@@ -145,7 +143,12 @@ export function AppSidebar() {
                         asChild
                         className="w-full"
                     >
-                        <Link href="/app/login">Sign In</Link>
+                        <Link
+                            href="/app/login"
+                            onClick={handleLinkClick}
+                        >
+                            Sign In
+                        </Link>
                     </Button>
                 </db.SignedOut>
             </SidebarFooter>

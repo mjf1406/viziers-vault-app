@@ -30,27 +30,11 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import db from "@/lib/db";
-import { Separator } from "../ui/separator";
+import { useUser } from "@/hooks/useUser";
 
-type NavUserProps = {
-    user?: {
-        name?: string | null;
-        email?: string | null;
-        avatar?: string | null;
-    } | null;
-};
-
-export function NavUser({ user: initialUser }: NavUserProps) {
+export function NavUser() {
     const { isMobile } = useSidebar();
-    const [user, setUser] = useState<NavUserProps["user"]>(initialUser ?? null);
-    const query = { $users: { profile: { $files: {} } } };
-    const { isLoading, error, data } = db.useQuery(query);
-    const userInfo = data?.$users[0];
-    console.log("🚀 ~ NavUser ~ userInfo:", userInfo);
-    const displayName = userInfo?.profile?.name ?? "Account";
-    const displayEmail = userInfo?.email ?? "";
-    const avatarSrc = userInfo?.profile?.$files?.url ?? undefined;
-    const plan = userInfo?.profile?.premium ? "Premium" : "Free";
+    const { displayName, avatarSrc, plan } = useUser();
 
     return (
         <SidebarMenu>

@@ -25,7 +25,6 @@ import {
     CredenzaFooter,
     CredenzaHeader,
     CredenzaTitle,
-    CredenzaTrigger,
 } from "@/components/ui/credenza";
 
 type AddPartyDialogProps = {
@@ -35,40 +34,27 @@ type AddPartyDialogProps = {
     addPending: (id: string) => void;
     removePending: (id: string) => void;
 
-    // New trigger API (both optional)
-    triggerText?: string;
-    triggerIcon?: React.ReactNode;
-    triggerClassName?: string;
-
     // optional dialog controls (useful if parent wants to control open)
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
 
     // responsive dialog options
-    fixedTrigger?: boolean;
     hideTitleOnMobile?: boolean;
-    hideTriggerTextOnMobile?: boolean;
 };
 
-export default function AddPartyDialog({
+export default function AddPartyDialogResponsive({
     mode,
     initial = null,
     onClose,
     addPending,
     removePending,
-    // new trigger props
-    triggerText,
-    triggerIcon,
-    triggerClassName,
     // dialog controls
     open,
     defaultOpen,
     onOpenChange,
     // responsive options
-    fixedTrigger = false,
     hideTitleOnMobile = false,
-    hideTriggerTextOnMobile = false,
 }: AddPartyDialogProps) {
     const { user } = db.useAuth();
     const [isUploading, setIsUploading] = useState(false);
@@ -228,31 +214,12 @@ export default function AddPartyDialog({
     };
 
     const title = mode === "edit" ? "Edit Party" : "Create New Party";
-    const triggerLabel =
-        triggerText ?? (mode === "edit" ? "Edit Party" : "Create Party");
 
     return (
         <Credenza
             open={dialogOpen}
             onOpenChange={setDialogOpen}
         >
-            <CredenzaTrigger asChild>
-                <Button className={triggerClassName ?? ""}>
-                    {triggerIcon ? (
-                        <span className="mr-2 flex items-center">
-                            {triggerIcon}
-                        </span>
-                    ) : null}
-                    <span
-                        className={
-                            hideTriggerTextOnMobile ? "hidden sm:inline" : ""
-                        }
-                    >
-                        {triggerLabel}
-                    </span>
-                </Button>
-            </CredenzaTrigger>
-
             <CredenzaContent className="sm:max-w-md p-5">
                 <form
                     onSubmit={(e) => void submit(e)}

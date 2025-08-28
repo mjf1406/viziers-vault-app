@@ -216,7 +216,7 @@ export default function AddPartyDialog({
                 removePending(newId);
             } catch (err: any) {
                 console.error("db.transact error", err);
-                toast.error("Create failed");
+                toast.error("Create failed:", err?.message || err);
                 removePending(newId);
                 setDialogOpen(true);
             } finally {

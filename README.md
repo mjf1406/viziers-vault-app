@@ -16,6 +16,11 @@
 
 ### 2025/08/28
 
+#### 20:35
+
+-   added a premium upsell to /parties when not logged in and/or on free plan
+-   gated creating parties behind premium plan
+
 #### 19:29
 
 -   SidebarHeader is now fixed at the bottom of the screen on mobile

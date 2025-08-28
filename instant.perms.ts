@@ -17,13 +17,15 @@ const commonBind = [
     "auth.id != null && auth.id == data.id",
     "isStillOwner",
     "auth.id != null && auth.id == newData.id",
+    "isPremium",
+    "true in auth.ref('$user.profile.premium')",
 ];
 
 const rules = {
     $files: {
         allow: {
             view: "isAuthenticated",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isAuthenticated",
             delete: "isAuthenticated",
         },
@@ -41,28 +43,28 @@ const rules = {
     todos: {
         allow: {
             view: "isAuthenticated",
-            create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            create: "isAuthenticated && isPremium",
+            update: "isOwner && isStillOwner && isPremium",
+            delete: "isOwner && isPremium",
         },
         bind: commonBind,
     },
     settings: {
         allow: {
             view: "isAuthenticated",
-            create: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            create: "isAuthenticated && isPremium",
+            update: "isOwner && isStillOwner && isPremium",
+            delete: "isOwner && isPremium",
         },
         bind: commonBind,
     },
     userProfiles: {
         allow: {
             view: "isAuthenticated",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             // update: "isAuthenticated",
-            update: "isOwner && isStillOwner",
-            delete: "isOwner",
+            update: "isOwner && isStillOwner && isPremium",
+            delete: "isOwner && isPremium",
         },
         bind: commonBind,
     },
@@ -101,7 +103,7 @@ const rules = {
     battleMaps: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -110,7 +112,7 @@ const rules = {
     parties: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -119,7 +121,7 @@ const rules = {
     encounters: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -128,7 +130,7 @@ const rules = {
     spellbooks: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -137,7 +139,7 @@ const rules = {
     magicShops: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -146,7 +148,7 @@ const rules = {
     worlds: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -155,7 +157,7 @@ const rules = {
     starSystems: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },
@@ -164,7 +166,7 @@ const rules = {
     galaxies: {
         allow: {
             view: "isCreator",
-            create: "isAuthenticated",
+            create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",
         },

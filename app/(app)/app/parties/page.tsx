@@ -8,12 +8,15 @@ import { Plus, Users } from "lucide-react";
 import PartiesGrid from "./components/PartiesGrid";
 import AddPartyDialogResponsive from "./components/AddPartyResponsiveDialog";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/hooks/useUser";
+import PartiesUpsell from "./components/PartiesUpsell";
 
 export default function PartiesPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingParty, setEditingParty] = useState<any | null>(null);
     const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
+    const { plan } = useUser();
 
     const addPending = (id: string) =>
         setPendingIds((s) => {
@@ -42,30 +45,32 @@ export default function PartiesPage() {
                     My Parties
                 </h1>
 
-                <div className="flex items-center gap-3">
-                    {/* Desktop button (visible on sm+) */}
-                    <Button
-                        className="hidden sm:inline-flex"
-                        onClick={() => setCreateOpen(true)}
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Party
-                    </Button>
+                {plan === "Premium" && (
+                    <div className="flex items-center gap-3">
+                        {/* Desktop button (visible on sm+) */}
+                        <Button
+                            className="hidden sm:inline-flex"
+                            onClick={() => setCreateOpen(true)}
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Party
+                        </Button>
 
-                    {/* Mobile FAB (visible only < sm) */}
-                    <Button
-                        onClick={() => setCreateOpen(true)}
-                        aria-label="Add Party"
-                        size="icon"
-                        variant="default"
-                        className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
-                    >
-                        <Plus
-                            className="!w-7 !h-7"
-                            size={36}
-                        />
-                    </Button>
-                </div>
+                        {/* Mobile FAB (visible only < sm) */}
+                        <Button
+                            onClick={() => setCreateOpen(true)}
+                            aria-label="Add Party"
+                            size="icon"
+                            variant="default"
+                            className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
+                        >
+                            <Plus
+                                className="!w-7 !h-7"
+                                size={36}
+                            />
+                        </Button>
+                    </div>
+                )}
 
                 {/* Create dialog (controlled) */}
                 <AddPartyDialogResponsive
@@ -101,10 +106,14 @@ export default function PartiesPage() {
                 )}
             </div>
 
-            <PartiesGrid
-                onEdit={(p) => openForEdit(p)}
-                pendingIds={pendingIds}
-            />
+            {plan === "Premium" ? (
+                <PartiesGrid
+                    onEdit={(p) => openForEdit(p)}
+                    pendingIds={pendingIds}
+                />
+            ) : (
+                <PartiesUpsell unlockedItem="Parties" />
+            )}
         </div>
     );
 }

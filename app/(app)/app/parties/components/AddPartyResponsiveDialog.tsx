@@ -203,8 +203,12 @@ export default function AddPartyDialogResponsive({
                 clearForm();
                 removePending(newId);
             } catch (err: any) {
-                console.error("db.transact error", err);
-                toast.error("Create failed");
+                console.error("db.transact error", err.message);
+                toast.error(
+                    `Create failed: ${
+                        err.type || err.message.split(":")[0] || err
+                    }`
+                );
                 removePending(newId);
                 setDialogOpen(true);
             } finally {

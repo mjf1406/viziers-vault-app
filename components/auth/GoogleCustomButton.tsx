@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 type ProfileInfo = { name?: string; picture?: string | null };
@@ -12,6 +12,7 @@ type Props = {
     nonce: string;
     onSuccess: (idToken: string, info?: ProfileInfo | null) => void;
     onError?: (err?: any) => void;
+    onLoadingChange?: (loading: boolean) => void; // parent listens; child only turns it on
 };
 
 export default function GoogleCustomButton({
@@ -19,9 +20,11 @@ export default function GoogleCustomButton({
     nonce,
     onSuccess,
     onError,
+    onLoadingChange,
 }: Props) {
     const [ready, setReady] = useState(false);
     const [isPrompting, setIsPrompting] = useState(false);
+    const gotCredentialRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -98,19 +101,20 @@ export default function GoogleCustomButton({
         }
     };
 
-    const handleCredential = async (credential: string) => {
+    const handleCredential = (credential: string) => {
         setIsPrompting(true);
+        onLoadingChange?.(true);
+        gotCredentialRef.current = true;
         try {
             const payload = decodeJwtPayload(credential);
             const name: string | undefined = payload?.name;
             const picture: string | undefined = payload?.picture;
-            // return token + decoded profile info (no upload here)
             onSuccess(credential, { name, picture });
         } catch (err) {
             console.error("Error handling Google credential", err);
-            // still deliver the token at minimum
             onSuccess(credential);
         } finally {
+            // Re-enable the button; parent controls the main overlay
             setIsPrompting(false);
         }
     };
@@ -122,6 +126,8 @@ export default function GoogleCustomButton({
             }
 
             setIsPrompting(true);
+            onLoadingChange?.(true);
+            gotCredentialRef.current = false;
 
             (window as any).google.accounts.id.prompt((notification: any) => {
                 try {
@@ -129,22 +135,28 @@ export default function GoogleCustomButton({
                         typeof notification.isDisplayed === "function" &&
                         notification.isDisplayed()
                     ) {
-                        setIsPrompting(false);
+                        // One Tap is displayed; keep loading until either credential or cancel
                         return;
                     }
 
-                    if (
+                    const dismissed =
                         (typeof notification.isNotDisplayed === "function" &&
                             notification.isNotDisplayed()) ||
                         (typeof notification.isSkippedMoment === "function" &&
                             notification.isSkippedMoment()) ||
                         (typeof notification.isDismissedMoment === "function" &&
-                            notification.isDismissedMoment())
-                    ) {
+                            notification.isDismissedMoment());
+
+                    if (dismissed && !gotCredentialRef.current) {
                         setIsPrompting(false);
+                        // Don't toggle parent loading off here; signal error/cancel instead
+                        onError?.(new Error("Google prompt dismissed"));
                     }
                 } catch (e) {
-                    setIsPrompting(false);
+                    if (!gotCredentialRef.current) {
+                        setIsPrompting(false);
+                        onError?.(e);
+                    }
                 }
             });
         } catch (err) {
@@ -158,13 +170,13 @@ export default function GoogleCustomButton({
             onClick={handleClick}
             disabled={!ready || isPrompting}
             variant={"outline"}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-full"
+            className="flex w-full items-center gap-3 rounded-full px-4 py-2"
         >
-            <span className="flex-none w-8 h-8 rounded-full bg-transparent p-1.5 flex items-center justify-center">
+            <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-transparent p-1.5">
                 {/* Google SVG */}
                 <svg
                     viewBox="0 0 533.5 544.3"
-                    className="w-5 h-5"
+                    className="h-5 w-5"
                 >
                     <path
                         fill="#4285F4"
@@ -188,9 +200,9 @@ export default function GoogleCustomButton({
             <span className="flex-1 text-left">Sign in with Google</span>
 
             {isPrompting && (
-                <span className="flex-none w-5 h-5 ml-2">
+                <span className="ml-2 flex h-5 w-5 flex-none">
                     <svg
-                        className="animate-spin w-4 h-4"
+                        className="h-4 w-4 animate-spin"
                         viewBox="0 0 24 24"
                     >
                         <circle

@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,12 +14,13 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
 import { makeUploadCandidate } from "@/lib/image";
 import { uploadImage } from "@/lib/storage";
 import { v4 as uuidv4 } from "uuid";
+import MagicLinkAuth from "./MagicLinkAuth";
 
 function useEnsureUserProfile() {
     const { user } = db.useAuth();
@@ -41,7 +42,6 @@ function useEnsureUserProfile() {
                 );
             } catch (err: any) {
                 if (err.message.includes("Creating entities that exist")) {
-                    // already created elsewhere — fine
                     console.warn(err);
                 } else {
                     console.error(
@@ -63,7 +63,6 @@ export default function LoginPage() {
     useEnsureUserProfile();
     const { user } = db.useAuth();
 
-    const [sentEmail, setSentEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
@@ -75,34 +74,16 @@ export default function LoginPage() {
         picture?: string | null;
     } | null>(null);
 
-    const handleSendMagicCode = async (email: string) => {
-        setIsLoading(true);
-        setError("");
-
-        try {
-            await db.auth.sendMagicCode({ email });
-            setSentEmail(email);
-        } catch (err: any) {
-            setError(err?.body?.message || "Failed to send magic code");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleVerifyMagicCode = async (code: string) => {
-        setIsLoading(true);
-        setError("");
-
-        try {
-            await db.auth.signInWithMagicCode({ email: sentEmail, code });
-            router.push("/app/dashboard");
-        } catch (err: any) {
-            console.error("Magic Link Verification error:", err);
-            setError(err?.body?.message || "Invalid code");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // Ensures the overlay paints before heavy async work
+    const nextPaint = useCallback(
+        () =>
+            new Promise<void>((resolve) =>
+                requestAnimationFrame(() =>
+                    requestAnimationFrame(() => resolve())
+                )
+            ),
+        []
+    );
 
     // Sign in with id token. If profileInfo exists we stash it and wait for the
     // `user` auth state to arrive; the effect below will perform fetch + upload
@@ -117,6 +98,7 @@ export default function LoginPage() {
         if (profileInfo) setPendingGoogleProfile(profileInfo);
 
         try {
+            await nextPaint();
             await db.auth.signInWithIdToken({
                 clientName: GOOGLE_CLIENT_NAME,
                 idToken: credential,
@@ -125,14 +107,14 @@ export default function LoginPage() {
 
             // If there's no profileInfo to apply, redirect immediately.
             if (!profileInfo) {
+                // keep loading until route change; unmount will clear it
                 router.push("/app/dashboard");
-                setIsLoading(false);
+                return;
             }
             // otherwise leave isLoading true and let the effect handle completion
         } catch (err: any) {
             console.error("Google sign-in error:", err);
             setError(err?.body?.message || "Google sign-in failed");
-            // clear pending profile so it won't be applied accidentally
             setPendingGoogleProfile(null);
             setIsLoading(false);
         } finally {
@@ -148,6 +130,8 @@ export default function LoginPage() {
 
         const applyProfile = async () => {
             setIsLoading(true);
+            await nextPaint();
+
             const uid = user.id;
             const info = pendingGoogleProfile;
 
@@ -181,7 +165,6 @@ export default function LoginPage() {
                                 : undefined
                         );
 
-                        // debug: make sure uploadImage returned something sensible
                         console.debug("avatar upload result:", {
                             uploadedFileId,
                             path,
@@ -194,7 +177,6 @@ export default function LoginPage() {
                     }
                 } catch (err) {
                     console.error("Avatar fetch/upload failed:", err);
-                    // proceed without avatar
                 }
             }
 
@@ -209,7 +191,6 @@ export default function LoginPage() {
                         .link({ $user: uid })
                 );
             } catch (err: any) {
-                // ignore "already exists" errors, surface others
                 if (!err?.message?.includes?.("Creating entities that exist")) {
                     console.error("Failed to ensure userProfiles row:", err);
                 }
@@ -226,7 +207,7 @@ export default function LoginPage() {
                 }
             }
 
-            // 4) Link avatar in a dedicated transaction (safer)
+            // 4) Link avatar
             if (uploadedFileId) {
                 try {
                     await db.transact(
@@ -243,7 +224,7 @@ export default function LoginPage() {
                 setPendingGoogleProfile(null);
                 router.push("/app/dashboard");
             }
-            if (!cancelled) setIsLoading(false);
+            // keep isLoading true for the route change
         };
 
         void applyProfile();
@@ -251,216 +232,94 @@ export default function LoginPage() {
         return () => {
             cancelled = true;
         };
-    }, [user?.id, pendingGoogleProfile, router]);
+    }, [user?.id, pendingGoogleProfile, router, nextPaint]);
 
     return (
-        <div className="container relative min-h-screen flex-col items-center justify-center flex w-full mx-auto">
-            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                <Card>
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-2xl text-center">
-                            Welcome to Vizier's Vault
-                        </CardTitle>
-                        <CardDescription className="text-center">
-                            Sign in to access your account
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-4">
-                        {error && (
-                            <div className="p-3 text-sm border border-destructive/50 text-destructive rounded-md bg-destructive/10">
-                                {error}
-                            </div>
-                        )}
-
-                        {!sentEmail ? (
-                            <>
-                                <div className="w-full flex items-center justify-center google-login-wrapper">
-                                    <GoogleCustomButton
-                                        clientId={
-                                            process.env
-                                                .NEXT_PUBLIC_GOOGLE_CLIENT_ID!
-                                        }
-                                        nonce={oauthNonce}
-                                        // GoogleCustomButton now calls onSuccess(idToken, { name?, picture? })
-                                        onSuccess={(credential, info) => {
-                                            void handleGoogleSignIn(
-                                                credential,
-                                                oauthNonce,
-                                                info ?? null
-                                            );
-                                        }}
-                                        onError={() =>
-                                            setError("Google login failed")
-                                        }
-                                    />
-                                </div>
-
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <Separator className="w-full" />
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">
-                                            Or continue with
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <MagicLinkForm
-                                    onSendEmail={handleSendMagicCode}
-                                    isLoading={isLoading}
-                                />
-                            </>
-                        ) : (
-                            <MagicCodeForm
-                                sentEmail={sentEmail}
-                                onVerifyCode={handleVerifyMagicCode}
-                                onBack={() => setSentEmail("")}
-                                isLoading={isLoading}
-                            />
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    );
-}
-
-function MagicLinkForm({
-    onSendEmail,
-    isLoading,
-}: {
-    onSendEmail: (email: string) => void;
-    isLoading: boolean;
-}) {
-    const [email, setEmail] = useState("");
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const trimmed = email.trim();
-        if (trimmed) {
-            onSendEmail(trimmed);
-        }
-    };
-
-    return (
-        <form
-            onSubmit={handleSubmit}
-            className="grid gap-4"
-        >
-            <div className="grid gap-2">
-                <label
-                    htmlFor="email"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        <div className="relative flex min-h-screen w-full flex-col items-center justify-center">
+            {isLoading && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-background/70 backdrop-blur-sm"
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Signing in"
                 >
-                    Email address
-                </label>
-                <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
-                        required
-                        disabled={isLoading}
-                    />
-                </div>
-            </div>
-
-            <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading || !email.trim()}
-            >
-                {isLoading ? "Sending..." : "Send Magic Link"}
-            </Button>
-        </form>
-    );
-}
-
-function MagicCodeForm({
-    sentEmail,
-    onVerifyCode,
-    onBack,
-    isLoading,
-}: {
-    sentEmail: string;
-    onVerifyCode: (code: string) => void;
-    onBack: () => void;
-    isLoading: boolean;
-}) {
-    const [code, setCode] = useState("");
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const trimmed = code.trim();
-        if (trimmed) {
-            onVerifyCode(trimmed);
-        }
-    };
-
-    return (
-        <div className="grid gap-4">
-            <div className="flex items-center space-x-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={onBack}
-                    className="p-0 h-auto"
-                >
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Back
-                </Button>
-            </div>
-
-            <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold">
-                    Enter verification code
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                    We sent a code to <strong>{sentEmail}</strong>
-                </p>
-            </div>
-
-            <form
-                onSubmit={handleSubmit}
-                className="grid gap-4"
-            >
-                <div className="grid gap-2">
-                    <label
-                        htmlFor="code"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                        Verification code
-                    </label>
-                    <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input
-                            id="code"
-                            type="text"
-                            placeholder="Enter 6-digit code"
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            className="pl-10 text-center text-lg tracking-widest"
-                            maxLength={6}
-                            required
-                            disabled={isLoading}
-                            autoFocus
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2
+                            className="animate-spin"
+                            size={72}
                         />
+                        <span className="font-medium">Signing in...</span>
                     </div>
                 </div>
+            )}
 
-                <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading || code.length !== 6}
-                >
-                    {isLoading ? "Verifying..." : "Verify Code"}
-                </Button>
-            </form>
+            <div className="container mx-auto flex w-full flex-col justify-center">
+                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                    <Card
+                        className="relative"
+                        aria-busy={isLoading}
+                    >
+                        <CardHeader className="space-y-1">
+                            <CardTitle className="text-center text-2xl">
+                                Welcome to Vizier&apos;s Vault
+                            </CardTitle>
+                            <CardDescription className="text-center">
+                                Sign in to access your account
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            {error && (
+                                <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                                    {error}
+                                </div>
+                            )}
+
+                            <div className="google-login-wrapper flex w-full items-center justify-center">
+                                <GoogleCustomButton
+                                    clientId={
+                                        process.env
+                                            .NEXT_PUBLIC_GOOGLE_CLIENT_ID!
+                                    }
+                                    nonce={oauthNonce}
+                                    onLoadingChange={(v) => {
+                                        if (v) setIsLoading(true); // child only turns it on
+                                    }}
+                                    onSuccess={(credential, info) => {
+                                        void handleGoogleSignIn(
+                                            credential,
+                                            oauthNonce,
+                                            info ?? null
+                                        );
+                                    }}
+                                    onError={(e) => {
+                                        setIsLoading(false);
+                                        setError(
+                                            e?.message || "Google login failed"
+                                        );
+                                    }}
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                    <Separator className="w-full" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-background px-2 text-muted-foreground">
+                                        Or continue with
+                                    </span>
+                                </div>
+                            </div>
+
+                            <MagicLinkAuth
+                                onError={(msg) => setError(msg)}
+                                onStartGlobalLoading={() => setIsLoading(true)}
+                                onStopGlobalLoading={() => setIsLoading(false)}
+                            />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     );
 }

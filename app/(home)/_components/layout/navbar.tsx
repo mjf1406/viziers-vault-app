@@ -1,13 +1,7 @@
 /** @format */
 
 "use client";
-import {
-    AppWindow,
-    ChevronsDown,
-    Menu,
-    Newspaper,
-    ScrollText,
-} from "lucide-react";
+import { ChevronsDown, Menu } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import {
@@ -19,16 +13,10 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import {
-    NavigationMenu,
-    NavigationMenuList,
-    NavigationMenuItem,
-    NavigationMenuLink,
-} from "@radix-ui/react-navigation-menu";
 import { Separator } from "@radix-ui/react-separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
-import LogoTextOnly from "@/components/brand/logo";
+import { LogoTextOnly } from "@/components/brand/logo";
 
 interface RouteProps {
     href: string;
@@ -44,12 +32,12 @@ const routeList: RouteProps[] = [
     {
         href: "/app/dashboard",
         label: "App",
-        icon: <AppWindow className="w-4 h-4 mr-2" />,
+        // icon: <AppWindow className="w-4 h-4 mr-2" />,
     },
     {
         href: "/blog",
         label: "Blog",
-        icon: <Newspaper className="w-4 h-4 mr-2" />,
+        // icon: <Newspaper className="w-4 h-4 mr-2" />,
     },
     {
         href: "/web/contact",
@@ -58,7 +46,7 @@ const routeList: RouteProps[] = [
     {
         href: "/docs",
         label: "Docs",
-        icon: <ScrollText className="w-4 h-4 mr-2" />,
+        // icon: <ScrollText className="w-4 h-4 mr-2" />,
     },
     {
         href: "/web/faq",

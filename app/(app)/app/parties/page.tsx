@@ -4,19 +4,30 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Users } from "lucide-react";
+import { Loader2, Plus, Users } from "lucide-react";
 import PartiesGrid from "./components/PartiesGrid";
 import AddPartyDialogResponsive from "./components/AddPartyResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
-import PartiesUpsell from "./components/PartiesUpsell";
+import PartiesUpsell from "@/components/PremiumUpsell";
 
 export default function PartiesPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingParty, setEditingParty] = useState<any | null>(null);
     const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
-    const { plan } = useUser();
+    const { plan, isLoading } = useUser();
+
+    if (isLoading)
+        return (
+            <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
+                <Loader2
+                    className="animate-spin"
+                    size={124}
+                />
+                Loading parties...
+            </div>
+        );
 
     const addPending = (id: string) =>
         setPendingIds((s) => {

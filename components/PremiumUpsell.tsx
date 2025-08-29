@@ -26,8 +26,10 @@ export default function PartiesUpsell({
     const { data } = useUser();
     const isLoggedIn = Boolean(data?.$users?.length);
 
-    const ctaHref = isLoggedIn ? "/billing" : "/login";
-    const ctaLabel = isLoggedIn ? "Go to Billing" : "Sign in to upgrade";
+    const ctaHref = isLoggedIn ? "/app/account" : "/app/login";
+    const ctaLabel = isLoggedIn
+        ? "Subscribe to Premium"
+        : "Sign in to subscribe";
 
     return (
         <Card className={className}>
@@ -69,17 +71,6 @@ export default function PartiesUpsell({
                     >
                         <Link href={ctaHref}>{ctaLabel}</Link>
                     </Button>
-                    {!isLoggedIn && (
-                        <p className="text-sm text-muted-foreground">
-                            Don’t have an account?{" "}
-                            <Link
-                                href="/login"
-                                className="underline"
-                            >
-                                Create one free
-                            </Link>
-                        </p>
-                    )}
                 </div>
             </CardContent>
         </Card>

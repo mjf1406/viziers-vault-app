@@ -8,10 +8,20 @@
 
 ## To-do List
 
--   create a features JSOHN for use in benefits.tsx and services.tsx, which can also be used in PricingSection in pricing.tsx
--   make the login page show better loading state
+-   added an action button to Party in the sidebar that navigates to /app/parties/add which opens the AddPartyDialog
 
 ## Change Log
+
+### 2025/08/29
+
+-   added a loading state on /app/parties for useUser
+-   added a basic account page at /app/account
+-   made the sidebar collapse to icons
+-   refactored sidebar to use actual shadcn Sidebar components
+-   created a features JSON for use in benefits.tsx and services.tsx, which can also be used in PricingSection in pricing.tsx
+-   added a little info icon on the 4-month free trial explaining the reasoning for such a a long trial
+-   make the login page show better loading state for better UX
+-   removed the icons in the navbar because I think they made it look too busy, therefor confusing
 
 ### 2025/08/28
 

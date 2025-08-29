@@ -1,5 +1,8 @@
 /** @format */
 
+// components/PricingSection.tsx
+/** @format */
+
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -9,81 +12,15 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Check } from "lucide-react";
 import Link from "next/link";
-
-enum PopularPlan {
-    NO = 0,
-    YES = 1,
-}
-
-interface PlanProps {
-    title: string;
-    popular: PopularPlan;
-    price: number;
-    description: string;
-    buttonText: string;
-    benefitList: string[];
-}
-
-const plans: PlanProps[] = [
-    {
-        title: "Free",
-        popular: 0,
-        price: 0,
-        description:
-            "Basic access to core generators with limited features and no data persistence.",
-        buttonText: "Start Using Free",
-        benefitList: [
-            "Premade worlds & cities only",
-            "CSV export only",
-            "VTT export",
-            "Image export",
-            "Community support on Discord",
-        ],
-    },
-    {
-        title: "Premium",
-        popular: 1,
-        price: 3,
-        description:
-            "Full access to all features with data persistence and advanced capabilities.",
-        buttonText: "Start 4-month free Trial",
-        benefitList: [
-            "Everything in Free, plus:",
-            "All generators (current and future)",
-            "Create custom worlds and cities",
-            "Permalink generation",
-            "Data persistence and export",
-            "Free 4-month trial included",
-        ],
-    },
-    {
-        title: "Beta Access",
-        popular: 0,
-        price: 5,
-        description:
-            "Full access to all features with data persistence and advanced capabilities.",
-        buttonText: "Subscribe to Beta",
-        benefitList: [
-            "Everything in Premium, plus:",
-            "Access to Beta features",
-        ],
-    },
-    {
-        title: "Alpha Access",
-        popular: 0,
-        price: 10,
-        description:
-            "Full access to all features with data persistence and advanced capabilities.",
-        buttonText: "Subscribe to Alpha",
-        benefitList: [
-            "Everything in Beta Access, plus:",
-            "Access to Alpha features",
-            "Voting power for new features on Discord",
-        ],
-    },
-];
+import { Check, HelpCircle } from "lucide-react";
+import { catalog } from "@/lib/features";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const PricingSection = () => {
     return (
@@ -100,83 +37,131 @@ export const PricingSection = () => {
             </h2>
 
             <h3 className="md:w-1/2 mx-auto text-xl text-center text-muted-foreground pb-14">
-                Choose the plan that fits your D&D campaign needs.
+                Choose the plan that fits your D&amp;D campaign needs.
             </h3>
 
             <div className="grid md:grid-cols-2 gap-8 lg:gap-4 max-w-4xl mx-auto">
-                {plans.map(
-                    ({
-                        title,
-                        popular,
-                        price,
-                        description,
-                        buttonText,
-                        benefitList,
-                    }) => (
-                        <Card
-                            key={title}
-                            className={
-                                popular === PopularPlan?.YES
-                                    ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
-                                    : ""
-                            }
-                        >
-                            <CardHeader>
-                                <CardTitle className="pb-2">{title}</CardTitle>
+                {catalog.plans.map((plan) => (
+                    <Card
+                        key={plan.id}
+                        className={
+                            plan.popular
+                                ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
+                                : ""
+                        }
+                    >
+                        <CardHeader>
+                            <CardTitle className="pb-2">{plan.title}</CardTitle>
 
-                                <CardDescription className="pb-4">
-                                    {description}
-                                </CardDescription>
+                            <CardDescription className="pb-4">
+                                {plan.description}
+                            </CardDescription>
 
-                                <div>
-                                    <span className="text-3xl font-bold">
-                                        ${price}
-                                    </span>
-                                    <span className="text-muted-foreground">
-                                        {" "}
-                                        /month
-                                    </span>
-                                </div>
-                            </CardHeader>
+                            <div>
+                                <span className="text-3xl font-bold">
+                                    ${plan.priceMonthly}
+                                </span>
+                                <span className="text-muted-foreground">
+                                    {" "}
+                                    /month
+                                </span>
+                            </div>
+                        </CardHeader>
 
-                            <CardContent className="flex">
-                                <div className="space-y-4">
-                                    {benefitList.map((benefit) => (
+                        <CardContent className="flex">
+                            <div className="space-y-4">
+                                {plan.bullets.map((bullet, idx) => {
+                                    if (bullet.type === "text") {
+                                        const isTrialLabel =
+                                            bullet.label ===
+                                            "Free 4-month trial included";
+                                        return (
+                                            <span
+                                                key={`${plan.id}-text-${idx}`}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <Check className="text-primary mr-2" />
+                                                <h3 className="flex items-center gap-2">
+                                                    {bullet.label}
+                                                    {isTrialLabel && (
+                                                        <TooltipProvider>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        aria-label="More info about trial length"
+                                                                        className="inline-flex items-center justify-center p-1 rounded text-muted-foreground hover:text-foreground"
+                                                                    >
+                                                                        <HelpCircle className="w-4 h-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className="max-w-sm">
+                                                                    We know that
+                                                                    not all
+                                                                    groups play
+                                                                    weekly or
+                                                                    even every
+                                                                    other week.
+                                                                    Some groups
+                                                                    only play
+                                                                    once per
+                                                                    month or
+                                                                    even less.
+                                                                    This 4-month
+                                                                    trial
+                                                                    ensures you
+                                                                    have ample
+                                                                    time to
+                                                                    really try
+                                                                    the app no
+                                                                    matter how
+                                                                    frequently
+                                                                    you and your
+                                                                    group play.
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+                                                </h3>
+                                            </span>
+                                        );
+                                    }
+                                    const f =
+                                        catalog.features[bullet.featureId];
+                                    const label =
+                                        bullet.labelOverride ?? f.title;
+                                    return (
                                         <span
-                                            key={benefit}
+                                            key={f.id}
                                             className="flex"
                                         >
                                             <Check className="text-primary mr-2" />
-                                            <h3>{benefit}</h3>
+                                            <h3>{label}</h3>
                                         </span>
-                                    ))}
-                                </div>
-                            </CardContent>
+                                    );
+                                })}
+                            </div>
+                        </CardContent>
 
-                            <CardFooter className="flex flex-col items-center">
-                                <Button
-                                    asChild
-                                    variant={
-                                        popular === PopularPlan?.YES
-                                            ? "default"
-                                            : "secondary"
-                                    }
-                                    className="w-full"
-                                >
-                                    <Link href="https://www.viziersvault.com/account">
-                                        {buttonText}
-                                    </Link>
-                                </Button>
+                        <CardFooter className="flex flex-col items-center">
+                            <Button
+                                asChild
+                                variant={plan.popular ? "default" : "secondary"}
+                                className="w-full"
+                            >
+                                <Link href={plan.ctaHref}>{plan.ctaText}</Link>
+                            </Button>
 
-                                {popular === PopularPlan.YES && (
-                                    <p className="w-full text-center text-sm text-muted-foreground mt-2">
-                                        No credit card required
-                                    </p>
-                                )}
-                            </CardFooter>
-                        </Card>
-                    )
-                )}
+                            {plan.popular && plan.footnote && (
+                                <p className="w-full text-center text-sm text-muted-foreground mt-2">
+                                    {plan.footnote}
+                                </p>
+                            )}
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         </section>
     );

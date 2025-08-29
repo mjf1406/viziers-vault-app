@@ -9,6 +9,7 @@
 ## To-do List
 
 -   added an action button to Party in the sidebar that navigates to /app/parties/add which opens the AddPartyDialog
+-   in the sidebar, add a badge that says "New" next to those that are new in the current version and make slightly transparent those that are not yet implemented
 
 ## Change Log
 

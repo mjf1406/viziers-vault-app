@@ -18,7 +18,7 @@ const commonBind = [
     "isStillOwner",
     "auth.id != null && auth.id == newData.id",
     "isPremium",
-    "true in auth.ref('$user.profile.premium')",
+    "auth.ref('$user.profile.plan').exists(p, p in ['basic', 'plus', 'pro'])",
 ];
 
 const rules = {

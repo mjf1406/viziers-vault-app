@@ -21,7 +21,7 @@ export default function PartiesPage() {
         "modalOpen",
         parseAsInteger.withDefault(0)
     );
-    const { plan, isLoading } = useUser();
+    const { plan, isLoading, user } = useUser();
 
     // Sync modalOpen query param with createOpen state
     useEffect(() => {
@@ -75,7 +75,7 @@ export default function PartiesPage() {
                     My Parties
                 </h1>
 
-                {plan !== "Free" && (
+                {user && plan !== "Free" && (
                     <div className="flex items-center gap-3">
                         {/* Desktop button (visible on sm+) */}
                         <Button
@@ -136,7 +136,7 @@ export default function PartiesPage() {
                 )}
             </div>
 
-            {plan !== "Free" ? (
+            {user && plan !== "Free" ? (
                 <PartiesGrid
                     onEdit={(p) => openForEdit(p)}
                     pendingIds={pendingIds}

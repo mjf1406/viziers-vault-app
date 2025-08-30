@@ -9,6 +9,8 @@
 ## To-do List
 
 -   moved userProfile creation and user avatar upload to separate server actions
+-   weird footer flash now...
+-   the example dashboard has a too wide width when the windows is narrow
 
 ## Change Log
 

@@ -13,6 +13,13 @@
 
 ## Change Log
 
+### 2025/08/30
+
+#### 12:21
+
+-   refactored features into one JSON, features.ts, for easy ingestion by pricing, account, benefits, and services. Single source of truth is best
+-   refactored plans into one JSON, plans.ts, for easy ingestion by pricing and account
+
 ### 2025/08/29
 
 -   added a loading state on /app/parties for useUser

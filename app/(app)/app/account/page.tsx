@@ -1,4 +1,5 @@
 /** @format */
+/* app/(app)/app/account/page.tsx */
 
 "use client";
 
@@ -19,7 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Check, Crown, ShieldAlert } from "lucide-react";
-import { catalog, Plan, TierId } from "@/lib/features";
+import { features, type Feature } from "@/lib/features";
+import { plans as allPlans, type Plan, type TierId } from "@/lib/plans";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "sonner";
 
@@ -28,20 +30,35 @@ export default function AccountPage() {
         displayName,
         displayEmail,
         avatarSrc,
-        plan: userPlanName, // "Premium" | "Free"
+        plan: userPlanName,
         isLoading,
         error,
         signOut,
     } = useUser();
 
-    const currentTier: TierId = useMemo(() => {
-        const v = userPlanName?.toLowerCase();
-        if (v === "premium" || v === "beta" || v === "alpha")
-            return v as TierId;
-        return "free";
-    }, [userPlanName]);
+    const normalizeTier = (name?: string): TierId => {
+        const v = name?.toLowerCase();
+        switch (v) {
+            case "premium":
+            case "basic":
+                return "basic";
+            case "beta":
+            case "plus":
+                return "plus";
+            case "alpha":
+            case "pro":
+                return "pro";
+            default:
+                return "free";
+        }
+    };
 
-    const plans = catalog.plans;
+    const currentTier: TierId = useMemo(
+        () => normalizeTier(userPlanName),
+        [userPlanName]
+    );
+
+    const plans = allPlans;
 
     const handleOpenBillingPortal = async () => {
         try {
@@ -76,6 +93,13 @@ export default function AccountPage() {
         }
     };
 
+    const tierOrder: Record<TierId, number> = {
+        free: 0,
+        basic: 1,
+        plus: 2,
+        pro: 3,
+    };
+
     return (
         <div className="mx-auto w-full max-w-5xl space-y-8 p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -84,7 +108,7 @@ export default function AccountPage() {
                         {avatarSrc ? (
                             <AvatarImage
                                 src={avatarSrc}
-                                alt={displayName}
+                                alt={displayName || "Avatar"}
                             />
                         ) : (
                             <AvatarFallback>
@@ -155,7 +179,7 @@ export default function AccountPage() {
                         </p>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-6 grid-cols-2">
                         {plans.map((p) => (
                             <PlanCard
                                 key={p.id}
@@ -163,6 +187,8 @@ export default function AccountPage() {
                                 isCurrent={p.id === currentTier}
                                 onCheckout={() => handleCheckout(p.id)}
                                 onManage={handleOpenBillingPortal}
+                                allFeatures={features}
+                                tierOrder={tierOrder}
                             />
                         ))}
                     </div>
@@ -177,36 +203,20 @@ function PlanCard({
     isCurrent,
     onCheckout,
     onManage,
+    allFeatures,
+    tierOrder,
 }: {
     plan: Plan;
     isCurrent: boolean;
     onCheckout: () => void;
     onManage: () => void;
+    allFeatures: Feature[];
+    tierOrder: Record<TierId, number>;
 }) {
     const isPaid = plan.id !== "free";
-    const bullets = plan.bullets.map((b, i) => {
-        if (b.type === "text") {
-            return (
-                <li
-                    key={`t-${i}`}
-                    className="text-sm"
-                >
-                    {b.label}
-                </li>
-            );
-        }
-        const f = catalog.features[b.featureId];
-        const label = b.labelOverride ?? f?.title ?? b.featureId;
-        return (
-            <li
-                key={`f-${b.featureId}-${i}`}
-                className="flex items-start gap-2"
-            >
-                <Check className="mt-0.5 h-4 w-4 text-green-600" />
-                <span className="text-sm">{label}</span>
-            </li>
-        );
-    });
+    const included = allFeatures.filter(
+        (f) => tierOrder[f.minTier] <= tierOrder[plan.id]
+    );
 
     return (
         <Card
@@ -233,7 +243,17 @@ function PlanCard({
                     </div>
                     <div className="text-sm text-muted-foreground">/month</div>
                 </div>
-                <ul className="space-y-2">{bullets}</ul>
+                <ul className="space-y-2">
+                    {included.map((f) => (
+                        <li
+                            key={f.id}
+                            className="flex items-start gap-2"
+                        >
+                            <Check className="mt-0.5 h-4 w-4 text-green-600" />
+                            <span className="text-sm">{f.title}</span>
+                        </li>
+                    ))}
+                </ul>
                 {plan.footnote ? (
                     <p className="text-xs text-muted-foreground">
                         {plan.footnote}

@@ -1,18 +1,54 @@
 /** @format */
-
-// components/BenefitsSection.tsx
-/** @format */
+/* components/BenefitsSection.tsx */
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
-import { catalog } from "@/lib/features";
 import Link from "next/link";
 
+type Benefit = {
+    id: string;
+    title: string;
+    description: string;
+    icon?: string; // lucide-react icon name, e.g., "Clock", "Scale", etc.
+};
+
 export const BenefitsSection = () => {
-    const tiles = catalog.marketing.benefitTileFeatureIds.map(
-        (id) => catalog.features[id]
-    );
+    // Outcome-focused benefits (not tied to features JSON)
+    const benefits: Benefit[] = [
+        {
+            id: "save-prep-time",
+            title: "Save Hours of Prep",
+            description:
+                "Spin up encounters, loot, and maps in minutes so you can spend " +
+                "more time on story and play.",
+            icon: "Clock",
+        },
+        {
+            id: "balanced-content",
+            title: "Balanced, Ready-to-Run Content",
+            description:
+                "Auto-tuned difficulty and scalable recommendations reduce " +
+                "guesswork and keep sessions flowing.",
+            icon: "Scale",
+        },
+        {
+            id: "seamless-ux",
+            title: "Frictionless Session Flow",
+            description:
+                "Fast, clean UI and smart defaults minimize clicks and context " +
+                "switching during the game.",
+            icon: "Sparkles",
+        },
+        {
+            id: "share-and-reuse",
+            title: "Share and Reuse Easily",
+            description:
+                "One-click links and exports let you hand off content to players " +
+                "or reuse across campaigns.",
+            icon: "Share2",
+        },
+    ];
 
     return (
         <section
@@ -30,22 +66,22 @@ export const BenefitsSection = () => {
                     </h2>
                     <p className="text-xl text-muted-foreground mb-8">
                         Focus on storytelling and player engagement while our
-                        tools handle the mechanical aspects of campaign
-                        preparation and generation.
+                        tools handle the mechanical aspects of preparation and
+                        play.
                     </p>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-4 w-full">
-                    {tiles.map((f, index) => (
+                    {benefits.map((b, index) => (
                         <Card
-                            key={f.id}
+                            key={b.id}
                             className="bg-muted/50 dark:bg-card hover:bg-background transition-all delay-75 group/number"
                         >
                             <CardHeader>
                                 <div className="flex justify-between">
-                                    {f.icon ? (
+                                    {b.icon ? (
                                         <Icon
-                                            name={f.icon as any}
+                                            name={b.icon as any}
                                             size={32}
                                             color="hsl(var(--primary))"
                                             className="mb-6 text-primary"
@@ -58,11 +94,11 @@ export const BenefitsSection = () => {
                                     </span>
                                 </div>
 
-                                <CardTitle>{f.title}</CardTitle>
+                                <CardTitle>{b.title}</CardTitle>
                             </CardHeader>
 
                             <CardContent className="text-muted-foreground">
-                                {f.description}
+                                {b.description}
                             </CardContent>
                         </Card>
                     ))}

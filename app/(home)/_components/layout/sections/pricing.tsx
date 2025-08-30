@@ -1,7 +1,5 @@
 /** @format */
-
-// components/PricingSection.tsx
-/** @format */
+/* components/PricingSection.tsx */
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,16 +11,18 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { Check, HelpCircle } from "lucide-react";
-import { catalog } from "@/lib/features";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Check } from "lucide-react";
+import { features } from "@/lib/features";
+import { plans, type TierId } from "@/lib/plans";
 
 export const PricingSection = () => {
+    const tierOrder: Record<TierId, number> = {
+        free: 0,
+        basic: 1,
+        plus: 2,
+        pro: 3,
+    };
+
     return (
         <section
             id="pricing"
@@ -41,127 +41,76 @@ export const PricingSection = () => {
             </h3>
 
             <div className="grid md:grid-cols-2 gap-8 lg:gap-4 max-w-4xl mx-auto">
-                {catalog.plans.map((plan) => (
-                    <Card
-                        key={plan.id}
-                        className={
-                            plan.popular
-                                ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
-                                : ""
-                        }
-                    >
-                        <CardHeader>
-                            <CardTitle className="pb-2">{plan.title}</CardTitle>
+                {plans.map((plan) => {
+                    const included = features.filter(
+                        (f) => tierOrder[f.minTier] <= tierOrder[plan.id]
+                    );
 
-                            <CardDescription className="pb-4">
-                                {plan.description}
-                            </CardDescription>
+                    return (
+                        <Card
+                            key={plan.id}
+                            className={
+                                plan.popular
+                                    ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
+                                    : ""
+                            }
+                        >
+                            <CardHeader>
+                                <CardTitle className="pb-2">
+                                    {plan.title}
+                                </CardTitle>
 
-                            <div>
-                                <span className="text-3xl font-bold">
-                                    ${plan.priceMonthly}
-                                </span>
-                                <span className="text-muted-foreground">
-                                    {" "}
-                                    /month
-                                </span>
-                            </div>
-                        </CardHeader>
+                                <CardDescription className="pb-4">
+                                    {plan.description}
+                                </CardDescription>
 
-                        <CardContent className="flex">
-                            <div className="space-y-4">
-                                {plan.bullets.map((bullet, idx) => {
-                                    if (bullet.type === "text") {
-                                        const isTrialLabel =
-                                            bullet.label ===
-                                            "Free 4-month trial included";
-                                        return (
-                                            <span
-                                                key={`${plan.id}-text-${idx}`}
-                                                className="flex items-center gap-2"
-                                            >
-                                                <Check className="text-primary mr-2" />
-                                                <h3 className="flex items-center gap-2">
-                                                    {bullet.label}
-                                                    {isTrialLabel && (
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger
-                                                                    asChild
-                                                                >
-                                                                    <button
-                                                                        type="button"
-                                                                        aria-label="More info about trial length"
-                                                                        className="inline-flex items-center justify-center p-1 rounded text-muted-foreground hover:text-foreground"
-                                                                    >
-                                                                        <HelpCircle className="w-4 h-4" />
-                                                                    </button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent className="max-w-sm">
-                                                                    We know that
-                                                                    not all
-                                                                    groups play
-                                                                    weekly or
-                                                                    even every
-                                                                    other week.
-                                                                    Some groups
-                                                                    only play
-                                                                    once per
-                                                                    month or
-                                                                    even less.
-                                                                    This 4-month
-                                                                    trial
-                                                                    ensures you
-                                                                    have ample
-                                                                    time to
-                                                                    really try
-                                                                    the app no
-                                                                    matter how
-                                                                    frequently
-                                                                    you and your
-                                                                    group play.
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    )}
-                                                </h3>
-                                            </span>
-                                        );
-                                    }
-                                    const f =
-                                        catalog.features[bullet.featureId];
-                                    const label =
-                                        bullet.labelOverride ?? f.title;
-                                    return (
+                                <div>
+                                    <span className="text-3xl font-bold">
+                                        ${plan.priceMonthly}
+                                    </span>
+                                    <span className="text-muted-foreground">
+                                        {" "}
+                                        /month
+                                    </span>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="flex">
+                                <div className="space-y-4">
+                                    {included.map((f) => (
                                         <span
                                             key={f.id}
                                             className="flex"
                                         >
                                             <Check className="text-primary mr-2" />
-                                            <h3>{label}</h3>
+                                            <h3>{f.title}</h3>
                                         </span>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
+                                    ))}
+                                </div>
+                            </CardContent>
 
-                        <CardFooter className="flex flex-col items-center">
-                            <Button
-                                asChild
-                                variant={plan.popular ? "default" : "secondary"}
-                                className="w-full"
-                            >
-                                <Link href={plan.ctaHref}>{plan.ctaText}</Link>
-                            </Button>
+                            <CardFooter className="flex flex-col items-center">
+                                <Button
+                                    asChild
+                                    variant={
+                                        plan.popular ? "default" : "secondary"
+                                    }
+                                    className="w-full"
+                                >
+                                    <Link href={plan.ctaHref}>
+                                        {plan.ctaText}
+                                    </Link>
+                                </Button>
 
-                            {plan.popular && plan.footnote && (
-                                <p className="w-full text-center text-sm text-muted-foreground mt-2">
-                                    {plan.footnote}
-                                </p>
-                            )}
-                        </CardFooter>
-                    </Card>
-                ))}
+                                {plan.popular && plan.footnote && (
+                                    <p className="w-full text-center text-sm text-muted-foreground mt-2">
+                                        {plan.footnote}
+                                    </p>
+                                )}
+                            </CardFooter>
+                        </Card>
+                    );
+                })}
             </div>
         </section>
     );

@@ -11,6 +11,7 @@
 -   moved userProfile creation and user avatar upload to separate server actions
 -   weird footer flash now...
 -   the example dashboard has a too wide width when the windows is narrow
+-   see if removing all Shadcn UI components from home page to see if it reduces First Load JS
 
 ## Change Log
 

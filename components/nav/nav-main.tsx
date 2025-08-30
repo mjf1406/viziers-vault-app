@@ -98,7 +98,7 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                             className={cn(
                                                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                                                 isDisabled &&
-                                                    "opacity-50 cursor-not-allowed",
+                                                    "opacity-40 cursor-not-allowed",
                                                 !isDisabled &&
                                                     (isActive
                                                         ? "bg-muted text-primary"

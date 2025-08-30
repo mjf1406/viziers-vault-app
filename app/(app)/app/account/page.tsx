@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Check, Crown, ShieldAlert } from "lucide-react";
+import { Check, CheckCircle, Crown, ShieldAlert } from "lucide-react";
 import { features, type Feature } from "@/lib/features";
 import { plans as allPlans, type Plan, type TierId } from "@/lib/plans";
 import { useUser } from "@/hooks/useUser";
@@ -42,10 +42,8 @@ export default function AccountPage() {
             case "premium":
             case "basic":
                 return "basic";
-            case "beta":
             case "plus":
                 return "plus";
-            case "alpha":
             case "pro":
                 return "pro";
             default:
@@ -214,9 +212,11 @@ function PlanCard({
     tierOrder: Record<TierId, number>;
 }) {
     const isPaid = plan.id !== "free";
-    const included = allFeatures.filter(
-        (f) => tierOrder[f.minTier] <= tierOrder[plan.id]
-    );
+    const included = allFeatures.filter((i) => i.minTier == plan.id);
+    const prevTierIndex =
+        tierOrder[plan.id] > 0 ? tierOrder[plan.id] - 1 : null;
+    const prevTier =
+        prevTierIndex !== null ? Object.keys(tierOrder)[prevTierIndex] : null;
 
     return (
         <Card
@@ -244,6 +244,14 @@ function PlanCard({
                     <div className="text-sm text-muted-foreground">/month</div>
                 </div>
                 <ul className="space-y-2">
+                    {prevTier && (
+                        <li className="flex items-start gap-2">
+                            <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
+                            <span className="text-sm">
+                                Everything in {prevTier} and...
+                            </span>
+                        </li>
+                    )}
                     {included.map((f) => (
                         <li
                             key={f.id}

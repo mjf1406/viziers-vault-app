@@ -15,6 +15,7 @@ export interface Tool {
         | "Planned"
         | "TBD - A wild dream";
     icon: string;
+    released?: "new" | "yes";
     philosophy: string;
     features: string[];
     integrations: string[];
@@ -40,6 +41,7 @@ export const tools: Tool[] = [
             "Generate magic shops based on city population, wealth, and magic level.",
         status: "Alpha 1",
         icon: "Store",
+        released: "new",
         philosophy:
             "I love to run roguelite D&D campaigns, where everything is randomly generated. This started just for basic magic items, but quickly expanded to everything that can be purchased in D&D 5e due to a player buying just a few too many spell components and completely wrecking the world. You remember this, don't you, Juno?",
         features: [
@@ -96,6 +98,7 @@ export const tools: Tool[] = [
             "Create wizard spellbooks by selecting level, schools of magic, and probability settings.",
         status: "Alpha 1",
         icon: "BookOpen",
+        released: "new",
         philosophy:
             "One of my players was playing a wizard and was always asking about any spellbooks that they find when looting. They only started finding spellbooks once I made this generator. These are meant to be used as lootable items for wizards to find so they can learn even more spells!",
         features: [
@@ -207,6 +210,7 @@ export const tools: Tool[] = [
             "Manage party composition, balance, and progress tracking.",
         status: "Alpha 2",
         icon: "Users",
+        released: "new",
         philosophy:
             "This is only here because I wanted to be able to generate balanced encounters and to track multiple parties on the same world.",
         features: [

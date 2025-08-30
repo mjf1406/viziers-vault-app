@@ -30,6 +30,7 @@ import {
     ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "../ui/badge";
 
 const stripSuffix = (title: string) =>
     title.replace(" Generator", "").replace(" Management", "");
@@ -80,28 +81,60 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                     ""
                                 );
                                 const isActive = pathname === href;
+                                const isDisabled = !tool.released;
+
                                 return (
                                     <SidebarMenuItem key={tool.id}>
                                         <SidebarMenuButton
-                                            asChild
-                                            isActive={isActive}
+                                            asChild={!isDisabled}
+                                            isActive={isActive && !isDisabled}
                                             tooltip={tool.title}
-                                        >
-                                            <Link
-                                                href={href}
-                                                onClick={handleLinkClick}
-                                                className={cn(
-                                                    "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                                                    isActive
+                                            className={cn(
+                                                "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                                                isDisabled &&
+                                                    "opacity-40 cursor-not-allowed",
+                                                !isDisabled &&
+                                                    (isActive
                                                         ? "bg-muted text-primary"
-                                                        : "text-muted-foreground hover:bg-accent/50"
-                                                )}
-                                            >
-                                                <Icon className="h-4 w-4 flex-shrink-0" />
-                                                <span className="ml-3">
-                                                    {stripSuffix(tool.title)}
-                                                </span>
-                                            </Link>
+                                                        : "text-muted-foreground hover:bg-accent/50")
+                                            )}
+                                        >
+                                            {isDisabled ? (
+                                                <div className="flex items-center w-full">
+                                                    <Icon className="h-4 w-4 flex-shrink-0 mr-2" />
+                                                    <span className="ml-3">
+                                                        {stripSuffix(
+                                                            tool.title
+                                                        )}
+
+                                                        <Badge
+                                                            className="ml-2 font-light"
+                                                            variant={"outline"}
+                                                        >
+                                                            Coming soon!
+                                                        </Badge>
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    href={href}
+                                                    onClick={handleLinkClick}
+                                                    className="flex items-center w-full"
+                                                >
+                                                    <Icon className="h-4 w-4 flex-shrink-0" />
+                                                    <span className="ml-3">
+                                                        {stripSuffix(
+                                                            tool.title
+                                                        )}
+                                                        {tool.released ===
+                                                            "new" && (
+                                                            <Badge className="ml-2">
+                                                                New
+                                                            </Badge>
+                                                        )}
+                                                    </span>
+                                                </Link>
+                                            )}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 );

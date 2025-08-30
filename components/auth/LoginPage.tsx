@@ -4,8 +4,6 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import db from "@/lib/db";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Card,
     CardContent,
@@ -37,6 +35,7 @@ function useEnsureUserProfile() {
                         .create({
                             joined: new Date(),
                             premium: false,
+                            plan: "free",
                         })
                         .link({ $user: user.id })
                 );

@@ -1,10 +1,13 @@
 /** @format */
 
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 import db from "@/lib/db";
 
 export type User = {
     name?: string | null;
+    id: string | null;
     email?: string | null;
     avatar?: string | null;
 } | null;
@@ -22,6 +25,7 @@ export function useUser(initialUser?: User) {
         if (!userInfo) return;
         setUser({
             name: userInfo.profile?.name ?? null,
+            id: userInfo.id ?? null,
             email: userInfo.email ?? null,
             avatar: userInfo.profile?.$files?.url ?? null,
         });

@@ -1,5 +1,4 @@
 /** @format */
-/* components/PricingSection.tsx */
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, CheckCircle } from "lucide-react";
 import { features } from "@/lib/features";
 import { plans, type TierId } from "@/lib/plans";
 
@@ -43,69 +41,93 @@ export const PricingSection = () => {
             <div className="grid md:grid-cols-2 gap-8 lg:gap-4 max-w-4xl mx-auto">
                 {plans.map((plan) => {
                     const included = features.filter(
-                        (f) => tierOrder[f.minTier] <= tierOrder[plan.id]
+                        (f) => f.minTier === plan.id
                     );
 
                     return (
                         <Card
                             key={plan.id}
-                            className={
+                            className={[
                                 plan.popular
-                                    ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1]"
-                                    : ""
-                            }
+                                    ? "drop-shadow-xl shadow-black/10 dark:shadow-white/10 border-[1.5px] border-primary lg:scale-[1.1] transform-gpu transition-all"
+                                    : "",
+                            ].join(" ")}
                         >
                             <CardHeader>
-                                <CardTitle className="pb-2">
-                                    {plan.title}
-                                </CardTitle>
-
-                                <CardDescription className="pb-4">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="flex items-center gap-2">
+                                        {plan.title}
+                                    </CardTitle>
+                                </div>
+                                <CardDescription>
                                     {plan.description}
                                 </CardDescription>
-
-                                <div>
-                                    <span className="text-3xl font-bold">
-                                        ${plan.priceMonthly}
-                                    </span>
-                                    <span className="text-muted-foreground">
-                                        {" "}
-                                        /month
-                                    </span>
-                                </div>
                             </CardHeader>
 
-                            <CardContent className="flex">
-                                <div className="space-y-4">
-                                    {included.map((f) => (
-                                        <span
-                                            key={f.id}
-                                            className="flex"
-                                        >
-                                            <Check className="text-primary mr-2" />
-                                            <h3>{f.title}</h3>
-                                        </span>
-                                    ))}
+                            <CardContent className="space-y-4">
+                                <div className="flex items-baseline gap-1">
+                                    <div className="text-3xl font-semibold">
+                                        ${plan.priceMonthly}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        /month
+                                    </div>
                                 </div>
+
+                                <ul className="space-y-2">
+                                    {tierOrder[plan.id] > 0 && (
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
+                                            <span className="text-sm">
+                                                Everything in{" "}
+                                                {
+                                                    Object.keys(tierOrder)[
+                                                        tierOrder[plan.id] - 1
+                                                    ]
+                                                }{" "}
+                                                and...
+                                            </span>
+                                        </li>
+                                    )}
+
+                                    {included.map((f) => (
+                                        <li
+                                            key={f.id}
+                                            className="flex items-start gap-2"
+                                        >
+                                            <Check className="mt-0.5 h-4 w-4 text-green-600" />
+                                            <span className="text-sm">
+                                                {f.title}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
                             </CardContent>
 
-                            <CardFooter className="flex flex-col items-center">
-                                <Button
-                                    asChild
-                                    variant={
-                                        plan.popular ? "default" : "secondary"
-                                    }
-                                    className="w-full"
-                                >
-                                    <Link href={plan.ctaHref}>
+                            <CardFooter className="flex flex-col w-full gap-2 justify-center items-center">
+                                {plan.id === "basic" && (
+                                    <Button
+                                        className="w-full"
+                                        variant={"default"}
+                                    >
+                                        {plan.ctaText || "Upgrade"}
+                                    </Button>
+                                )}
+                                {plan.id === "free" && (
+                                    <Button
+                                        className="w-full"
+                                        variant="outline"
+                                    >
                                         {plan.ctaText}
-                                    </Link>
-                                </Button>
-
-                                {plan.popular && plan.footnote && (
-                                    <p className="w-full text-center text-sm text-muted-foreground mt-2">
-                                        {plan.footnote}
-                                    </p>
+                                    </Button>
+                                )}
+                                {plan.id !== "free" && plan.id !== "basic" && (
+                                    <Button
+                                        className="w-full"
+                                        variant="outline"
+                                    >
+                                        {plan.ctaText}
+                                    </Button>
                                 )}
                             </CardFooter>
                         </Card>

@@ -66,7 +66,7 @@ function UserPreview({
 
 export function NavUser() {
     const { isMobile } = useSidebar();
-    const { displayName, avatarSrc, plan } = useUser();
+    const { displayName, avatarSrc, plan, user } = useUser();
 
     return (
         <SidebarMenu>

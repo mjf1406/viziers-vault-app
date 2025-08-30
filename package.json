@@ -5,9 +5,12 @@
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "next build --turbopack",
-        "start": "next start"
+        "start": "next start",
+        "pushschema": "npx instant-cli@latest push schema",
+        "pushperms": "npx instant-cli@latest push perms"
     },
     "dependencies": {
+        "@instantdb/admin": "^0.21.9",
         "@instantdb/react": "^0.21.3",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",

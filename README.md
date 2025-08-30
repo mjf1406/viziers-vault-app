@@ -9,11 +9,16 @@
 ## To-do List
 
 -   added an action button to Party in the sidebar that navigates to /app/parties/add which opens the AddPartyDialog
--   in the sidebar, add a badge that says "New" next to those that are new in the current version and make slightly transparent those that are not yet implemented
+-   moved userProfile creation and user avatar upload to separate server actions
 
 ## Change Log
 
 ### 2025/08/30
+
+#### 14:48
+
+-   in the sidebar, add a badge that says "New" next to those that are new in the current version and make slightly transparent those that are not yet implemented
+-   added plan to userProfile in schema
 
 #### 12:21
 

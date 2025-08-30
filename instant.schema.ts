@@ -19,6 +19,7 @@ const _schema = i.schema({
         userProfiles: i.entity({
             joined: i.date().optional(),
             premium: i.boolean().optional(),
+            plan: i.string().optional(), // "free", "basic", "plus", "pro" :::: null = free
             name: i.string().optional(),
         }),
 
@@ -35,10 +36,10 @@ const _schema = i.schema({
         battleMaps: i.entity({}),
         parties: i.entity({
             name: i.string(),
-            pcs: i.json(), // [{l: 1, q: 3}] - this means there are 3 level one PCs
+            pcs: i.json(), // [{level: 1, quantity: 3}] - this means there are three level-one PCs
             createdAt: i.date(),
             updatedAt: i.date().optional(),
-            creatorId: i.string(),
+            creatorId: i.string().indexed(),
         }),
         encounters: i.entity({}),
         spellbooks: i.entity({}),

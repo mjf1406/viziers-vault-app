@@ -51,10 +51,10 @@ export function useUser(initialUser?: User) {
         [user?.avatar, userInfo?.profile?.$files?.url]
     );
 
-    const plan = useMemo(
-        () => (userInfo?.profile?.premium ? "Premium" : "Free"),
-        [userInfo?.profile?.premium]
-    );
+    const plan = useMemo(() => {
+        const p = userInfo?.profile?.plan;
+        return p ? p.charAt(0).toUpperCase() + p.slice(1) : p;
+    }, [userInfo?.profile?.plan]);
 
     const signOut = async () => {
         await db.auth.signOut();

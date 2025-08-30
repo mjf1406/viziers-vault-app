@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/nav/app-sidebar";
 import { SidebarHeader } from "@/components/nav/SidebarHeader";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { FooterSection } from "../(home)/_components/layout/sections/footer";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
     title: "App | Vizier's Vault",
@@ -32,7 +33,9 @@ export default function AppLayout({
                         <AppSidebar />
                         <div>
                             <SidebarHeader />
-                            <main className="w-full">{children}</main>
+                            <main className="w-full">
+                                <NuqsAdapter>{children}</NuqsAdapter>
+                            </main>
                             <Toaster richColors />
                             <FooterSection />
                         </div>

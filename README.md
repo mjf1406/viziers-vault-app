@@ -8,12 +8,15 @@
 
 ## To-do List
 
--   added an action button to Party in the sidebar that navigates to /app/parties/add which opens the AddPartyDialog
 -   moved userProfile creation and user avatar upload to separate server actions
 
 ## Change Log
 
 ### 2025/08/30
+
+#### 15:22
+
+-   added an action button to Party in the sidebar that navigates to /app/parties/add which opens the AddPartyDialog
 
 #### 14:48
 

@@ -3,20 +3,32 @@
 // app/parties/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Plus, Users } from "lucide-react";
 import PartiesGrid from "./components/PartiesGrid";
 import AddPartyDialogResponsive from "./components/AddPartyResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import PartiesUpsell from "@/components/PremiumUpsell";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 export default function PartiesPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingParty, setEditingParty] = useState<any | null>(null);
     const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
+    const [modalOpen, setModalOpen] = useQueryState(
+        "modalOpen",
+        parseAsInteger.withDefault(0)
+    );
     const { plan, isLoading } = useUser();
+
+    // Sync modalOpen query param with createOpen state
+    useEffect(() => {
+        if (modalOpen === 1 && !createOpen) {
+            setCreateOpen(true);
+        }
+    }, [modalOpen, createOpen]);
 
     if (isLoading)
         return (
@@ -48,6 +60,13 @@ export default function PartiesPage() {
         setEditOpen(true);
     };
 
+    const handleCreateOpenChange = (open: boolean) => {
+        setCreateOpen(open);
+        if (!open && modalOpen === 1) {
+            setModalOpen(0);
+        }
+    };
+
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
@@ -56,7 +75,7 @@ export default function PartiesPage() {
                     My Parties
                 </h1>
 
-                {plan === "Premium" && (
+                {plan !== "Free" && (
                     <div className="flex items-center gap-3">
                         {/* Desktop button (visible on sm+) */}
                         <Button
@@ -87,7 +106,7 @@ export default function PartiesPage() {
                 <AddPartyDialogResponsive
                     mode="create"
                     open={createOpen}
-                    onOpenChange={(v) => setCreateOpen(v)}
+                    onOpenChange={handleCreateOpenChange}
                     hideTitleOnMobile={true}
                     addPending={addPending}
                     removePending={removePending}
@@ -117,7 +136,7 @@ export default function PartiesPage() {
                 )}
             </div>
 
-            {plan === "Premium" ? (
+            {plan !== "Free" ? (
                 <PartiesGrid
                     onEdit={(p) => openForEdit(p)}
                     pendingIds={pendingIds}

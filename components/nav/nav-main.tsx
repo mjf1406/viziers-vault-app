@@ -14,6 +14,7 @@ import {
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarMenu,
+    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
@@ -28,9 +29,11 @@ import {
     Globe,
     Swords,
     ChevronUp,
+    Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 const stripSuffix = (title: string) =>
     title.replace(" Generator", "").replace(" Management", "");
@@ -84,7 +87,10 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                 const isDisabled = !tool.released;
 
                                 return (
-                                    <SidebarMenuItem key={tool.id}>
+                                    <SidebarMenuItem
+                                        key={tool.id}
+                                        className="flex items-center justify-between w-full"
+                                    >
                                         <SidebarMenuButton
                                             asChild={!isDisabled}
                                             isActive={isActive && !isDisabled}
@@ -92,7 +98,7 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                             className={cn(
                                                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                                                 isDisabled &&
-                                                    "opacity-40 cursor-not-allowed",
+                                                    "opacity-50 cursor-not-allowed",
                                                 !isDisabled &&
                                                     (isActive
                                                         ? "bg-muted text-primary"
@@ -106,13 +112,12 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                         {stripSuffix(
                                                             tool.title
                                                         )}
-
-                                                        <Badge
-                                                            className="ml-2 font-light"
-                                                            variant={"outline"}
-                                                        >
-                                                            Coming soon!
-                                                        </Badge>
+                                                        {tool.released ===
+                                                            "new" && (
+                                                            <Badge className="ml-2">
+                                                                New
+                                                            </Badge>
+                                                        )}
                                                     </span>
                                                 </div>
                                             ) : (
@@ -136,6 +141,25 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                 </Link>
                                             )}
                                         </SidebarMenuButton>
+                                        <SidebarMenuAction
+                                            asChild={!isDisabled}
+                                            className={cn(
+                                                isDisabled &&
+                                                    "opacity-40 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {isDisabled ? (
+                                                <div>
+                                                    <Plus className="w-4 h-4" />
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    href={`${href}?modalOpen=1`}
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </Link>
+                                            )}
+                                        </SidebarMenuAction>
                                     </SidebarMenuItem>
                                 );
                             })}

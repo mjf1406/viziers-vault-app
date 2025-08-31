@@ -41,10 +41,11 @@ export const CommunitySection = () => {
                         <CardFooter>
                             <Button asChild>
                                 <a
-                                    href="#"
+                                    href="https://discord.gg/yh7eZq62"
+                                    rel="noopener noreferrer"
                                     target="_blank"
                                 >
-                                    Join Discord Server
+                                    Join the Discord
                                 </a>
                             </Button>
                         </CardFooter>

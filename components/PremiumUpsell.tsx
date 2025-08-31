@@ -14,15 +14,15 @@ import {
 } from "@/components/ui/card";
 import { useUser } from "@/hooks/useUser";
 
-type PartiesUpsellProps = {
+type PremiumUpsellProps = {
     className?: string;
     unlockedItem: string;
 };
 
-export default function PartiesUpsell({
+export default function PremiumUpsell({
     className,
     unlockedItem,
-}: PartiesUpsellProps) {
+}: PremiumUpsellProps) {
     const { data } = useUser();
     const isLoggedIn = Boolean(data?.$users?.length);
 

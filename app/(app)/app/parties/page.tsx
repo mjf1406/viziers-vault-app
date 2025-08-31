@@ -5,8 +5,8 @@
 
 import { useState, useEffect } from "react";
 import { Loader2, Plus, Users } from "lucide-react";
-import PartiesGrid from "./components/PartiesGrid";
-import AddPartyDialogResponsive from "./components/AddPartyResponsiveDialog";
+import PartiesGrid from "./_components/PartiesGrid";
+import AddPartyDialogResponsive from "./_components/AddPartyResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import PartiesUpsell from "@/components/PremiumUpsell";
@@ -82,8 +82,8 @@ export default function PartiesPage() {
                             className="hidden sm:inline-flex"
                             onClick={() => setCreateOpen(true)}
                         >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Party
+                            <Plus className="w-4 h-4" />
+                            Create Party
                         </Button>
 
                         {/* Mobile FAB (visible only < sm) */}

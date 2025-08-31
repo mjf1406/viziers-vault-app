@@ -28,6 +28,7 @@ export const FooterSection = () => {
                             <div key={tool.id}>
                                 <Link
                                     href={tool.url}
+                                    prefetch={false}
                                     className="opacity-60 hover:opacity-100"
                                 >
                                     {tool.title}
@@ -42,6 +43,8 @@ export const FooterSection = () => {
                             <Link
                                 href="/"
                                 target="_blank"
+                                rel="noopener noreferrer"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Home
@@ -51,6 +54,8 @@ export const FooterSection = () => {
                             <Link
                                 href="/docs"
                                 target="_blank"
+                                rel="noopener noreferrer"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Docs
@@ -60,6 +65,8 @@ export const FooterSection = () => {
                             <Link
                                 href="/blog"
                                 target="_blank"
+                                rel="noopener noreferrer"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Blog
@@ -72,6 +79,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/contact"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Contact Us
@@ -81,6 +89,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/faq"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 FAQ
@@ -90,6 +99,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/contact"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Feedback
@@ -103,6 +113,8 @@ export const FooterSection = () => {
                             <Link
                                 href="https://github.com/mjf1406/viziers-vault-app"
                                 target="_blank"
+                                rel="noopener noreferrer"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 GitHub
@@ -111,7 +123,10 @@ export const FooterSection = () => {
 
                         <div>
                             <Link
-                                href="#"
+                                href="https://discord.gg/yh7eZq62"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Discord
@@ -121,6 +136,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="#"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Reddit
@@ -133,6 +149,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/privacy-policy"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Privacy Policy
@@ -142,6 +159,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/terms-of-service"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Terms of Service
@@ -151,6 +169,7 @@ export const FooterSection = () => {
                         <div>
                             <Link
                                 href="/web/cookie-policy"
+                                prefetch={false}
                                 className="opacity-60 hover:opacity-100"
                             >
                                 Cookie Policy
@@ -171,18 +190,22 @@ export const FooterSection = () => {
                         <Link
                             href="https://shadcn-landing-page-livid.vercel.app/"
                             target="_blank"
+                            rel="noopener noreferrer"
+                            prefetch={false}
                             className="opacity-60 hover:opacity-100"
                         >
                             Landing Page Template
                         </Link>
                         <Link
                             href="#"
+                            prefetch={false}
                             className="opacity-60 hover:opacity-100"
                         >
                             Privacy Policy
                         </Link>
                         <Link
                             href="#"
+                            prefetch={false}
                             className="opacity-60 hover:opacity-100"
                         >
                             Terms of Service

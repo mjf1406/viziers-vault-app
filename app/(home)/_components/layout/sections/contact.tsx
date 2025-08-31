@@ -61,25 +61,20 @@ export const ContactSection = () => {
                     <CardContent>
                         <p className="text-muted-foreground mb-4">
                             Suggest new features or improvements for future
-                            releases via Google Forms (preferred) or Discord.
+                            releases via or Discord.
                         </p>
                         <Button
                             asChild
                             variant="outline"
                             className="w-full mb-2"
                         >
-                            {/* TODO: add a google form link here and a join Discord button */}
-                            <Link href="mailto:feedback@viziers-vault.com">
-                                Send Feedback
+                            <Link
+                                href="https://discord.gg/yh7eZq62"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                Join the Discord
                             </Link>
-                        </Button>
-                        <Button
-                            asChild
-                            variant="outline"
-                            className="w-full"
-                        >
-                            {/* TODO: Update the Discord join link */}
-                            <Link href="#">Join the Discord</Link>
                         </Button>
                     </CardContent>
                 </Card>

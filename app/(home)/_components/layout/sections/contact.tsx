@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Github, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { JoinTheDiscord } from "@/components/brand/discord";
 
 export const ContactSection = () => {
     return (
@@ -45,7 +46,6 @@ export const ContactSection = () => {
                             variant="outline"
                             className="w-full"
                         >
-                            {/* TODO: Update the Discord join link */}
                             <Link href="#">Join the Discord</Link>
                         </Button>
                     </CardContent>
@@ -61,21 +61,9 @@ export const ContactSection = () => {
                     <CardContent>
                         <p className="text-muted-foreground mb-4">
                             Suggest new features or improvements for future
-                            releases via or Discord.
+                            releases via Discord.
                         </p>
-                        <Button
-                            asChild
-                            variant="outline"
-                            className="w-full mb-2"
-                        >
-                            <Link
-                                href="https://discord.gg/yh7eZq62"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >
-                                Join the Discord
-                            </Link>
-                        </Button>
+                        <JoinTheDiscord />
                     </CardContent>
                 </Card>
 

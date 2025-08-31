@@ -5,6 +5,7 @@ import { ChevronsDownIcon } from "lucide-react";
 import Link from "next/link";
 import { getAvailableTools } from "@/lib/tools";
 import { LogoTextOnly } from "@/components/brand/logo";
+import { Discord } from "@/components/brand/discord";
 
 export const FooterSection = () => {
     return (
@@ -122,15 +123,7 @@ export const FooterSection = () => {
                         </div>
 
                         <div>
-                            <Link
-                                href="https://discord.gg/yh7eZq62"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                prefetch={false}
-                                className="opacity-60 hover:opacity-100"
-                            >
-                                Discord
-                            </Link>
+                            <Discord />
                         </div>
 
                         <div>

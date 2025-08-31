@@ -17,6 +17,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
 import { LogoTextOnly } from "@/components/brand/logo";
+import { DiscordIcon } from "@/components/brand/discord";
 
 interface RouteProps {
     href: string;
@@ -136,21 +137,7 @@ export const Navbar = () => {
                                             <IconBrandGithub />
                                         </a>
                                     </Button>
-                                    <Button
-                                        variant="ghost"
-                                        asChild
-                                        size="icon"
-                                        className="hidden sm:flex"
-                                    >
-                                        <a
-                                            href="#"
-                                            rel="noopener noreferrer"
-                                            target="_blank"
-                                        >
-                                            <IconBrandDiscord />
-                                        </a>
-                                    </Button>
-
+                                    <DiscordIcon />
                                     <ThemeToggle />
                                 </div>
                             </SheetFooter>
@@ -189,20 +176,8 @@ export const Navbar = () => {
                             <IconBrandGithub />
                         </a>
                     </Button>
-                    <Button
-                        variant="ghost"
-                        asChild
-                        size="icon"
-                        className="hidden sm:flex"
-                    >
-                        <a
-                            href="#"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            <IconBrandDiscord />
-                        </a>
-                    </Button>
+
+                    <DiscordIcon />
 
                     <ThemeToggle />
                 </div>

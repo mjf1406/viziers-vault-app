@@ -11,9 +11,12 @@
 -   moved userProfile creation and user avatar upload to separate server actions
 -   see if removing all Shadcn UI components from home page reduces First Load JS
 -   finished setting up the Discord server with
-    -   a forum for feature requests
-    -   a forum for bug reports
-    -   a forum for feedback
+    -   [x] a forum for feature requests
+    -   [x] a forum for bug reports
+    -   [x] a forum for feedback
+    -   onboarding
+    -   auto-roles
+    -   add invite link to discord.tsx
 -   we need rate limits
     -   Encounter, Magic Shop, and Spellbook generators use D&D Data, so they have to be on the server to ensure the user only gets what's necessary for the output and it linked according to their settings
 
@@ -23,11 +26,8 @@
 
 #### 15:56
 
--   updated /web/contact to reflect the Discord server
--   updated Discord link where necessary
 -   all links in the footer are now no longer prefetched
 -   got started on the spellbook generator
--   added Discord link: https://discord.gg/yh7eZq62
 
 #### 14:49
 

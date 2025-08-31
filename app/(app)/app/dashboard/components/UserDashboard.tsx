@@ -131,7 +131,7 @@ export default function UserDashboard() {
     };
 
     return (
-        <div className="container mx-auto p-4 xl:p-10 space-y-4 min-h-dvh">
+        <div className="container mx-auto space-y-4 min-h-dvh">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">

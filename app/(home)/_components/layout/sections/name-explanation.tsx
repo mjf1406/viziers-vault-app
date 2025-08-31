@@ -50,7 +50,7 @@ export const NameExplanationSection = () => {
                             <CardTitle className="text-xl">Vizier</CardTitle>
                         </div>
                         <p className="text-muted-foreground">
-                            A ode to the Vizier card: every generation is an
+                            An ode to the Vizier card: every generation is an
                             answer.
                         </p>
                     </CardHeader>

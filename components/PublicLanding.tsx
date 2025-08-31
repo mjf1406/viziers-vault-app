@@ -98,7 +98,7 @@ export default function PublicLanding() {
     };
 
     return (
-        <div className="container mx-auto p-4 xl:p-10 space-y-4 min-h-dvh">
+        <div className="container mx-auto space-y-4 min-h-dvh">
             {/* Premium Features Floating Card */}
             <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-transparent h-32 pointer-events-none z-10" />
@@ -173,7 +173,7 @@ export default function PublicLanding() {
                     aria-hidden="true"
                     className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none hidden md:block"
                     style={{
-                        width: "98vw",
+                        width: "calc(100% - 18rem)",
                         height: "380px", // total vertical size of the ellipse
                         top: "calc(100% + 12px)", // push it below the card/container
                     }}

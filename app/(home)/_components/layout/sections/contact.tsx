@@ -120,15 +120,6 @@ export const ContactSection = () => {
                     </CardContent>
                 </Card>
             </div>
-
-            <div className="text-center mt-12">
-                <p className="text-muted-foreground">
-                    Built by a full-time teacher for the TTRPG community.
-                    <br />
-                    AI was used for UI development, but all algorithms and art
-                    are human-created.
-                </p>
-            </div>
         </section>
     );
 };

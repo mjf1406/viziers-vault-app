@@ -9,21 +9,27 @@
 ## To-do List
 
 -   moved userProfile creation and user avatar upload to separate server actions
--   the example dashboard has a too wide width when the windows is narrow
 -   see if removing all Shadcn UI components from home page reduces First Load JS
--   fixed: logged in dashboard has too much padding on mobile
--   typo on /web/about: should be "An ode".
--   on /web/contact, need to remove the "Built by a..." section
 -   set up the Discord server with
     -   a forum for feature requests
     -   a forum for bug reports
     -   a forum for feedback
 -   updated /web/contact to reflect the Discord server
--   review and update the FAQ page at /web/faq
 -   we need rate limits
     -   Encounter, Magic Shop, and Spellbook generators use D&D Data, so they have to be on the server to ensure the user only gets what's necessary for the output and it linked according to their settings
 
 ## Change Log
+
+### 2025/08/31
+
+#### 14:49
+
+-   added a detailed section to the web/pricing
+-   review and update the FAQ page at /web/faq
+-   the example dashboard has a too wide width when the windows is narrow
+-   fixed: logged in dashboard has too much padding on mobile
+-   typo on /web/about: should be "An ode".
+-   on /web/contact, need to remove the "Built by a..." section
 
 ### 2025/08/30
 

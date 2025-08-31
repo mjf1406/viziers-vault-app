@@ -2,6 +2,7 @@
 
 import { FooterSection } from "../../_components/layout/sections/footer";
 import { PricingSection } from "../../_components/layout/sections/pricing";
+import { PlanFeaturesSection } from "./_components/FeaturesExplainerSection";
 
 export const metadata = {
     title: "Vizier's Vault - D&D 5e Tools",
@@ -36,6 +37,7 @@ export default function PricingPage() {
     return (
         <>
             <PricingSection />
+            <PlanFeaturesSection />
             <FooterSection />
         </>
     );

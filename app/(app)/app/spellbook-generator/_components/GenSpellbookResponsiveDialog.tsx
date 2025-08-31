@@ -23,6 +23,7 @@ import {
     CredenzaHeader,
     CredenzaTitle,
 } from "@/components/ui/credenza";
+import generateSpellbook from "../_actions/generateSpellbook";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -226,7 +227,7 @@ export default function SpellbookGeneratorDialog({
 
     const submit = async (e?: React.FormEvent) => {
         e?.preventDefault();
-
+        await generateSpellbook();
         const schoolsResult: string[] | "random" = schoolsRandom
             ? "random"
             : selectedSchools;

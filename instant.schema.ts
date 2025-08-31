@@ -8,6 +8,10 @@ import { i } from "@instantdb/react";
 
 const _schema = i.schema({
     entities: {
+        // ----------------------
+        //      Admin Tables
+        // ----------------------
+
         $files: i.entity({
             path: i.string().unique().indexed(),
             url: i.string(),
@@ -15,7 +19,6 @@ const _schema = i.schema({
         $users: i.entity({
             email: i.string().unique().indexed().optional(),
         }),
-        settings: i.entity({}),
         userProfiles: i.entity({
             joined: i.date().optional(),
             premium: i.boolean().optional(),
@@ -23,16 +26,25 @@ const _schema = i.schema({
             name: i.string().optional(),
         }),
 
+        // ----------------------
+        //      Data Tables
+        // ----------------------
+        // We might not need this as we can just upload the CSV files to Instant
+
         dnd5e_magicItems: i.entity({}),
         dnd5e_spells: i.entity({}),
         dnd5e_bestiary: i.entity({}),
+
+        // ----------------------
+        //      User Tables
+        // ----------------------
 
         todos: i.entity({
             createdAt: i.number().optional(),
             done: i.boolean().optional(),
             text: i.string().optional(),
         }),
-
+        settings: i.entity({}),
         battleMaps: i.entity({}),
         parties: i.entity({
             name: i.string(),

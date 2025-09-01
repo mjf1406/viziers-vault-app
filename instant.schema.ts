@@ -31,9 +31,67 @@ const _schema = i.schema({
         // ----------------------
         // We might not need this as we can just upload the CSV files to Instant
 
-        dnd5e_magicItems: i.entity({}),
-        dnd5e_spells: i.entity({}),
-        dnd5e_bestiary: i.entity({}),
+        dnd5e_magicItems: i.entity({
+            dndbeyondId: i.string().unique().indexed(),
+            name: i.string().indexed(),
+            rarity: i.string().optional().indexed(),
+            type: i.string().optional().indexed(),
+            attunement: i.string().optional().indexed(),
+            notes: i.string().optional(),
+            source: i.string().optional().indexed(),
+            url: i.string().optional(),
+            updatedAt: i.date().optional().indexed(),
+        }),
+        dnd5e_spells: i.entity({
+            // D&D Beyond primary key
+            dndbeyondId: i.string().unique().indexed(),
+
+            // Naming
+            name: i.string().optional().indexed(), // human-readable name (if available)
+            slug: i.string().optional().indexed(), // e.g. "abi-dalzims-horrid-wilting"
+
+            // Spell data
+            levelText: i.string().optional(), // e.g. "8th", "Cantrip"
+            level: i.number().optional().indexed(), // numeric (8 for "8th", 0 for Cantrip)
+            castingTime: i.string().optional().indexed(),
+            range: i.string().optional().indexed(),
+            area: i.string().optional().indexed(),
+            areaShape: i.string().optional().indexed(),
+            components: i.string().optional().indexed(), // e.g. "V, S, M"
+            materialComponents: i.string().optional(),
+            duration: i.string().optional().indexed(),
+            school: i.string().optional().indexed(),
+            attackSave: i.string().optional(),
+            damageEffect: i.string().optional(),
+            description: i.string().optional(),
+            classes: i.json().optional().indexed(),
+
+            // Provenance
+            source: i.string().optional().indexed(),
+            url: i.string().optional(),
+            updatedAt: i.date().optional().indexed(),
+        }),
+
+        dnd5e_bestiary: i.entity({
+            // D&D Beyond primary key
+            dndbeyondId: i.string().unique().indexed(),
+
+            // Naming
+            name: i.string().optional().indexed(), // e.g. 'The Demogorgon' (unescaped)
+
+            // Stat block basics
+            crText: i.string().optional(), // e.g. "1/2", "8"
+            cr: i.number().optional().indexed(), // numeric form when parsable (0.5 for "1/2")
+            type: i.string().optional().indexed(), // e.g. "Giant"
+            size: i.string().optional().indexed(), // e.g. "Large"
+            alignment: i.string().optional().indexed(),
+            habitat: i.string().optional().indexed(),
+
+            // Provenance
+            source: i.string().optional().indexed(),
+            url: i.string().optional(),
+            updatedAt: i.date().optional().indexed(),
+        }),
 
         // ----------------------
         //      User Tables

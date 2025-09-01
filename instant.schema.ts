@@ -29,7 +29,6 @@ const _schema = i.schema({
         // ----------------------
         //      Data Tables
         // ----------------------
-        // We might not need this as we can just upload the CSV files to Instant
 
         dnd5e_magicItems: i.entity({
             dndbeyondId: i.string().unique().indexed(),

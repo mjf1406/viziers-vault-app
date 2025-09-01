@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { IconBrandDiscord } from "@tabler/icons-react";
 
+const discrodURL = "#";
+
 export function JoinTheDiscord() {
     return (
         <Button
@@ -12,7 +14,7 @@ export function JoinTheDiscord() {
             className="w-full"
         >
             <Link
-                href={process.env.DISCORD_LINK!}
+                href={discrodURL}
                 target="_blank"
                 prefetch={false}
             >
@@ -31,7 +33,7 @@ export function DiscordIcon() {
             className="hidden sm:flex"
         >
             <Link
-                href={process.env.DISCORD_LINK!}
+                href={discrodURL}
                 rel="noopener noreferrer"
                 target="_blank"
                 prefetch={false}
@@ -45,7 +47,7 @@ export function DiscordIcon() {
 export function Discord() {
     return (
         <Link
-            href={process.env.DISCORD_LINK!}
+            href={discrodURL}
             target="_blank"
             prefetch={false}
         >

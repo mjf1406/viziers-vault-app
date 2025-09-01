@@ -24,6 +24,8 @@ import {
     CredenzaTitle,
 } from "@/components/ui/credenza";
 import generateSpellbook from "../_actions/generateSpellbook";
+import { CLASSES, SCHOOLS } from "@/lib/5e-data";
+import { Dices, Loader2 } from "lucide-react";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -50,29 +52,6 @@ type SpellbookGeneratorDialogProps = {
     hideTitleOnMobile?: boolean;
     onGenerate?: (opts: GenerateOpts) => Promise<void> | void;
 };
-
-const SCHOOLS = [
-    "Abjuration",
-    "Conjuration",
-    "Divination",
-    "Enchantment",
-    "Evocation",
-    "Illusion",
-    "Necromancy",
-    "Transmutation",
-];
-
-const CLASSES = [
-    "Artificer",
-    "Bard",
-    "Cleric",
-    "Druid",
-    "Paladin",
-    "Ranger",
-    "Sorcerer",
-    "Warlock",
-    "Wizard",
-];
 
 export default function SpellbookGeneratorDialog({
     mode = "create",
@@ -225,9 +204,12 @@ export default function SpellbookGeneratorDialog({
     const handleSelectAllClasses = () => setSelectedClasses([...CLASSES]);
     const handleClearClasses = () => setSelectedClasses([]);
 
-    const submit = async (e?: React.FormEvent) => {
-        e?.preventDefault();
-        await generateSpellbook();
+    const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const formEl = e.currentTarget;
+        const formData = new FormData(formEl);
+
         const schoolsResult: string[] | "random" = schoolsRandom
             ? "random"
             : selectedSchools;
@@ -250,6 +232,9 @@ export default function SpellbookGeneratorDialog({
                 selectedLevel === "random"
                     ? "random"
                     : parseInt(selectedLevel, 10);
+
+            // Call server action with FormData
+            await generateSpellbook(formData);
 
             if (onGenerate) {
                 await onGenerate({
@@ -513,11 +498,23 @@ export default function SpellbookGeneratorDialog({
                             className="flex-1"
                             disabled={isGenerating}
                         >
-                            {isGenerating
-                                ? "Generating..."
-                                : mode === "edit"
-                                ? "Save"
-                                : "Generate Spellbook"}
+                            {isGenerating ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Generate Spellbook
+                                </>
+                            ) : (
+                                <>
+                                    {mode === "edit" ? (
+                                        <>Save</>
+                                    ) : (
+                                        <>
+                                            <Dices className="h-4 w-4" />
+                                            Generate Spellbook
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </Button>
                     </CredenzaFooter>
                 </form>

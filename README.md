@@ -8,7 +8,6 @@
 
 ## To-do List
 
--   moved userProfile creation and user avatar upload to separate server actions
 -   see if removing all Shadcn UI components from home page reduces First Load JS
 -   finished setting up the Discord server with
     -   [x] a forum for feature requests
@@ -17,10 +16,24 @@
     -   onboarding
     -   auto-roles
     -   add invite link to discord.tsx
--   we need rate limits
-    -   Encounter, Magic Shop, and Spellbook generators use D&D Data, so they have to be on the server to ensure the user only gets what's necessary for the output and it linked according to their settings
+-   Template is done and ready for the other sites requires
+    -   account page
+    -   basic settings
+    -   payment integration with subscriptions
+    -   rate limiting with Upstash Redis
+    -   moved userProfile creation and user avatar upload to separate server actions
+    -   need Obsidian markdown to HTML function for the blog and docs
+    -   set up basic blog and docs
+    -   I'd love to get Docker involved here so users can self-host
 
 ## Change Log
+
+### 2025/09/02
+
+#### 21:18
+
+-   added min height to magic shop
+-   added items to know when the template is ready for my other sites
 
 ### 2025/08/31
 

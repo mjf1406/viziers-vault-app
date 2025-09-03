@@ -52,7 +52,7 @@ export default function AccountPage() {
     };
 
     const currentTier: TierId = useMemo(
-        () => normalizeTier(userPlanName),
+        () => normalizeTier(userPlanName ?? undefined),
         [userPlanName]
     );
 

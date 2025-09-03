@@ -26,6 +26,7 @@ import { NavUser } from "./nav-user";
 import { LogoSidebar } from "../brand/logo";
 import { LayoutDashboard } from "lucide-react";
 import { NavMain } from "./nav-main";
+import LoginButton from "../auth/LoginButton";
 
 export function AppSidebar() {
     const pathname = usePathname();
@@ -96,17 +97,12 @@ export function AppSidebar() {
                 </db.SignedIn>
 
                 <db.SignedOut>
-                    <Button
-                        asChild
+                    <LoginButton
+                        onClick={handleLinkClick}
                         className="w-full"
                     >
-                        <Link
-                            href="/app/login"
-                            onClick={handleLinkClick}
-                        >
-                            Sign In
-                        </Link>
-                    </Button>
+                        Sign in
+                    </LoginButton>
                 </db.SignedOut>
             </SidebarFooter>
         </Sidebar>

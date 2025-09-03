@@ -14,12 +14,32 @@ export type User = {
 
 export function useUser(initialUser?: User) {
     const [user, setUser] = useState<User>(initialUser ?? null);
+    let authUser;
+    try {
+        authUser = db.useUser();
+    } catch (e: any) {
+        authUser = null;
+        if (
+            e.message! != "useUser must be used within an auth-protected route"
+        ) {
+            console.error(e);
+            throw e;
+        }
+    }
 
-    // keep the same query shape you used in NavUser
     const query = { $users: { profile: { $files: {} } } };
     const { isLoading, error, data } = db.useQuery(query);
-
     const userInfo = data?.$users?.[0];
+
+    useEffect(() => {
+        if (!authUser?.id) {
+            setUser(null);
+            return;
+        }
+        if (user?.id !== authUser.id) {
+            setUser((prev) => ({ ...(prev ?? {}), id: authUser.id }));
+        }
+    }, [authUser?.id, user?.id]);
 
     useEffect(() => {
         if (!userInfo) return;
@@ -29,54 +49,51 @@ export function useUser(initialUser?: User) {
             email: userInfo.email ?? null,
             avatar: userInfo.profile?.$files?.url ?? null,
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         userInfo?.profile?.name,
         userInfo?.email,
         userInfo?.profile?.$files?.url,
+        userInfo?.id,
     ]);
 
-    const displayName = useMemo(
-        () => user?.name ?? userInfo?.profile?.name ?? "Account",
-        [user?.name, userInfo?.profile?.name]
-    );
+    const loggedIn = Boolean(authUser?.id);
 
-    const displayEmail = useMemo(
-        () => user?.email ?? userInfo?.email ?? "",
-        [user?.email, userInfo?.email]
-    );
+    const displayName = useMemo(() => {
+        if (!loggedIn) return null;
+        return user?.name ?? userInfo?.profile?.name ?? "Account";
+    }, [loggedIn, user?.name, userInfo?.profile?.name]);
 
-    const avatarSrc = useMemo(
-        () => user?.avatar ?? userInfo?.profile?.$files?.url ?? undefined,
-        [user?.avatar, userInfo?.profile?.$files?.url]
-    );
+    const displayEmail = useMemo(() => {
+        if (!loggedIn) return null;
+        return user?.email ?? userInfo?.email ?? null;
+    }, [loggedIn, user?.email, userInfo?.email]);
+
+    const avatarSrc = useMemo(() => {
+        if (!loggedIn) return null;
+        return user?.avatar ?? userInfo?.profile?.$files?.url ?? null;
+    }, [loggedIn, user?.avatar, userInfo?.profile?.$files?.url]);
 
     const plan = useMemo(() => {
+        if (!loggedIn) return null;
         const p = userInfo?.profile?.plan;
-        return p ? p.charAt(0).toUpperCase() + p.slice(1) : p;
-    }, [userInfo?.profile?.plan]);
+        return p ? p.charAt(0).toUpperCase() + p.slice(1) : p ?? null;
+    }, [loggedIn, userInfo?.profile?.plan]);
 
     const signOut = async () => {
+        setUser(null);
         await db.auth.signOut();
     };
 
     return {
-        // state + setters
         user,
         setUser,
-
-        // status + raw data
         isLoading,
         error,
         data,
-
-        // derived fields convenient for UIs
         displayName,
         displayEmail,
         avatarSrc,
         plan,
-
-        // actions
         signOut,
     };
 }

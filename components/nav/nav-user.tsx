@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import db from "@/lib/db";
 import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 function UserPreview({
     displayName,
@@ -67,6 +68,7 @@ function UserPreview({
 export function NavUser() {
     const { isMobile } = useSidebar();
     const { displayName, avatarSrc, plan, user } = useUser();
+    const router = useRouter();
 
     return (
         <SidebarMenu>

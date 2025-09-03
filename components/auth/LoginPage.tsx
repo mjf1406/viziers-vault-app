@@ -1,5 +1,5 @@
 /** @format */
-
+// components\auth\LoginPage.tsx
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
 import { makeUploadCandidate } from "@/lib/image";
 import { uploadImage } from "@/lib/storage";
@@ -57,6 +57,41 @@ function useEnsureUserProfile() {
 }
 
 const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
+const DEFAULT_FALLBACK = "/app/dashboard";
+
+/**
+ * Return a safe, same-origin path for redirecting.
+ * Accepts:
+ *  - relative path starting with "/" (but not protocol-relative "//")
+ *  - absolute same-origin URLs => converted to pathname+search+hash
+ * Rejects anything that could be an open redirect.
+ */
+function sanitizeReturnTo(candidate?: string | null): string | null {
+    if (!candidate) return null;
+    const trimmed = candidate.trim();
+    if (!trimmed) return null;
+    // disallow CR/LF
+    if (/[\n\r]/.test(trimmed)) return null;
+
+    // Accept a single-leading-slash path, e.g. "/foo?bar=baz"
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+        return trimmed;
+    }
+
+    // Accept same-origin absolute URL, convert to path+search+hash
+    if (typeof window !== "undefined") {
+        try {
+            const parsed = new URL(trimmed);
+            if (parsed.origin === window.location.origin) {
+                return parsed.pathname + parsed.search + parsed.hash;
+            }
+        } catch {
+            // not a valid absolute URL — reject
+        }
+    }
+
+    return null;
+}
 
 export default function LoginPage() {
     useEnsureUserProfile();
@@ -65,7 +100,49 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
-    const [oauthNonce, setOauthNonce] = useState<string>(() => uuidv4());
+    const searchParams = useSearchParams();
+    const rawReturnTo = searchParams?.get("returnTo") ?? null;
+
+    // helper to read session fallback (safe access)
+    const getSessionReturn = () => {
+        if (typeof window === "undefined") return null;
+        try {
+            return sessionStorage.getItem("preLoginPath");
+        } catch {
+            return null;
+        }
+    };
+
+    const getSafeDestination = useCallback(
+        (override?: string | null) => {
+            const candidates = [override, rawReturnTo, getSessionReturn()];
+            for (const c of candidates) {
+                const safe = sanitizeReturnTo(c ?? null);
+                if (safe) return safe;
+            }
+            return null;
+        },
+        [rawReturnTo]
+    );
+
+    const navigateToReturn = useCallback(
+        (override?: string | null) => {
+            const dest = getSafeDestination(override);
+            if (dest) {
+                void router.push(dest);
+                return;
+            }
+
+            // If we cannot compute a safe path, try to emulate "back".
+            if (typeof window !== "undefined" && window.history.length > 1) {
+                router.back();
+                return;
+            }
+
+            void router.push(DEFAULT_FALLBACK);
+        },
+        [getSafeDestination, router]
+    );
 
     // pending profile info returned from Google button (name + picture url).
     const [pendingGoogleProfile, setPendingGoogleProfile] = useState<{
@@ -107,7 +184,7 @@ export default function LoginPage() {
             // If there's no profileInfo to apply, redirect immediately.
             if (!profileInfo) {
                 // keep loading until route change; unmount will clear it
-                router.push("/app/dashboard");
+                navigateToReturn();
                 return;
             }
             // otherwise leave isLoading true and let the effect handle completion
@@ -221,7 +298,7 @@ export default function LoginPage() {
 
             if (!cancelled) {
                 setPendingGoogleProfile(null);
-                router.push("/app/dashboard");
+                navigateToReturn();
             }
             // keep isLoading true for the route change
         };
@@ -231,7 +308,10 @@ export default function LoginPage() {
         return () => {
             cancelled = true;
         };
-    }, [user?.id, pendingGoogleProfile, router, nextPaint]);
+    }, [user?.id, pendingGoogleProfile, navigateToReturn, nextPaint]);
+
+    // local oauth nonce state
+    const [oauthNonce, setOauthNonce] = useState<string>(() => uuidv4());
 
     return (
         <div className="relative flex min-h-screen w-full flex-col items-center justify-center">

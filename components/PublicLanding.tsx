@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getToolsWithMockData } from "@/lib/tools";
+import LoginButton from "./auth/LoginButton";
 
 export default function PublicLanding() {
     // Mock data for the example dashboard
@@ -149,15 +150,9 @@ export default function PublicLanding() {
                                 </div>
                             </div>
 
-                            <Button
-                                asChild
-                                size="lg"
-                                className="w-full md:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                            >
-                                <Link href="/app/login">
-                                    Subscribe to Premium
-                                </Link>
-                            </Button>
+                            <LoginButton size={"lg"}>
+                                Subscribe to Premium
+                            </LoginButton>
                         </CardContent>
                     </Card>
                 </div>

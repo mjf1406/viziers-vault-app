@@ -39,6 +39,7 @@ import {
 import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
+import LoginButton from "../auth/LoginButton";
 
 const getIconComponent = (iconName: string) => {
     const iconMap: { [key: string]: any } = {
@@ -263,14 +264,12 @@ export function GeneratorsNavbar() {
                 </db.SignedIn>
 
                 <db.SignedOut>
-                    {/* Sign In Button - Unauthenticated Users */}
-                    <Button
-                        asChild
+                    <LoginButton
                         variant="default"
                         size="sm"
                     >
-                        <Link href="/app/login">Sign In</Link>
-                    </Button>
+                        Sign in
+                    </LoginButton>
                 </db.SignedOut>
 
                 <ThemeToggle />
@@ -418,12 +417,12 @@ export function GeneratorsNavbar() {
 
                             <db.SignedOut>
                                 <div className="pt-4 border-t">
-                                    <Button
-                                        asChild
-                                        className="w-full"
+                                    <LoginButton
+                                        variant="default"
+                                        size="sm"
                                     >
-                                        <Link href="/app/login">Sign In</Link>
-                                    </Button>
+                                        Sign in
+                                    </LoginButton>
                                 </div>
                             </db.SignedOut>
                         </div>

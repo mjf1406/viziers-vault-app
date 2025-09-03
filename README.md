@@ -18,6 +18,9 @@
     -   add invite link to discord.tsx
 -   Template is done and ready for the other sites requires
     -   account page
+        -   [ ] update name
+        -   [ ] update subscription
+        -   [ ] update avatar
     -   basic settings
     -   payment integration with subscriptions
     -   rate limiting with Upstash Redis
@@ -27,6 +30,11 @@
     -   I'd love to get Docker involved here so users can self-host
 
 ## Change Log
+
+### 2025/09/03
+
+-   useUser() now integrated with db.useUser() and properly sets user to null on logout
+-   login now no longer redirects to /app/dashboard, instead redirects back to referrer
 
 ### 2025/09/02
 

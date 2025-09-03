@@ -72,3 +72,16 @@ export function resolveSelections<T extends string>(
     const unique = Array.from(new Set(input));
     return unique.filter((v) => pool.includes(v));
 }
+
+// Source: https://github.com/JDSherbert/Fisher-Yates-Shuffle/blob/main/TypeScript/Shuffle.ts
+export function FisherYatesShuffle<T>(array: T[]): T[] {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [
+            shuffledArray[j],
+            shuffledArray[i],
+        ];
+    }
+    return shuffledArray;
+}

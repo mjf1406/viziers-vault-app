@@ -23,6 +23,9 @@
         -   [ ] update avatar
     -   basic settings
     -   payment integration with subscriptions
+        -   (Paddle)[https://www.paddle.com/]
+        -   (Coda)[https://www.coda.co/merchant-of-record/]
+        -   (LemonSqueezy)[https://www.lemonsqueezy.com/]
     -   rate limiting with Upstash Redis
     -   moved userProfile creation and user avatar upload to separate server actions
     -   need Obsidian markdown to HTML function for the blog and docs

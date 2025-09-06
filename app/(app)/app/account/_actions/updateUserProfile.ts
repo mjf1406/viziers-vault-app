@@ -1,8 +1,8 @@
 /** @format */
-// server\_actions\updateUserProfile.ts
+// server_actions/updateUserProfile.ts
 "use server";
 
-import dbServer from "../db-server";
+import dbServer from "@/server/db-server";
 
 type Plan = "free" | "basic" | "plus" | "pro" | null;
 
@@ -29,9 +29,10 @@ export type UpdateUserProfileResult =
       };
 
 /**
- * Ensures a userProfiles row exists for this user and updates provided fields.
+ * Update a userProfiles row for this user.
  * - Auth: verifies refresh_token and scopes queries to that user.
- * - Creates userProfiles[id] if missing, linking to $user.
+ * - NOTE: this no longer creates a profile if missing; it will fail if the
+ *   profile does not exist.
  */
 export async function updateUserProfile(
     params: UpdateUserProfileParams
@@ -48,24 +49,6 @@ export async function updateUserProfile(
 
     const scopedDb = dbServer.asUser({ token });
     const uid = user.id as string;
-
-    // Create if missing (ignore "exists" error)
-    try {
-        await scopedDb.transact([
-            scopedDb.tx.userProfiles[uid]
-                .create({
-                    joined: new Date(),
-                    premium: false,
-                    plan: "free",
-                })
-                .link({ $user: uid }),
-        ]);
-    } catch (err: any) {
-        const msg = String(err?.message ?? "");
-        if (!msg.includes("Creating entities that exist")) {
-            return { success: false, error: "Failed to ensure profile exists" };
-        }
-    }
 
     // Prepare partial update
     const update: Record<string, any> = {};
@@ -103,7 +86,7 @@ export async function updateUserProfile(
     }
 
     if (Object.keys(update).length === 0) {
-        // Nothing to update; still considered success since we ensured existence
+        // Nothing to update
         return { success: true, updatedFields: [] };
     }
 
@@ -116,7 +99,9 @@ export async function updateUserProfile(
             txId: (res as any)["tx-id"],
             updatedFields,
         };
-    } catch {
-        return { success: false, error: "Failed to update profile" };
+    } catch (err: any) {
+        // Propagate a clear failure message (profile probably missing or perms)
+        const msg = String(err?.message ?? "Failed to update profile");
+        return { success: false, error: msg };
     }
 }

@@ -18,21 +18,25 @@
     -   add invite link to discord.tsx
 -   Template is done and ready for the other sites requires
     -   account page
-        -   [ ] update name
+        -   [x] update name
         -   [ ] update subscription
-        -   [ ] update avatar
+        -   [x] update avatar
     -   basic settings
     -   payment integration with subscriptions
         -   (Paddle)[https://www.paddle.com/]
         -   (Coda)[https://www.coda.co/merchant-of-record/]
         -   (LemonSqueezy)[https://www.lemonsqueezy.com/]
     -   rate limiting with Upstash Redis
-    -   moved userProfile creation and user avatar upload to separate server actions
     -   need Obsidian markdown to HTML function for the blog and docs
     -   set up basic blog and docs
     -   I'd love to get Docker involved here so users can self-host
 
 ## Change Log
+
+### 2025/09/06
+
+-   user can now update their avatar and display name
+-   moved userProfile creation and initial avatar upload to the server using the admin sdk
 
 ### 2025/09/03
 

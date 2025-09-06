@@ -2,19 +2,13 @@
 // server_actions/updateUserAvatar.ts
 "use server";
 
-// If your storage uploader is available on the server, import it here.
-// It should accept a Blob|File, a storage path, and optional metadata, and
-// return a file entity id that can be linked via $files.
 import { uploadImage } from "@/lib/storage";
-import dbServer from "../db-server";
+import dbServer from "@/server/db-server";
 
 export type UpdateAvatarFromUrlParams = {
-    // user.refresh_token from the client
     token: string;
     imageUrl: string;
-    // Optional filename hint for storage path
     fileName?: string;
-    // Optional content type override; else inferred from fetch headers
     contentTypeHint?: string;
 };
 
@@ -46,27 +40,7 @@ function slugify(name: string): string {
         .replace(/[^a-z0-9.\-_]/g, "");
 }
 
-async function ensureProfileExists(scopedDb: any, uid: string) {
-    try {
-        await scopedDb.transact([
-            scopedDb.tx.userProfiles[uid]
-                .create({
-                    joined: new Date(),
-                    premium: false,
-                    plan: "free",
-                })
-                .link({ $user: uid }),
-        ]);
-    } catch (err: any) {
-        const msg = String(err?.message ?? "");
-        if (!msg.includes("Creating entities that exist")) {
-            throw err;
-        }
-    }
-}
-
 async function removeExistingAvatars(scopedDb: any, uid: string) {
-    // Assumes the relation key is $files and the file table is files.
     const data = await scopedDb.query({
         userProfiles: {
             $: { where: { id: uid }, limit: 1 },
@@ -86,10 +60,7 @@ async function removeExistingAvatars(scopedDb: any, uid: string) {
     const unlinkOps = linkedFiles.map((f) =>
         scopedDb.tx.userProfiles[uid].unlink({ $files: f.id })
     );
-    const deleteOps = linkedFiles.map((f) =>
-        // If your schema uses a different table name, change "files" below.
-        scopedDb.tx.files[f.id].delete()
-    );
+    const deleteOps = linkedFiles.map((f) => scopedDb.tx.files[f.id].delete());
 
     const res = await scopedDb.transact([...unlinkOps, ...deleteOps]);
 
@@ -120,7 +91,6 @@ async function uploadAndLinkAvatar(
         contentType,
     });
 
-    // Link new avatar
     const res = await scopedDb.transact([
         scopedDb.tx.userProfiles[uid]
             .update({})
@@ -134,8 +104,9 @@ async function uploadAndLinkAvatar(
 }
 
 /**
- * Server action: update avatar from a remote URL (e.g., Google profile photo).
- * Also deletes all previously linked avatar files and links.
+ * Update avatar from remote URL.
+ * Requires that a userProfiles row already exists for the user; this
+ * action will NOT create one.
  */
 export async function updateUserAvatarFromUrl(
     params: UpdateAvatarFromUrlParams
@@ -163,7 +134,17 @@ export async function updateUserAvatarFromUrl(
     const scopedDb = dbServer.asUser({ token });
     const uid = user.id as string;
 
-    await ensureProfileExists(scopedDb, uid);
+    // Ensure profile exists — do not create it here.
+    {
+        const q = await scopedDb.query({
+            userProfiles: { $: { where: { id: uid }, limit: 1 } },
+        });
+        const existing =
+            Array.isArray(q.userProfiles) && q.userProfiles.length > 0;
+        if (!existing) {
+            return { success: false, error: "User profile not found" };
+        }
+    }
 
     // Fetch the image
     let resp: Response;
@@ -226,19 +207,18 @@ export async function updateUserAvatarFromUrl(
             success: true,
             uploadedFileId,
             txId: undefined,
-            deletedFileIds: [], // not strictly needed; previous step already removed
+            deletedFileIds: [],
         };
-    } catch {
+    } catch (err) {
+        console.error("updateUserAvatarFromUrl error:", err);
         return { success: false, error: "Failed to upload/link avatar" };
     }
 }
 
 /**
- * Server action: update avatar from a FormData upload.
- * Accepts fields:
- *  - token: string (user.refresh_token)
- *  - avatar: File
- *  - fileName?: string (optional override)
+ * Update avatar from FormData upload.
+ * Requires that a userProfiles row already exists for the user; this
+ * action will NOT create one.
  */
 export async function updateUserAvatarFromForm(
     formData: FormData
@@ -274,10 +254,18 @@ export async function updateUserAvatarFromForm(
     const scopedDb = dbServer.asUser({ token });
     const uid = user.id as string;
 
+    // Ensure profile exists — do not create it here.
     try {
-        await ensureProfileExists(scopedDb, uid);
-    } catch {
-        return { success: false, error: "Failed to ensure profile exists" };
+        const q = await scopedDb.query({
+            userProfiles: { $: { where: { id: uid }, limit: 1 } },
+        });
+        const existing =
+            Array.isArray(q.userProfiles) && q.userProfiles.length > 0;
+        if (!existing) {
+            return { success: false, error: "User profile not found" };
+        }
+    } catch (err) {
+        return { success: false, error: "Failed to verify profile existence" };
     }
 
     // Remove old avatars first
@@ -299,7 +287,8 @@ export async function updateUserAvatarFromForm(
             ct
         );
         return { success: true, uploadedFileId, txId, deletedFileIds };
-    } catch {
+    } catch (err) {
+        console.error("updateUserAvatarFromForm error:", err);
         return { success: false, error: "Failed to upload/link avatar" };
     }
 }

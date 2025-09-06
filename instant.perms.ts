@@ -25,7 +25,7 @@ const rules = {
     $files: {
         allow: {
             view: "isAuthenticated",
-            create: "isAuthenticated", // TODO: need to let new users upload their avatar, but not upload party images... how do?
+            create: "isAuthenticated",
             update: "isAuthenticated",
             delete: "isAuthenticated",
         },
@@ -33,18 +33,19 @@ const rules = {
     },
     $users: {
         allow: {
-            view: "auth.id == data.id",
+            view: "isOwner",
             create: "false",
             delete: "false",
             update: "false",
         },
+        bind: commonBind,
     },
     userProfiles: {
         allow: {
-            view: "isAuthenticated",
+            view: "isOwner",
             create: "false",
-            update: "false",
-            delete: "false",
+            update: "isOwner",
+            delete: "isOwner",
         },
         bind: commonBind,
     },

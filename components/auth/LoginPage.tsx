@@ -17,51 +17,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
 import { v4 as uuidv4 } from "uuid";
 import MagicLinkAuth from "./MagicLinkAuth";
-import { updateUserAvatarFromUrl } from "@/server/_actions/updateUserAvatar";
-import { updateUserProfile } from "@/server/_actions/updateUserProfile";
-
-function useEnsureUserProfile() {
-    const { user } = db.useAuth();
-
-    useEffect(() => {
-        if (!user?.id) return;
-
-        const rowId = user.id;
-
-        const createProfile = async () => {
-            try {
-                await db.transact(
-                    db.tx.userProfiles[rowId]
-                        .create({
-                            joined: new Date(),
-                            premium: false,
-                            plan: "free",
-                        })
-                        .link({ $user: user.id })
-                );
-            } catch (err: any) {
-                if (err.message.includes("Creating entities that exist")) {
-                    console.warn(err);
-                } else {
-                    console.error(
-                        "useEnsureUserProfile: create profile error:",
-                        err
-                    );
-                    throw err;
-                }
-            }
-        };
-
-        void createProfile();
-    }, [user?.id]);
-}
+import { createUserProfileIfMissing } from "@/app/(app)/app/login/_actions/createUserProfile";
 
 const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
 const DEFAULT_FALLBACK = "/app/dashboard";
 
-/**
- * Return a safe, same-origin path for redirecting.
- */
 function sanitizeReturnTo(candidate?: string | null): string | null {
     if (!candidate) return null;
     const trimmed = candidate.trim();
@@ -77,14 +37,13 @@ function sanitizeReturnTo(candidate?: string | null): string | null {
                 return parsed.pathname + parsed.search + parsed.hash;
             }
         } catch {
-            // not a valid absolute URL — reject
+            // ignore
         }
     }
     return null;
 }
 
 export default function LoginPage() {
-    useEnsureUserProfile();
     const { user } = db.useAuth();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -167,7 +126,6 @@ export default function LoginPage() {
                 navigateToReturn();
                 return;
             }
-            // otherwise leave isLoading true and let the effect handle completion
         } catch (err: any) {
             console.error("Google sign-in error:", err);
             setError(err?.body?.message || "Google sign-in failed");
@@ -178,7 +136,8 @@ export default function LoginPage() {
         }
     };
 
-    // When auth arrives and we have pending profile info, call server actions
+    // When auth arrives and we have pending profile info, call server action
+    // which creates a profile only if missing and uploads/links avatar if provided.
     useEffect(() => {
         if (!user?.id || !pendingGoogleProfile) return;
         let cancelled = false;
@@ -189,7 +148,7 @@ export default function LoginPage() {
 
             const token = (user as any)?.refresh_token;
             if (!token) {
-                console.error("Missing refresh_token for server actions");
+                console.error("Missing refresh_token for server action");
                 setIsLoading(false);
                 return;
             }
@@ -197,49 +156,30 @@ export default function LoginPage() {
             const info = pendingGoogleProfile;
 
             try {
-                // 1) Avatar (from URL) — server action will fetch, upload, and link
-                if (info.picture) {
-                    try {
-                        const avatarRes = await updateUserAvatarFromUrl({
-                            token,
-                            imageUrl: info.picture,
-                            fileName: `${user.id}-avatar`,
-                        });
-                        if (!avatarRes?.success) {
-                            console.warn(
-                                "updateUserAvatarFromUrl failed",
-                                avatarRes
-                            );
-                        }
-                    } catch (err) {
-                        console.error("updateUserAvatarFromUrl error:", err);
-                    }
-                }
+                try {
+                    const res = await createUserProfileIfMissing({
+                        token,
+                        name: info.name ?? null,
+                        imageUrl: info.picture ?? null,
+                        fileName: `${user.id}-avatar`,
+                    });
 
-                // 2) Name update
-                if (info.name) {
-                    try {
-                        const profileRes = await updateUserProfile({
-                            token,
-                            name: info.name,
-                        });
-                        if (!profileRes?.success) {
-                            console.warn(
-                                "updateUserProfile failed",
-                                profileRes
-                            );
-                        }
-                    } catch (err) {
-                        console.error("updateUserProfile error:", err);
+                    // res.created === true => we created a profile (and possibly uploaded+linked)
+                    // res.created === false => profile already existed; do nothing
+                    if (!res || (res as any).created === false) {
+                        // nothing to do — do not overwrite existing profile
+                        console.debug(
+                            "Profile already existed or was not created by action"
+                        );
                     }
+                } catch (err) {
+                    console.error("createUserProfileIfMissing error:", err);
                 }
             } finally {
                 if (!cancelled) {
                     setPendingGoogleProfile(null);
                     navigateToReturn();
                 }
-                // keep isLoading true for the route change; if we didn't navigate
-                // make sure we stop loading
                 if (cancelled) setIsLoading(false);
             }
         };

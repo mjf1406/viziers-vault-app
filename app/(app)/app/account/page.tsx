@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +25,7 @@ import { plans as allPlans, type Plan, type TierId } from "@/lib/plans";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "sonner";
 import db from "@/lib/db";
-import { updateUserProfile } from "@/server/_actions/updateUserProfile";
-import { updateUserAvatarFromForm } from "@/server/_actions/updateUserAvatar";
+import { uploadImage } from "@/lib/storage";
 
 export default function AccountPage() {
     const {
@@ -37,19 +36,67 @@ export default function AccountPage() {
         isLoading,
         error,
         signOut,
+        data: useUserData,
     } = useUser();
 
-    // get refresh token for server actions
+    // client-side auth state from the client SDK
     const { user } = db.useAuth();
-    const refreshToken = (user as any)?.refresh_token as string | undefined;
 
-    const [nameInput, setNameInput] = useState<string | undefined>(displayName);
+    // preview + selection state
+    const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const fileUrlRef = useRef<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    // handle potential null displayName
+    const [nameInput, setNameInput] = useState<string | undefined>(
+        displayName ?? undefined
+    );
     const [nameLoading, setNameLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        setNameInput(displayName);
+        setNameInput(displayName ?? undefined);
     }, [displayName]);
+
+    useEffect(() => {
+        return () => {
+            // cleanup any object URL on unmount
+            if (fileUrlRef.current) {
+                URL.revokeObjectURL(fileUrlRef.current);
+                fileUrlRef.current = null;
+            }
+        };
+    }, []);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0] ?? null;
+        if (!f) {
+            // clear selection/preview
+            setSelectedFile(null);
+            if (fileUrlRef.current) {
+                URL.revokeObjectURL(fileUrlRef.current);
+                fileUrlRef.current = null;
+            }
+            setPreviewSrc(null);
+            return;
+        }
+
+        if (!f.type.startsWith("image/")) {
+            toast.error("Please select an image file");
+            return;
+        }
+
+        setSelectedFile(f);
+
+        // revoke previous url
+        if (fileUrlRef.current) {
+            URL.revokeObjectURL(fileUrlRef.current);
+        }
+        const url = URL.createObjectURL(f);
+        fileUrlRef.current = url;
+        setPreviewSrc(url);
+    };
 
     const normalizeTier = (name?: string): TierId => {
         const v = name?.toLowerCase();
@@ -113,60 +160,141 @@ export default function AccountPage() {
         pro: 3,
     };
 
-    // Avatar upload handler — calls server action with FormData
+    // Avatar upload handler — client-side upload + client SDK transact
     const handleAvatarSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!refreshToken) {
-            toast.error("Missing auth token. Please refresh and try again.");
+
+        if (!user?.id) {
+            toast.error("Not signed in. Please refresh and try again.");
             return;
         }
 
-        const form = e.currentTarget;
-        const fileInput = form.elements.namedItem("avatar") as HTMLInputElement;
-        const file = fileInput?.files?.[0];
+        const file = selectedFile ?? fileInputRef.current?.files?.[0];
         if (!file) {
             toast.error("Please select an image to upload.");
             return;
         }
 
         setUploading(true);
+
         try {
-            const fd = new FormData();
-            fd.append("avatar", file);
-            fd.append("token", refreshToken);
-            const res = await updateUserAvatarFromForm(fd);
-            if (res?.success) {
-                toast.success("Avatar updated");
-            } else {
-                toast.error(res?.error || "Failed to update avatar");
+            const uid = user.id as string;
+            const base = (file.name || `avatar`).replace(/\s+/g, "-");
+            const path = `avatars/${uid}-avatar-${Date.now()}-${base}`;
+
+            // 1) Upload file to storage via client helper
+            const uploadedFileId = await uploadImage(file, path, {
+                contentType: file.type || undefined,
+                name: file.name,
+            });
+
+            // 2) Read linked files from the top-level useUser query data
+            const usersArr = (useUserData?.$users as any[]) ?? [];
+            const userRow = usersArr.find((u) => u.id === uid) ?? usersArr[0];
+
+            if (!userRow || !userRow.profile) {
+                toast.error(
+                    "Profile row not found. Please sign out and sign back in or contact support."
+                );
+                setUploading(false);
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to upload avatar");
+
+            const filesField = userRow.profile.$files;
+            let linkedFileIds: string[] = [];
+
+            if (filesField) {
+                if (Array.isArray(filesField)) {
+                    linkedFileIds = filesField
+                        .map((f: any) => f?.id)
+                        .filter(Boolean);
+                } else if (typeof filesField === "object") {
+                    // single file object
+                    if (filesField.id) linkedFileIds = [filesField.id];
+                    else {
+                        // fallback: collect ids from nested values
+                        linkedFileIds = Object.values(filesField)
+                            .flat()
+                            .map((f: any) => f?.id)
+                            .filter(Boolean);
+                    }
+                }
+            }
+
+            // 3) Build transaction ops: unlink + delete old files, and link new file
+            const ops: any[] = [];
+
+            for (const fid of linkedFileIds) {
+                ops.push(db.tx.userProfiles[uid].unlink({ $files: fid }));
+            }
+            for (const fid of linkedFileIds) {
+                ops.push(db.tx.$files[fid].delete());
+            }
+
+            // Link new uploaded file
+            ops.push(
+                db.tx.userProfiles[uid]
+                    .update({})
+                    .link({ $files: uploadedFileId })
+            );
+
+            // 4) Execute transaction
+            await db.transact(ops);
+
+            // cleanup preview & selected file (user's avatarSrc will update via live query)
+            if (fileUrlRef.current) {
+                URL.revokeObjectURL(fileUrlRef.current);
+                fileUrlRef.current = null;
+            }
+            setSelectedFile(null);
+            setPreviewSrc(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+
+            toast.success("Avatar updated");
+        } catch (err: any) {
+            console.error("Avatar upload/update failed:", err);
+            if (
+                String(err?.message || "")
+                    .toLowerCase()
+                    .includes("permission")
+            ) {
+                toast.error(
+                    "Permission denied. Consider using a server-side admin action to update avatars."
+                );
+            } else {
+                toast.error("Failed to upload avatar. Please try again.");
+            }
         } finally {
             setUploading(false);
         }
     };
 
+    // Name update using client SDK
     const handleUpdateName = async () => {
-        if (!refreshToken) {
-            toast.error("Missing auth token. Please refresh and try again.");
+        if (!user?.id) {
+            toast.error("Not signed in. Please refresh and try again.");
             return;
         }
         setNameLoading(true);
         try {
-            const res = await updateUserProfile({
-                token: refreshToken,
-                name: nameInput ?? null,
-            });
-            if (res?.success) {
-                toast.success("Profile updated");
+            const uid = user.id as string;
+            await db.transact([
+                db.tx.userProfiles[uid].update({ name: nameInput ?? null }),
+            ]);
+            toast.success("Profile updated");
+        } catch (err: any) {
+            console.error("Profile update failed:", err);
+            if (
+                String(err?.message || "")
+                    .toLowerCase()
+                    .includes("permission")
+            ) {
+                toast.error(
+                    "Permission denied. Consider using a server-side admin action to update profile."
+                );
             } else {
-                toast.error(res?.error || "Failed to update profile");
+                toast.error("Failed to update profile. Please try again.");
             }
-        } catch (err) {
-            console.error(err);
-            toast.error("Failed to update profile");
         } finally {
             setNameLoading(false);
         }
@@ -177,9 +305,9 @@ export default function AccountPage() {
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-4">
                     <Avatar className="h-24 w-24">
-                        {avatarSrc ? (
+                        {previewSrc || avatarSrc ? (
                             <AvatarImage
-                                src={avatarSrc}
+                                src={previewSrc ?? avatarSrc ?? undefined}
                                 alt={displayName || "Avatar"}
                             />
                         ) : (
@@ -189,6 +317,7 @@ export default function AccountPage() {
                             </AvatarFallback>
                         )}
                     </Avatar>
+
                     <div className="text-left">
                         <div className="flex items-center gap-2">
                             <h1 className="text-2xl font-semibold">
@@ -206,6 +335,7 @@ export default function AccountPage() {
                         </p>
                     </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                     {currentTier !== "free" ? (
                         <Button
@@ -255,9 +385,13 @@ export default function AccountPage() {
                         <CardContent>
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-16 w-16">
-                                    {avatarSrc ? (
+                                    {previewSrc || avatarSrc ? (
                                         <AvatarImage
-                                            src={avatarSrc}
+                                            src={
+                                                previewSrc ??
+                                                avatarSrc ??
+                                                undefined
+                                            }
                                             alt={displayName || "Avatar"}
                                         />
                                     ) : (
@@ -279,6 +413,8 @@ export default function AccountPage() {
                                         accept="image/*"
                                         className="hidden"
                                         id="avatar-file-input"
+                                        onChange={handleFileChange}
+                                        ref={fileInputRef}
                                     />
                                     <label htmlFor="avatar-file-input">
                                         <Button
@@ -296,7 +432,7 @@ export default function AccountPage() {
                                     </label>
                                     <Button
                                         type="submit"
-                                        disabled={!refreshToken || uploading}
+                                        disabled={!user?.id || uploading}
                                     >
                                         {uploading
                                             ? "Uploading..."
@@ -316,7 +452,7 @@ export default function AccountPage() {
                                 />
                                 <Button
                                     onClick={handleUpdateName}
-                                    disabled={!refreshToken || nameLoading}
+                                    disabled={nameLoading}
                                 >
                                     {nameLoading ? "Saving..." : "Save"}
                                 </Button>

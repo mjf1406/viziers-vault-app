@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,9 @@ import { features, type Feature } from "@/lib/features";
 import { plans as allPlans, type Plan, type TierId } from "@/lib/plans";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "sonner";
+import db from "@/lib/db";
+import { updateUserProfile } from "@/server/_actions/updateUserProfile";
+import { updateUserAvatarFromForm } from "@/server/_actions/updateUserAvatar";
 
 export default function AccountPage() {
     const {
@@ -35,6 +38,18 @@ export default function AccountPage() {
         error,
         signOut,
     } = useUser();
+
+    // get refresh token for server actions
+    const { user } = db.useAuth();
+    const refreshToken = (user as any)?.refresh_token as string | undefined;
+
+    const [nameInput, setNameInput] = useState<string | undefined>(displayName);
+    const [nameLoading, setNameLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        setNameInput(displayName);
+    }, [displayName]);
 
     const normalizeTier = (name?: string): TierId => {
         const v = name?.toLowerCase();
@@ -96,6 +111,65 @@ export default function AccountPage() {
         basic: 1,
         plus: 2,
         pro: 3,
+    };
+
+    // Avatar upload handler — calls server action with FormData
+    const handleAvatarSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!refreshToken) {
+            toast.error("Missing auth token. Please refresh and try again.");
+            return;
+        }
+
+        const form = e.currentTarget;
+        const fileInput = form.elements.namedItem("avatar") as HTMLInputElement;
+        const file = fileInput?.files?.[0];
+        if (!file) {
+            toast.error("Please select an image to upload.");
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const fd = new FormData();
+            fd.append("avatar", file);
+            fd.append("token", refreshToken);
+            const res = await updateUserAvatarFromForm(fd);
+            if (res?.success) {
+                toast.success("Avatar updated");
+            } else {
+                toast.error(res?.error || "Failed to update avatar");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to upload avatar");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleUpdateName = async () => {
+        if (!refreshToken) {
+            toast.error("Missing auth token. Please refresh and try again.");
+            return;
+        }
+        setNameLoading(true);
+        try {
+            const res = await updateUserProfile({
+                token: refreshToken,
+                name: nameInput ?? null,
+            });
+            if (res?.success) {
+                toast.success("Profile updated");
+            } else {
+                toast.error(res?.error || "Failed to update profile");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to update profile");
+        } finally {
+            setNameLoading(false);
+        }
     };
 
     return (
@@ -170,6 +244,86 @@ export default function AccountPage() {
                 </Alert>
             ) : (
                 <>
+                    {/* Profile edit card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Profile</CardTitle>
+                            <CardDescription>
+                                Update display name and avatar
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-16 w-16">
+                                    {avatarSrc ? (
+                                        <AvatarImage
+                                            src={avatarSrc}
+                                            alt={displayName || "Avatar"}
+                                        />
+                                    ) : (
+                                        <AvatarFallback>
+                                            {displayName
+                                                ?.slice(0, 2)
+                                                ?.toUpperCase() ?? "AC"}
+                                        </AvatarFallback>
+                                    )}
+                                </Avatar>
+
+                                <form
+                                    onSubmit={handleAvatarSubmit}
+                                    className="flex items-center gap-2"
+                                >
+                                    <input
+                                        name="avatar"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        id="avatar-file-input"
+                                    />
+                                    <label htmlFor="avatar-file-input">
+                                        <Button
+                                            type="button"
+                                            onClick={() => {
+                                                const el =
+                                                    document.getElementById(
+                                                        "avatar-file-input"
+                                                    ) as HTMLInputElement | null;
+                                                el?.click();
+                                            }}
+                                        >
+                                            Choose image
+                                        </Button>
+                                    </label>
+                                    <Button
+                                        type="submit"
+                                        disabled={!refreshToken || uploading}
+                                    >
+                                        {uploading
+                                            ? "Uploading..."
+                                            : "Upload avatar"}
+                                    </Button>
+                                </form>
+                            </div>
+
+                            <div className="mt-4 flex items-center gap-2">
+                                <input
+                                    className="rounded-md border px-3 py-2"
+                                    value={nameInput ?? ""}
+                                    onChange={(e) =>
+                                        setNameInput(e.target.value)
+                                    }
+                                    placeholder="Display name"
+                                />
+                                <Button
+                                    onClick={handleUpdateName}
+                                    disabled={!refreshToken || nameLoading}
+                                >
+                                    {nameLoading ? "Saving..." : "Save"}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     <div className="space-y-3">
                         <h2 className="text-xl font-semibold">Your plan</h2>
                         <p className="text-sm text-muted-foreground">

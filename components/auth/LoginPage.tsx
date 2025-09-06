@@ -15,10 +15,10 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
-import { makeUploadCandidate } from "@/lib/image";
-import { uploadImage } from "@/lib/storage";
 import { v4 as uuidv4 } from "uuid";
 import MagicLinkAuth from "./MagicLinkAuth";
+import { updateUserAvatarFromUrl } from "@/server/_actions/updateUserAvatar";
+import { updateUserProfile } from "@/server/_actions/updateUserProfile";
 
 function useEnsureUserProfile() {
     const { user } = db.useAuth();
@@ -61,24 +61,15 @@ const DEFAULT_FALLBACK = "/app/dashboard";
 
 /**
  * Return a safe, same-origin path for redirecting.
- * Accepts:
- *  - relative path starting with "/" (but not protocol-relative "//")
- *  - absolute same-origin URLs => converted to pathname+search+hash
- * Rejects anything that could be an open redirect.
  */
 function sanitizeReturnTo(candidate?: string | null): string | null {
     if (!candidate) return null;
     const trimmed = candidate.trim();
     if (!trimmed) return null;
-    // disallow CR/LF
     if (/[\n\r]/.test(trimmed)) return null;
-
-    // Accept a single-leading-slash path, e.g. "/foo?bar=baz"
     if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
         return trimmed;
     }
-
-    // Accept same-origin absolute URL, convert to path+search+hash
     if (typeof window !== "undefined") {
         try {
             const parsed = new URL(trimmed);
@@ -89,7 +80,6 @@ function sanitizeReturnTo(candidate?: string | null): string | null {
             // not a valid absolute URL — reject
         }
     }
-
     return null;
 }
 
@@ -103,7 +93,6 @@ export default function LoginPage() {
     const searchParams = useSearchParams();
     const rawReturnTo = searchParams?.get("returnTo") ?? null;
 
-    // helper to read session fallback (safe access)
     const getSessionReturn = () => {
         if (typeof window === "undefined") return null;
         try {
@@ -132,13 +121,10 @@ export default function LoginPage() {
                 void router.push(dest);
                 return;
             }
-
-            // If we cannot compute a safe path, try to emulate "back".
             if (typeof window !== "undefined" && window.history.length > 1) {
                 router.back();
                 return;
             }
-
             void router.push(DEFAULT_FALLBACK);
         },
         [getSafeDestination, router]
@@ -150,7 +136,6 @@ export default function LoginPage() {
         picture?: string | null;
     } | null>(null);
 
-    // Ensures the overlay paints before heavy async work
     const nextPaint = useCallback(
         () =>
             new Promise<void>((resolve) =>
@@ -161,9 +146,6 @@ export default function LoginPage() {
         []
     );
 
-    // Sign in with id token. If profileInfo exists we stash it and wait for the
-    // `user` auth state to arrive; the effect below will perform fetch + upload
-    // and create/update userProfiles linking the uploaded file.
     const handleGoogleSignIn = async (
         credential: string,
         nonce: string,
@@ -181,9 +163,7 @@ export default function LoginPage() {
                 nonce,
             });
 
-            // If there's no profileInfo to apply, redirect immediately.
             if (!profileInfo) {
-                // keep loading until route change; unmount will clear it
                 navigateToReturn();
                 return;
             }
@@ -198,8 +178,7 @@ export default function LoginPage() {
         }
     };
 
-    // When auth arrives and we have pending profile info, fetch the picture,
-    // upload it, then update/create userProfiles and link the uploaded file.
+    // When auth arrives and we have pending profile info, call server actions
     useEffect(() => {
         if (!user?.id || !pendingGoogleProfile) return;
         let cancelled = false;
@@ -208,99 +187,61 @@ export default function LoginPage() {
             setIsLoading(true);
             await nextPaint();
 
-            const uid = user.id;
+            const token = (user as any)?.refresh_token;
+            if (!token) {
+                console.error("Missing refresh_token for server actions");
+                setIsLoading(false);
+                return;
+            }
+
             const info = pendingGoogleProfile;
 
-            let uploadedFileId: string | null = null;
-
-            // 1) fetch & upload avatar (if present)
-            if (info.picture) {
-                try {
-                    const resp = await fetch(info.picture, { mode: "cors" });
-                    if (resp.ok) {
-                        const blob = await resp.blob();
-                        const ext =
-                            (blob.type && blob.type.split("/")[1]) || "jpg";
-                        const filename = `${uid}-avatar.${ext}`;
-                        const file = new File([blob], filename, {
-                            type: blob.type || "image/jpeg",
-                        });
-
-                        const candidate = await makeUploadCandidate(file);
-                        const safeName = (candidate.name || filename).replace(
-                            /\s+/g,
-                            "-"
-                        );
-                        const path = `avatars/${uid}-avatar-${Date.now()}-${safeName}`;
-
-                        uploadedFileId = await uploadImage(
-                            (candidate as any).blobOrFile ?? file,
-                            path,
-                            (candidate as any).type
-                                ? { contentType: (candidate as any).type }
-                                : undefined
-                        );
-
-                        console.debug("avatar upload result:", {
-                            uploadedFileId,
-                            path,
-                        });
-                    } else {
-                        console.warn(
-                            "Failed to fetch Google picture:",
-                            resp.status
-                        );
-                    }
-                } catch (err) {
-                    console.error("Avatar fetch/upload failed:", err);
-                }
-            }
-
-            // 2) Ensure userProfiles row exists (create if missing)
             try {
-                await db.transact(
-                    db.tx.userProfiles[uid]
-                        .create({
-                            joined: new Date(),
-                            premium: false,
-                        })
-                        .link({ $user: uid })
-                );
-            } catch (err: any) {
-                if (!err?.message?.includes?.("Creating entities that exist")) {
-                    console.error("Failed to ensure userProfiles row:", err);
+                // 1) Avatar (from URL) — server action will fetch, upload, and link
+                if (info.picture) {
+                    try {
+                        const avatarRes = await updateUserAvatarFromUrl({
+                            token,
+                            imageUrl: info.picture,
+                            fileName: `${user.id}-avatar`,
+                        });
+                        if (!avatarRes?.success) {
+                            console.warn(
+                                "updateUserAvatarFromUrl failed",
+                                avatarRes
+                            );
+                        }
+                    } catch (err) {
+                        console.error("updateUserAvatarFromUrl error:", err);
+                    }
                 }
-            }
 
-            // 3) Update name if provided
-            if (info.name) {
-                try {
-                    await db.transact(
-                        db.tx.userProfiles[uid].update({ name: info.name })
-                    );
-                } catch (err) {
-                    console.error("Failed to update profile name:", err);
+                // 2) Name update
+                if (info.name) {
+                    try {
+                        const profileRes = await updateUserProfile({
+                            token,
+                            name: info.name,
+                        });
+                        if (!profileRes?.success) {
+                            console.warn(
+                                "updateUserProfile failed",
+                                profileRes
+                            );
+                        }
+                    } catch (err) {
+                        console.error("updateUserProfile error:", err);
+                    }
                 }
-            }
-
-            // 4) Link avatar
-            if (uploadedFileId) {
-                try {
-                    await db.transact(
-                        db.tx.userProfiles[uid]
-                            .update({})
-                            .link({ $files: uploadedFileId })
-                    );
-                } catch (err) {
-                    console.error("Failed to link avatar to profile:", err);
+            } finally {
+                if (!cancelled) {
+                    setPendingGoogleProfile(null);
+                    navigateToReturn();
                 }
+                // keep isLoading true for the route change; if we didn't navigate
+                // make sure we stop loading
+                if (cancelled) setIsLoading(false);
             }
-
-            if (!cancelled) {
-                setPendingGoogleProfile(null);
-                navigateToReturn();
-            }
-            // keep isLoading true for the route change
         };
 
         void applyProfile();
@@ -310,7 +251,6 @@ export default function LoginPage() {
         };
     }, [user?.id, pendingGoogleProfile, navigateToReturn, nextPaint]);
 
-    // local oauth nonce state
     const [oauthNonce, setOauthNonce] = useState<string>(() => uuidv4());
 
     return (
@@ -361,7 +301,7 @@ export default function LoginPage() {
                                     }
                                     nonce={oauthNonce}
                                     onLoadingChange={(v) => {
-                                        if (v) setIsLoading(true); // child only turns it on
+                                        if (v) setIsLoading(true);
                                     }}
                                     onSuccess={(credential, info) => {
                                         void handleGoogleSignIn(

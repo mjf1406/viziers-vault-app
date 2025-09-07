@@ -28,7 +28,7 @@
         -   (LemonSqueezy)[https://www.lemonsqueezy.com/]
     -   rate limiting with Upstash Redis
     -   need Obsidian markdown to HTML function for the blog and docs
-    -   set up basic blog and docs
+        -   set up basic blog and docs
     -   I'd love to get Docker involved here so users can self-host
 
 ## Change Log

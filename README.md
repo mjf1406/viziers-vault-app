@@ -21,19 +21,21 @@
         -   [x] update name
         -   [ ] update subscription
         -   [x] update avatar
-    -   basic settings
     -   payment integration with subscriptions
         -   (Paddle)[https://www.paddle.com/]
         -   (Coda)[https://www.coda.co/merchant-of-record/]
         -   (LemonSqueezy)[https://www.lemonsqueezy.com/]
     -   [x] rate limiting with Upstash Redis
-    -   need Obsidian markdown to HTML function for the blog and docs
-        -   set up basic blog and docs
-    -   I'd love to get Docker involved here so users can self-host
+    -   [x] need Obsidian markdown to HTML function for the blog and docs
+        -   [x] set up basic blog and docs
 
 ## Change Log
 
 ### 2025/09/13
+
+#### 18:16
+
+-   Obsidian as CMS blog and docs complete. There may be some Obsidian markdown that doesn't work yet, as only testest latex, images, and checkboxes. Might need to check codeblocks and others on the list at [Remark Obsidian](https://github.com/heavycircle/remark-obsidian)
 
 #### 15:07
 

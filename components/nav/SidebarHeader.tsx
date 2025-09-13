@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { IconBrandDiscord, IconBrandGithub } from "@tabler/icons-react";
-import { Home, Newspaper, ScrollText } from "lucide-react";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { DiscordIcon } from "../brand/discord";
 
@@ -31,21 +30,6 @@ export function SidebarHeader() {
                     <Button
                         variant="ghost"
                         asChild
-                        size="icon"
-                        className="hidden sm:flex"
-                    >
-                        <a
-                            href="/"
-                            rel="noopener noreferrer"
-                            target="_blank"
-                        >
-                            <Home />
-                        </a>
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        asChild
-                        size="icon"
                         className="hidden sm:flex"
                     >
                         <a
@@ -53,13 +37,12 @@ export function SidebarHeader() {
                             rel="noopener noreferrer"
                             target="_blank"
                         >
-                            <Newspaper />
+                            Blog
                         </a>
                     </Button>
                     <Button
                         variant="ghost"
                         asChild
-                        size="icon"
                         className="hidden sm:flex"
                     >
                         <a
@@ -67,7 +50,20 @@ export function SidebarHeader() {
                             rel="noopener noreferrer"
                             target="_blank"
                         >
-                            <ScrollText />
+                            Docs
+                        </a>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        asChild
+                        className="hidden sm:flex"
+                    >
+                        <a
+                            href="/app/dashboard"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            App
                         </a>
                     </Button>
                     <Button

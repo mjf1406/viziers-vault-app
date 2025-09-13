@@ -1,7 +1,6 @@
 /** @format */
 
 import { Separator } from "@/components/ui/separator";
-import { ChevronsDownIcon } from "lucide-react";
 import Link from "next/link";
 import { getAvailableTools } from "@/lib/tools";
 import { LogoTextOnly } from "@/components/brand/logo";

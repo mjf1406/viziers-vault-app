@@ -27,6 +27,11 @@ const CONTENT_DIR = path.join(process.cwd(), "content");
 export type RenderedMarkdown = {
     html: string;
     frontmatter: Record<string, unknown>;
+    headings: Array<{
+        id: string;
+        text: string;
+        depth: number; // 1-6
+    }>;
 };
 
 export type SectionIndexItem = {
@@ -35,6 +40,7 @@ export type SectionIndexItem = {
     title: string;
     description?: string;
     date?: string;
+    category?: string;
 };
 
 // List all slugs (including nested) under a section, returning `[...slug]` arrays
@@ -102,6 +108,8 @@ export function listSectionIndex(section: "docs" | "blog"): SectionIndexItem[] {
                 "Untitled";
             const description = data?.description as string | undefined;
             const date = (data?.date as string | Date | undefined)?.toString();
+            const category =
+                (data?.category as string | undefined) ?? undefined;
 
             items.push({
                 slug: slugParts,
@@ -109,6 +117,7 @@ export function listSectionIndex(section: "docs" | "blog"): SectionIndexItem[] {
                 title,
                 description,
                 date,
+                category,
             });
         }
     };
@@ -130,23 +139,134 @@ export function listSectionIndex(section: "docs" | "blog"): SectionIndexItem[] {
     return items;
 }
 
+export type FolderTree = {
+    name: string; // folder or file base name
+    slug: string[]; // accumulated
+    href?: string; // for files
+    title?: string; // from frontmatter or slug
+    children?: FolderTree[]; // for folders
+};
+
+export function listSectionFolderTree(section: "docs" | "blog"): FolderTree[] {
+    const baseDir = path.join(CONTENT_DIR, section);
+    if (!fs.existsSync(baseDir)) return [];
+
+    function readDir(dir: string, parts: string[]): FolderTree[] {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        const folders: FolderTree[] = [];
+        const files: FolderTree[] = [];
+
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const sub = readDir(path.join(dir, entry.name), [
+                    ...parts,
+                    slugify(entry.name),
+                ]);
+                folders.push({
+                    name: entry.name,
+                    slug: [...parts, slugify(entry.name)],
+                    children: sub,
+                });
+                continue;
+            }
+            if (!/\.mdx?$/.test(entry.name)) continue;
+            const isIndex = /^index\.mdx?$/.test(entry.name);
+            const fileBase = entry.name.replace(/\.mdx?$/, "");
+            const fileSlug = slugify(fileBase);
+            const slugParts = isIndex ? parts : [...parts, fileSlug];
+
+            const fullPath = path.join(dir, entry.name);
+            const raw = fs.readFileSync(fullPath, "utf-8");
+            const { data } = matter(raw);
+            const title =
+                (data?.title as string) ??
+                slugParts[slugParts.length - 1] ??
+                "Untitled";
+            files.push({
+                name: fileBase,
+                slug: slugParts,
+                href: `/${section}/${slugParts.join("/")}`,
+                title,
+            });
+        }
+
+        // Sort folders and files by title/name
+        folders.sort((a, b) => a.name.localeCompare(b.name));
+        files.sort((a, b) =>
+            (a.title ?? a.name).localeCompare(b.title ?? b.name)
+        );
+        return [...folders, ...files];
+    }
+
+    return readDir(baseDir, []);
+}
+
 // Resolve a filesystem path from a `[...slug]` array, trying .md then .mdx
 function resolveFilePath(
     section: "docs" | "blog",
     slugParts: string[]
 ): string | null {
-    const baseDir = path.join(CONTENT_DIR, section);
-    const rel = slugParts.join(path.sep);
-    const candidates = [
-        path.join(baseDir, `${rel}.md`),
-        path.join(baseDir, `${rel}.mdx`),
-        // also support files that already end with index.md under a folder
-        path.join(baseDir, rel, "index.md"),
-        path.join(baseDir, rel, "index.mdx"),
-    ];
-    for (const candidate of candidates) {
-        if (fs.existsSync(candidate)) return candidate;
+    // Walk the filesystem by matching each slug to the slugified entry name
+    let currentDir = path.join(CONTENT_DIR, section);
+    if (!fs.existsSync(currentDir)) return null;
+
+    // If there is only one part, it may be a file at root or a folder with index
+    const parts = [...slugParts];
+
+    // Try to resolve as a file at each level when we are at the last part
+    for (let i = 0; i < parts.length; i += 1) {
+        const part = parts[i];
+        const isLast = i === parts.length - 1;
+
+        const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+        if (isLast) {
+            // 1) Try to find a file whose base name slugifies to part
+            for (const entry of entries) {
+                if (entry.isFile() && /\.mdx?$/.test(entry.name)) {
+                    const base = entry.name.replace(/\.mdx?$/, "");
+                    if (slugify(base) === part) {
+                        return path.join(currentDir, entry.name);
+                    }
+                }
+            }
+            // 2) Try a directory whose slug matches, then index.md(x)
+            let matchedDir: string | null = null;
+            for (const entry of entries) {
+                if (entry.isDirectory() && slugify(entry.name) === part) {
+                    matchedDir = path.join(currentDir, entry.name);
+                    break;
+                }
+            }
+            if (matchedDir) {
+                const idxMd = path.join(matchedDir, "index.md");
+                const idxMdx = path.join(matchedDir, "index.mdx");
+                if (fs.existsSync(idxMd)) return idxMd;
+                if (fs.existsSync(idxMdx)) return idxMdx;
+            }
+            // 3) Fallback: try direct exact file path constructions (legacy)
+            const legacyCandidates = [
+                path.join(currentDir, `${part}.md`),
+                path.join(currentDir, `${part}.mdx`),
+            ];
+            for (const candidate of legacyCandidates) {
+                if (fs.existsSync(candidate)) return candidate;
+            }
+            return null;
+        }
+
+        // Not last: must be a directory that matches this slug
+        let nextDir: string | null = null;
+        for (const entry of entries) {
+            if (entry.isDirectory() && slugify(entry.name) === part) {
+                nextDir = path.join(currentDir, entry.name);
+                break;
+            }
+        }
+        if (!nextDir) return null;
+        currentDir = nextDir;
     }
+
     return null;
 }
 
@@ -205,17 +325,55 @@ export async function renderMarkdown(
         };
     }
 
+    // Collect headings and assign slug ids that will survive into HTML
+    const collectedHeadings: Array<{
+        id: string;
+        text: string;
+        depth: number;
+    }> = [];
+    function remarkCollectHeadings() {
+        return (tree: any) => {
+            visit(tree, "heading", (node: any) => {
+                const depth: number = node.depth;
+                if (!Array.isArray(node.children)) return;
+                const text = node.children
+                    .filter((c: any) => c.type === "text" || c.value)
+                    .map((c: any) => (c.value ?? c.alt ?? "").toString())
+                    .join("")
+                    .trim();
+                if (!text) return;
+                const baseId = slugify(text);
+                let id = baseId;
+                // De-duplicate ids (rare but possible on long pages)
+                let i = 2;
+                while (collectedHeadings.some((h) => h.id === id)) {
+                    id = `${baseId}-${i++}`;
+                }
+                // Ensure id is attached so rehype-stringify emits it on the element
+                node.data = node.data || {};
+                node.data.hProperties = node.data.hProperties || {};
+                node.data.hProperties.id = id;
+                collectedHeadings.push({ id, text, depth });
+            });
+        };
+    }
+
     const vfile = await remark()
         .use(gfm)
         .use(remarkMath)
         .use(remarkRemoveFirstH1)
+        .use(remarkCollectHeadings)
         // Add remark-obsidian or other plugins here as needed in the future
         .use(remarkRehype)
         .use(rehypeKatex)
         .use(rehypeStringify)
         .process(withEmbeds);
 
-    return { html: String(vfile), frontmatter: data };
+    return {
+        html: String(vfile),
+        frontmatter: data,
+        headings: collectedHeadings,
+    };
 }
 
 export function listParams(section: "docs" | "blog"): { slug: string[] }[] {

@@ -1,6 +1,7 @@
 /** @format */
 
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @import "tw-animate-css";
 
@@ -130,4 +131,51 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* Improve markdown prose styles */
+.prose {
+    max-width: none;
+}
+.prose-container {
+    max-width: var(--reading-width, 70ch);
+    margin-left: auto;
+    margin-right: auto;
+}
+.prose pre code {
+    white-space: pre-wrap;
+}
+.prose ul.contains-task-list,
+.prose ol.contains-task-list {
+    list-style: none;
+    padding-left: 0;
+}
+.prose ul.contains-task-list li.task-list-item,
+.prose ol.contains-task-list li.task-list-item {
+    list-style: none;
+    padding-left: 0.75rem;
+}
+.prose ul.contains-task-list li.task-list-item ul,
+.prose ul.contains-task-list li.task-list-item ol,
+.prose ol.contains-task-list li.task-list-item ul,
+.prose ol.contains-task-list li.task-list-item ol {
+    margin-left: 1.25rem;
+}
+.prose input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+.prose :where(h1, h2, h3, h4) {
+    scroll-margin-top: 6rem;
+}
+
+/* Ensure display math renders on its own line with spacing */
+.prose .katex-display {
+    margin: 1rem 0;
+    max-width: 100%;
+    overflow: visible;
+}
+.prose .katex-display > .katex {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 }

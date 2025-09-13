@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 35431.8 41280.4" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<clipPath id="TextBounds">
+<rect height="7575.13" transform="matrix(0.352734 -0 -0 0.352734 -1213 457)" width="3671.43" x="3438.86" y="-1295.6"/>
+</clipPath>
+<clipPath id="TextBounds_2">
+<rect height="7575.13" transform="matrix(0.352734 -0 -0 0.352734 -6873 -10004)" width="2287.55" x="19485" y="28361.3"/>
+</clipPath>
+<clipPath id="TextBounds_3">
+<rect height="7575.13" transform="matrix(0.352734 -0 -0 0.352734 -9344 -6843)" width="4764.83" x="26490.2" y="19399.9"/>
+</clipPath>
+<clipPath id="TextBounds_4">
+<rect height="7575.13" transform="matrix(0.352734 -0 -0 0.352734 -2236 -3542)" width="3301.6" x="6339.06" y="10041.6"/>
+</clipPath>
+<clipPath id="TextBounds_5">
+<rect height="7575.13" transform="matrix(0.352734 -0 -0 0.352734 -7477 -3646)" width="3671.43" x="21197.3" y="10336.4"/>
+</clipPath>
+</defs>
+<g id="Layer_x0020_1" vectornator:layerName="Layer_x0020_1">
+<path d="M18345.3 2106.41L26768.1 6968.43L35188 11830.5L35188 21554.5L35188 31278.6L26768.1 36140.6L18345.3 40999.8L9925.33 36140.6L1505.38 31278.6L1505.38 21554.5L1505.38 11830.5L9925.33 6968.43L18345.3 2106.41Z" fill="#ffebd6" fill-rule="evenodd" opacity="1" stroke="#000000" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="486.183"/>
+<path d="M1505.38 31278.6L35188 11830.5" fill="none" opacity="1" stroke="#006633" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="486.183"/>
+<text clip-path="url(#TextBounds)" fill="#000000" font-family="Arial" font-size="2323.17" opacity="1" stroke="none" text-anchor="start" transform="matrix(2.835 0 0 2.835 3438.86 -1295.6)" vectornator:width="1295.04" x="0" y="0">
+<tspan textLength="1292.04" x="0" y="2103">a</tspan>
+</text>
+<path d="M0 9724.05L1304.1 7748.06L2361.55 9582.3L0 9724.05ZM15153.1 1085.81L1786.05 8805.51L1689.66 8635.41L15056.7 918.54L15153.1 1085.81ZM16842.7 0L15538.6 1975.99L14478.3 141.75L16842.7 0Z" fill="#000000" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M18631.6 21577.2L26466.4 36109.2" fill="none" opacity="1" stroke="#000000" stroke-dasharray="1580.0" stroke-linecap="round" stroke-linejoin="miter" stroke-width="486.183"/>
+<text clip-path="url(#TextBounds_2)" fill="#000000" font-family="Arial" font-size="2323.17" opacity="1" stroke="none" text-anchor="start" transform="matrix(2.835 0 0 2.835 19485 28361.3)" vectornator:width="806.895" x="0" y="0">
+<tspan textLength="773.633" x="0" y="2103">r</tspan>
+</text>
+<text clip-path="url(#TextBounds_3)" fill="#000000" font-family="Arial" font-size="2323.17" opacity="1" stroke="none" text-anchor="start" transform="matrix(2.835 0 0 2.835 26490.2 19399.9)" vectornator:width="1680.72" x="0" y="0">
+<tspan textLength="1677.72" x="0" y="2103">R</tspan>
+</text>
+<path d="M18345.3 2106.41L1505.38 31278.6" fill="none" opacity="1" stroke="#000066" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="486.183"/>
+<path d="M18413.3 21166.1L35188 31278.6" fill="none" opacity="1" stroke="#000000" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="194.473"/>
+<text clip-path="url(#TextBounds_4)" fill="#000066" font-family="Arial" font-size="2323.17" opacity="1" stroke="none" text-anchor="start" transform="matrix(2.835 0 0 2.835 6339.06 10041.6)" vectornator:width="1164.58" x="0" y="0">
+<tspan textLength="1161.58" x="0" y="2103">s</tspan>
+</text>
+<text clip-path="url(#TextBounds_5)" fill="#006633" font-family="Arial" font-size="2323.17" opacity="1" stroke="none" text-anchor="start" transform="matrix(2.835 0 0 2.835 21197.3 10336.4)" vectornator:width="1295.04" x="0" y="0">
+<tspan textLength="1292.04" x="0" y="2103">d</tspan>
+</text>
+<path d="M18024.9 21554.5C18024.9 21340 18198.8 21166.1 18413.3 21166.1C18627.8 21166.1 18801.7 21340 18801.7 21554.5C18801.7 21769 18627.8 21942.9 18413.3 21942.9C18198.8 21942.9 18024.9 21769 18024.9 21554.5Z" fill="#000000" fill-rule="evenodd" opacity="1" stroke="#000000" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="194.473"/>
+</g>
+</svg>

@@ -1,0 +1,184 @@
+{
+  "main": {
+    "id": "8273cc86b6cbc56f",
+    "type": "split",
+    "children": [
+      {
+        "id": "ad522bef08e6ae52",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "42d9a827466c7c29",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/hexagons.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "hexagons"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "d0589f3a50ccd80d",
+    "type": "split",
+    "children": [
+      {
+        "id": "98628bc72a41413d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1860e99ad009aa55",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "cf16e1f5f2244030",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f8380e1f57bd213a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "43782b843ecdc13e",
+    "type": "split",
+    "children": [
+      {
+        "id": "c862dbdf7cf21303",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f8db7ea65fe2649f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "docs/world-generation.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for world-generation"
+            }
+          },
+          {
+            "id": "0dcccabe94fa6348",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "a4efa46d63c63743",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "a89ce3451ec075b7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "docs/hexagons.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of hexagons"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "42d9a827466c7c29",
+  "lastOpenFiles": [
+    "docs/ttrpg-tools-beta.md",
+    "docs/hexagons.md",
+    "docs/world-generation.md",
+    "docs/hexagon-properties.svg",
+    "docs/Hexagons.md",
+    "docs/hexagon properties.svg",
+    "docs/TTRPG Tools Beta.md",
+    "blog/hello-world.md",
+    "World Generation.md",
+    "docs/getting-started.md"
+  ]
+}

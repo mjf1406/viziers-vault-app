@@ -1,0 +1,22 @@
+- [ ] 2d world generation
+	- [ ] with basic biomes
+		- [ ] aquatic
+			- [ ] Ponds & Lakes  
+			- [ ] Rivers & Streams  
+			- [ ] Estuaries  
+			- [ ] Oceans & Seas
+		- [ ] terrestrial
+			- [ ] rainforest  
+			- [ ] tropical seasonal forest  
+			- [ ] scrubland  
+			- [ ] savanna  
+			- [ ] tropical desert  
+			- [ ] deciduous forest  
+			- [ ] chaparral  
+			- [ ] grassland  
+			- [ ] temperate desert  
+			- [ ] coniferous forest  
+			- [ ] tundra  
+- [ ] Use created parties on the world maps that are generated and have them move around the map. Only DM version for now, so no fog of war.
+- [ ] 2d battle map generation based on the biome the party is in.
+- [ ] 

@@ -28,7 +28,6 @@ export function LogoSidebar({}: React.HTMLAttributes<HTMLDivElement>) {
                         className="flex h-12 items-center text-primary rounded-md text-sm font-medium transition-colors"
                     >
                         <Dices className="!h-8 !w-8 flex-shrink-0" />
-                        <FontAwesomeIcon icon={byPrefixAndName.fas["dice"]} />
                         <span className="ml-1 text-xl font-bold">
                             Vizier's Vault
                         </span>

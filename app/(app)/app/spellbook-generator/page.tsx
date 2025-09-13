@@ -4,7 +4,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dices, Loader2, Users } from "lucide-react";
+import { BookOpen, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -131,7 +131,7 @@ export default function SpellbookPage() {
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">
-                    <Users />
+                    <BookOpen />
                     My Spellbooks
                 </h1>
 

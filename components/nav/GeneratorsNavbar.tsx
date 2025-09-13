@@ -39,6 +39,7 @@ import {
 import { useState } from "react";
 import { getAvailableTools } from "@/lib/tools";
 import db from "@/lib/db";
+import { signOutAndClearSession } from "@/lib/auth-helpers";
 import LoginButton from "../auth/LoginButton";
 
 const getIconComponent = (iconName: string) => {
@@ -86,7 +87,7 @@ const accountItems = [
     {
         name: "Sign Out",
         icon: LogOut,
-        onClick: () => db.auth.signOut(),
+        onClick: () => signOutAndClearSession(),
     },
 ];
 

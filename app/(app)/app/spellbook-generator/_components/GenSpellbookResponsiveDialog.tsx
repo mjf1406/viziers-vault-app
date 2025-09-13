@@ -210,6 +210,8 @@ export default function SpellbookGeneratorDialog({
         const formEl = e.currentTarget;
         const formData = new FormData(formEl);
 
+        // No client credentials; server reads HTTP-only cookies
+
         const schoolsResult: string[] | "random" = schoolsRandom
             ? "random"
             : selectedSchools;
@@ -253,9 +255,31 @@ export default function SpellbookGeneratorDialog({
             }
 
             setDialogOpen(false);
-        } catch (err) {
+        } catch (err: any) {
             console.error("generate error", err);
-            toast.error("Generation failed");
+            // Check for middleware-set rate limit message cookie
+            if (typeof document !== "undefined") {
+                const cookieStr = document.cookie || "";
+                const m = cookieStr.match(/(?:^|; )vv_rl_msg=([^;]+)/);
+                if (m) {
+                    try {
+                        const raw = decodeURIComponent(m[1]);
+                        // eslint-disable-next-line no-console
+                        console.error(raw);
+                        toast.error("429 Too Many Requests");
+                    } finally {
+                        document.cookie = "vv_rl_msg=; path=/; max-age=0";
+                    }
+                    setDialogOpen(true);
+                    return;
+                }
+            }
+
+            const msg =
+                err?.message ||
+                err?.body?.message ||
+                (typeof err === "string" ? err : "Generation failed");
+            toast.error(msg);
             setDialogOpen(true);
         } finally {
             setIsGenerating(false);

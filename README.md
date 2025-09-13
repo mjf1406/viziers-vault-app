@@ -33,6 +33,10 @@
 
 ### 2025/09/13
 
+#### 19:26
+
+-   all headers are the same expect search is present on /docs and /blog
+
 #### 19:03
 
 -   massive metadata and seo update done

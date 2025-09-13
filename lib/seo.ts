@@ -27,7 +27,7 @@ const isProd =
     /^https?:\/\//.test(siteUrl) && !/localhost|127\.0\.0\.1/.test(siteUrl);
 
 export const seoDefaults = {
-    siteName: process.env.NEXT_PUBLIC_SITE_NAME || "SiteName",
+    siteName: process.env.NEXT_PUBLIC_SITE_NAME || "",
     locale: "en_US",
     description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || "",
 };
@@ -41,7 +41,19 @@ export function buildBaseMetadata(): Metadata {
         },
         description: seoDefaults.description,
         icons: {
-            icon: "/favicon.ico",
+            icon: [
+                { url: "/favicon.ico", rel: "icon" },
+                {
+                    url: "/favicon-16x16.png",
+                    sizes: "16x16",
+                    type: "image/png",
+                },
+                {
+                    url: "/favicon-32x32.png",
+                    sizes: "32x32",
+                    type: "image/png",
+                },
+            ],
             apple: "/apple-touch-icon.png",
             other: [{ rel: "mask-icon", url: "/safari-pinned-tab.svg" }],
         },
@@ -50,9 +62,10 @@ export function buildBaseMetadata(): Metadata {
 }
 
 export function sectionTitleTemplate(sectionLabel: string): Metadata["title"] {
+    // Do NOT include siteName here; the root layout template appends it.
     return {
-        default: `${sectionLabel} | ${seoDefaults.siteName}`,
-        template: `%s | ${sectionLabel} | ${seoDefaults.siteName}`,
+        default: sectionLabel,
+        template: `%s | ${sectionLabel}`,
     };
 }
 

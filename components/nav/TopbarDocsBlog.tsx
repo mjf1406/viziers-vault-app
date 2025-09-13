@@ -6,10 +6,11 @@ import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Home, Newspaper, ScrollText } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { DiscordIcon } from "@/components/brand/discord";
+import { IconBrandGithub } from "@tabler/icons-react";
 
 export function TopbarDocsBlog({
     section,
@@ -63,6 +64,13 @@ export function TopbarDocsBlog({
                         size="sm"
                         asChild
                     >
+                        <Link href="/app/dashboard">App</Link>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                    >
                         <Link href="/blog">Blog</Link>
                     </Button>
                     <Button
@@ -74,13 +82,21 @@ export function TopbarDocsBlog({
                     </Button>
                     <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
                         asChild
+                        className="hidden sm:flex"
                     >
-                        <Link href="/app/dashboard">App</Link>
+                        <Link
+                            href="https://github.com/mjf1406/viziers-vault-app"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            <IconBrandGithub />
+                        </Link>
                     </Button>
+                    <DiscordIcon />
+                    <ThemeToggle />
                 </div>
-                <ThemeToggle />
             </div>
         </header>
     );

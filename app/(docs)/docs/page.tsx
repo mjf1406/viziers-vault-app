@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
 
 export default async function DocsHomePage() {
     const items = listSectionIndex("docs");

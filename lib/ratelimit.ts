@@ -21,32 +21,27 @@ export interface LimitSpec {
 
 export type RateLimits = Record<TierId, Record<RateCategory, LimitSpec>>;
 
-export const rateLimits: RateLimits = {
-    free: {
-        generations: { limit: 6, window: "5 m" },
-        partyUpdates: { limit: 0, window: "5 m" },
-        avatarUploads: { limit: 1, window: "30 m" },
-        api: { limit: 6, window: "5 m" },
-    },
-    basic: {
-        generations: { limit: 12, window: "5 m" },
-        partyUpdates: { limit: 2, window: "5 m" },
-        avatarUploads: { limit: 2, window: "30 m" },
-        api: { limit: 12, window: "5 m" },
-    },
-    plus: {
-        generations: { limit: 18, window: "5 m" },
-        partyUpdates: { limit: 4, window: "5 m" },
-        avatarUploads: { limit: 3, window: "30 m" },
-        api: { limit: 18, window: "5 m" },
-    },
-    pro: {
-        generations: { limit: 24, window: "5 m" },
-        partyUpdates: { limit: 6, window: "5 m" },
-        avatarUploads: { limit: 5, window: "30 m" },
-        api: { limit: 24, window: "5 m" },
-    },
-};
+function buildRateLimitsFromPlans(): RateLimits {
+    const out: Partial<Record<TierId, Record<RateCategory, LimitSpec>>> = {};
+    for (const plan of plans) {
+        const limits = plan.rateLimits;
+        if (!limits) continue;
+        out[plan.id] = {
+            generations: limits.generations,
+            partyUpdates: limits.partyUpdates,
+            avatarUploads: limits.avatarUploads,
+            api: limits.api,
+        } as Record<RateCategory, LimitSpec>;
+    }
+    // Fallback: if any tier missing, try mirroring free
+    const free = out["free"];
+    for (const tier of ["free", "basic", "plus", "pro"] as const) {
+        if (!out[tier] && free) out[tier] = free;
+    }
+    return out as RateLimits;
+}
+
+const rateLimits: RateLimits = buildRateLimitsFromPlans();
 
 // Create a single Redis client (Edge-compatible fetch-based client)
 const redis = new Redis({

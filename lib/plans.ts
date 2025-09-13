@@ -13,6 +13,21 @@ export interface Plan {
     ctaHref: string;
     popular?: boolean; // used for visual emphasis and footnotes
     footnote?: string; // e.g., "No credit card required"
+    rateLimits?: {
+        generations: {
+            limit: number;
+            window: import("@upstash/ratelimit").Duration;
+        };
+        partyUpdates: {
+            limit: number;
+            window: import("@upstash/ratelimit").Duration;
+        };
+        avatarUploads: {
+            limit: number;
+            window: import("@upstash/ratelimit").Duration;
+        };
+        api: { limit: number; window: import("@upstash/ratelimit").Duration };
+    };
 }
 
 export const plans: Plan[] = [
@@ -24,6 +39,12 @@ export const plans: Plan[] = [
             "Basic access to core generators with limited features and no data persistence.",
         ctaText: "Start Using Free",
         ctaHref: "/app/account",
+        rateLimits: {
+            generations: { limit: 6, window: "5 m" },
+            partyUpdates: { limit: 0, window: "5 m" },
+            avatarUploads: { limit: 1, window: "30 m" },
+            api: { limit: 6, window: "5 m" },
+        },
     },
     {
         id: "basic",
@@ -35,6 +56,12 @@ export const plans: Plan[] = [
         ctaHref: "/app/account",
         popular: true,
         footnote: "No credit card required",
+        rateLimits: {
+            generations: { limit: 12, window: "5 m" },
+            partyUpdates: { limit: 2, window: "5 m" },
+            avatarUploads: { limit: 2, window: "30 m" },
+            api: { limit: 12, window: "5 m" },
+        },
     },
     {
         id: "plus",
@@ -44,6 +71,12 @@ export const plans: Plan[] = [
             "Full access to all features with data persistence and advanced capabilities.",
         ctaText: "Subscribe to Plus",
         ctaHref: "/app/account",
+        rateLimits: {
+            generations: { limit: 18, window: "5 m" },
+            partyUpdates: { limit: 4, window: "5 m" },
+            avatarUploads: { limit: 3, window: "30 m" },
+            api: { limit: 18, window: "5 m" },
+        },
     },
     {
         id: "pro",
@@ -53,5 +86,11 @@ export const plans: Plan[] = [
             "Full access to all features with data persistence and advanced capabilities.",
         ctaText: "Subscribe to Pro",
         ctaHref: "/app/account",
+        rateLimits: {
+            generations: { limit: 24, window: "5 m" },
+            partyUpdates: { limit: 6, window: "5 m" },
+            avatarUploads: { limit: 5, window: "30 m" },
+            api: { limit: 24, window: "5 m" },
+        },
     },
 ];

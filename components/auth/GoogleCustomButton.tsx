@@ -42,6 +42,11 @@ export default function GoogleCustomButton({
                             }
                         },
                         nonce,
+                        // Mobile reliability improvements
+                        use_fedcm_for_prompt: true,
+                        itp_support: true,
+                        cancel_on_tap_outside: false,
+                        context: "signin",
                     });
                     (window as any).google.accounts.id.disableAutoSelect?.();
                     setReady(true);
@@ -126,39 +131,121 @@ export default function GoogleCustomButton({
             }
 
             setIsPrompting(true);
-            onLoadingChange?.(true);
             gotCredentialRef.current = false;
 
-            (window as any).google.accounts.id.prompt((notification: any) => {
-                try {
-                    if (
-                        typeof notification.isDisplayed === "function" &&
-                        notification.isDisplayed()
-                    ) {
-                        // One Tap is displayed; keep loading until either credential or cancel
-                        return;
-                    }
+            const attemptPrompt = (allowFedcmToggle: boolean) => {
+                (window as any).google.accounts.id.prompt(
+                    (notification: any) => {
+                        try {
+                            if (
+                                typeof notification.isDisplayed ===
+                                    "function" &&
+                                notification.isDisplayed()
+                            ) {
+                                // One Tap is displayed; keep loading until either credential or cancel
+                                return;
+                            }
 
-                    const dismissed =
-                        (typeof notification.isNotDisplayed === "function" &&
-                            notification.isNotDisplayed()) ||
-                        (typeof notification.isSkippedMoment === "function" &&
-                            notification.isSkippedMoment()) ||
-                        (typeof notification.isDismissedMoment === "function" &&
-                            notification.isDismissedMoment());
+                            const dismissed =
+                                (typeof notification.isNotDisplayed ===
+                                    "function" &&
+                                    notification.isNotDisplayed()) ||
+                                (typeof notification.isSkippedMoment ===
+                                    "function" &&
+                                    notification.isSkippedMoment()) ||
+                                (typeof notification.isDismissedMoment ===
+                                    "function" &&
+                                    notification.isDismissedMoment());
 
-                    if (dismissed && !gotCredentialRef.current) {
-                        setIsPrompting(false);
-                        // Don't toggle parent loading off here; signal error/cancel instead
-                        onError?.(new Error("Google prompt dismissed"));
+                            const notDisplayedReason =
+                                typeof notification.getNotDisplayedReason ===
+                                "function"
+                                    ? notification.getNotDisplayedReason()
+                                    : undefined;
+                            const dismissedReason =
+                                typeof notification.getDismissedReason ===
+                                "function"
+                                    ? notification.getDismissedReason()
+                                    : undefined;
+                            const skippedReason =
+                                typeof notification.getSkippedReason ===
+                                "function"
+                                    ? notification.getSkippedReason()
+                                    : undefined;
+
+                            if (dismissed && !gotCredentialRef.current) {
+                                // Retry once toggling FedCM to handle quirky mobile browsers
+                                if (allowFedcmToggle) {
+                                    try {
+                                        (
+                                            window as any
+                                        ).google.accounts.id.initialize({
+                                            client_id: clientId,
+                                            callback: (res: any) => {
+                                                if (res?.credential) {
+                                                    handleCredential(
+                                                        res.credential
+                                                    );
+                                                } else {
+                                                    onError?.(res);
+                                                }
+                                            },
+                                            nonce,
+                                            use_fedcm_for_prompt: false,
+                                            itp_support: true,
+                                            cancel_on_tap_outside: false,
+                                            context: "signin",
+                                        });
+                                        (
+                                            window as any
+                                        ).google.accounts.id.disableAutoSelect?.();
+                                        return attemptPrompt(false);
+                                    } catch (e) {
+                                        // fall through
+                                    }
+                                }
+
+                                setIsPrompting(false);
+                                if (typeof window !== "undefined") {
+                                    // Helpful diagnostics in dev tools without exposing to users
+                                    console.debug("GSI prompt dismissed", {
+                                        dismissedReason,
+                                        notDisplayedReason,
+                                        skippedReason,
+                                    });
+                                }
+                                onError?.(
+                                    new Error(
+                                        `Google sign-in was closed or blocked${
+                                            dismissedReason
+                                                ? `: ${dismissedReason}`
+                                                : ""
+                                        }${
+                                            notDisplayedReason
+                                                ? ` (${notDisplayedReason})`
+                                                : ""
+                                        }${
+                                            skippedReason
+                                                ? ` [${skippedReason}]`
+                                                : ""
+                                        }. Try again or use email link.`
+                                    )
+                                );
+                            }
+                        } catch (e) {
+                            if (!gotCredentialRef.current) {
+                                setIsPrompting(false);
+                                onError?.(e);
+                            }
+                        }
                     }
-                } catch (e) {
-                    if (!gotCredentialRef.current) {
-                        setIsPrompting(false);
-                        onError?.(e);
-                    }
-                }
-            });
+                );
+            };
+
+            // Defer prompt slightly to avoid clashing with click UI/animations
+            requestAnimationFrame(() =>
+                requestAnimationFrame(() => attemptPrompt(true))
+            );
         } catch (err) {
             setIsPrompting(false);
             onError?.(err);

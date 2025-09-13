@@ -33,8 +33,9 @@
 
 ### 2025/09/13
 
-#### 18:16
+#### 19:03
 
+-   massive metadata and seo update done
 -   moved rate limits into plans.ts and they are now shown on the /web/pricing in both sets of cards.
 -   Obsidian as CMS blog and docs complete. There may be some Obsidian markdown that doesn't work yet, as only testest latex, images, and checkboxes. Might need to check codeblocks and others on the list at [Remark Obsidian](https://github.com/heavycircle/remark-obsidian)
 

@@ -1,14 +1,12 @@
 /** @format */
 
 import type { Metadata } from "next";
+import { buildBaseMetadata } from "@/lib/seo";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
-export const metadata: Metadata = {
-    title: "App | Vizier's Vault",
-    description: "Generate various things for D&D 5e",
-};
+export const metadata: Metadata = buildBaseMetadata();
 
 export default function RootLayout({
     children,

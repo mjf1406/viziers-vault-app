@@ -2,6 +2,8 @@
 
 import React from "react";
 import { listParams, renderMarkdown } from "@/lib/markdown";
+import type { Metadata } from "next";
+import { canonicalFor, robotsForPath } from "@/lib/seo";
 import Link from "next/link";
 import { OnThisPage } from "@/components/ui/on-this-page";
 import { ContentWidth } from "@/components/ui/content-width";
@@ -15,6 +17,24 @@ import {
 
 export async function generateStaticParams() {
     return listParams("blog");
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string[] }>;
+}): Promise<Metadata> {
+    const { slug } = await params;
+    const { frontmatter } = await renderMarkdown("blog", slug);
+    const title = (frontmatter as any)?.title || slug.at(-1) || "Blog";
+    const description = (frontmatter as any)?.description || undefined;
+    const path = `/blog/${slug.join("/")}`;
+    return {
+        title,
+        description,
+        alternates: { canonical: canonicalFor(path) },
+        robots: robotsForPath(path),
+    };
 }
 
 export default async function BlogPostPage({

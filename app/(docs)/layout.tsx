@@ -1,6 +1,7 @@
 /** @format */
 
 import type { Metadata } from "next";
+import { sectionTitleTemplate } from "@/lib/seo";
 import React from "react";
 import {
     SidebarProvider,
@@ -17,7 +18,7 @@ import { listSectionFolderTree } from "@/lib/markdown";
 import { FooterSection } from "@/app/(home)/_components/layout/sections/footer";
 
 export const metadata: Metadata = {
-    title: "Docs | Vizier's Vault",
+    title: sectionTitleTemplate("Docs"),
     description: "Generate various things for D&D 5e",
 };
 

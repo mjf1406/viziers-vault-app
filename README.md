@@ -35,6 +35,11 @@
 
 ### 2025/09/13
 
+#### 15:07
+
+-   basic blog and docs. Still need layout.tsx with sidebar and header
+-   made /docs and /blog static and not dynamic
+
 #### 13:27
 
 -   implemented rate limiting via middleware and upstash redis

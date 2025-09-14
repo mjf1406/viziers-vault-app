@@ -19,6 +19,14 @@ export async function middleware(req: NextRequest) {
         const res = NextResponse.next();
         for (const [k, v] of Object.entries(result.headers))
             res.headers.set(k, v);
+        // Add conservative security headers
+        res.headers.set("X-Frame-Options", "DENY");
+        res.headers.set("X-Content-Type-Options", "nosniff");
+        res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+        res.headers.set(
+            "Permissions-Policy",
+            "camera=(), microphone=(), geolocation=()"
+        );
         return res;
     }
 
@@ -31,5 +39,12 @@ export async function middleware(req: NextRequest) {
         maxAge: 10,
         sameSite: "lax",
     });
+    res.headers.set("X-Frame-Options", "DENY");
+    res.headers.set("X-Content-Type-Options", "nosniff");
+    res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.headers.set(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=()"
+    );
     return res;
 }

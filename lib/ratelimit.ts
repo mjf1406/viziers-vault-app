@@ -7,6 +7,7 @@ import { Ratelimit, type Duration } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import type { NextRequest } from "next/server";
 import { plans, type TierId } from "./plans";
+import { verifyHint, type VerifiedHint } from "./hint";
 
 export type RateCategory =
     | "generations"
@@ -105,20 +106,32 @@ export function getClientIp(req: NextRequest): string | null {
     return hdr.get("x-real-ip") || null;
 }
 
-export function getUserIdFromHeaders(req: NextRequest): string | null {
-    // Prefer explicitly provided user id header or cookie
-    const hdr = req.headers.get("x-vv-uid");
-    if (hdr && hdr.trim()) return hdr.trim();
-    const cookieVal = req.cookies.get("vv_uid")?.value;
-    return cookieVal || null;
+async function getVerifiedHintFromRequest(
+    req: NextRequest
+): Promise<VerifiedHint | null> {
+    try {
+        const raw = req.cookies.get("vv_hint")?.value;
+        const secret = process.env.VV_COOKIE_SECRET;
+        if (!raw || !secret) return null;
+        return await verifyHint(raw, secret);
+    } catch {
+        return null;
+    }
 }
 
-export function getTierFromHeaders(req: NextRequest): TierId {
-    const hdr =
-        req.headers.get("x-vv-plan") ||
-        req.cookies.get("vv_plan")?.value ||
-        null;
-    return resolveTierFromPlans(hdr);
+export async function getUserIdFromHeaders(
+    req: NextRequest
+): Promise<string | null> {
+    // Only trust signed cookie; remove legacy fallbacks
+    const hint = await getVerifiedHintFromRequest(req);
+    return hint?.uid ?? null;
+}
+
+export async function getTierFromHeaders(req: NextRequest): Promise<TierId> {
+    // Only trust signed cookie; otherwise default to free
+    const hint = await getVerifiedHintFromRequest(req);
+    if (hint?.tier) return resolveTierFromPlans(hint.tier);
+    return "free";
 }
 
 export type Classification = {
@@ -183,10 +196,10 @@ export async function enforceRateLimit(req: NextRequest): Promise<
         return { ok: true, headers: {} };
     }
 
-    const tier = getTierFromHeaders(req);
-    const userId = getUserIdFromHeaders(req);
+    const tier = await getTierFromHeaders(req);
+    const userId = await getUserIdFromHeaders(req);
     const ip = getClientIp(req);
-    const identifier = userId || ip || "anonymous";
+    const identifier = userId ? `${userId}:${ip || "noip"}` : ip || "anonymous";
 
     const limiter = getLimiter(category, tier);
     const { success, limit, reset, remaining } = await limiter.limit(

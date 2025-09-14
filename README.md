@@ -32,6 +32,12 @@
 
 ## Change Log
 
+### 2025/09/14
+
+#### 14:05
+
+-   security updates to auth and cookies, primarily for rate limiting security
+
 ### 2025/09/13
 
 #### 19:26

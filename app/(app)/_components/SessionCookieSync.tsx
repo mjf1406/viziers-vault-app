@@ -24,7 +24,8 @@ export default function SessionCookieSync() {
         void fetch("/api/session/sync", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ userId: uid, plan }),
+            // Only send userId; server computes plan and sets signed cookie
+            body: JSON.stringify({ userId: uid }),
         }).catch(() => {});
     }, [user?.id, profile?.plan]);
 

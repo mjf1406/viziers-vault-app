@@ -10,6 +10,7 @@ import { resolveLevel, resolveSelections } from "../_functions/helpers";
 import { CLASSES, SCHOOLS } from "@/lib/5e-data";
 import dbServer from "@/server/db-server";
 import { cookies } from "next/headers";
+import { verifyHint } from "@/lib/hint";
 
 type GenerateOpts = {
     level: number | "random";
@@ -44,17 +45,19 @@ export default async function generateSpellbook(
     formData: FormData
 ): Promise<void> {
     try {
-        // --- auth: verify uid via HTTP-only cookie set by session sync ---
+        // --- auth: verify via signed vv_hint cookie ---
         const cookieStore = await cookies();
-        const uid = cookieStore.get("vv_uid")?.value ?? "";
-        console.log("🚀 ~ generateSpellbook ~ uid:", uid);
-        const tier = cookieStore.get("vv_plan")?.value ?? "";
-        console.log("🚀 ~ generateSpellbook ~ tier:", tier);
-        if (!uid) {
-            throw new Error("Unauthorized: missing user");
+        const hintRaw = cookieStore.get("vv_hint")?.value ?? "";
+        const secret = process.env.VV_COOKIE_SECRET || "";
+        const hint =
+            secret && hintRaw ? await verifyHint(hintRaw, secret) : null;
+        const uid = hint?.uid ?? "";
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.log("generateSpellbook uid=", uid, "tier=", hint?.tier);
         }
-        if (!tier) {
-            throw new Error("Unauthorized: missing tier");
+        if (!uid) {
+            throw new Error("Unauthorized: missing/invalid session");
         }
 
         const q = {
@@ -65,9 +68,12 @@ export default async function generateSpellbook(
         };
         const users = await dbServer.query(q);
         const userInfo = users?.$users?.[0];
-        console.log("🚀 ~ generateSpellbook ~ userInfo:", userInfo);
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.log("generateSpellbook user fetched");
+        }
         const authorized = userInfo.id === uid;
-        const planMatch = userInfo.profile?.plan === tier;
+        const planMatch = userInfo.profile?.plan === hint?.tier;
         if (!authorized || !planMatch) {
             throw new Error("401 Unauthorized");
         }
@@ -120,17 +126,21 @@ export default async function generateSpellbook(
             )
         );
 
-        console.log("generateSpellbook — resolved options:", {
-            level,
-            schools,
-            classes,
-            initialLength,
-            finalLength: spells.length,
-            // candidateCount: candidates.length,
-            // filteredCount: filteredCandidates.length,
-        });
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.log("generateSpellbook — resolved options:", {
+                level,
+                schools,
+                classes,
+                initialLength,
+                finalLength: spells.length,
+            });
+        }
     } catch (err) {
-        console.error("generateSpellbook error:", err);
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.error("generateSpellbook error:", err);
+        }
         throw err;
     }
 }

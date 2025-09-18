@@ -34,9 +34,15 @@
 
 ### 2025/09/18
 
+#### 12:49
+
+-   updated how the upsell cards work
+
 #### 12:13
 
 -   just fixed boby in body by removing body tag from loading.tsx
+-   minified react error in prod is now gone everywhere
+-
 
 #### 11:47
 

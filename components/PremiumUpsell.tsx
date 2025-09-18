@@ -45,7 +45,7 @@ export default function PremiumUpsell({
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="flex flex-col gap-4">
                     <Feature
                         icon={<IconUsersGroup className="h-5 w-5" />}
                         title={`Unlimited ${unlockedItem}`}

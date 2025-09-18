@@ -8,12 +8,12 @@ import { BookOpen, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import PremiumUpsell from "@/components/PremiumUpsell";
 import { id as genId } from "@instantdb/react";
 import { toast } from "sonner";
 import SpellbookGeneratorDialog, {
     GenerateOpts,
 } from "./_components/GenSpellbookResponsiveDialog";
+import SpellbookUpsell from "./_components/SpellbookUpsell";
 
 export default function SpellbookPage() {
     const [createOpen, setCreateOpen] = useState(false);
@@ -135,32 +135,30 @@ export default function SpellbookPage() {
                     My Spellbooks
                 </h1>
 
-                {user && plan !== "Free" && (
-                    <div className="flex items-center gap-3">
-                        {/* Desktop button (visible on sm+) */}
-                        <Button
-                            className="hidden sm:inline-flex"
-                            onClick={() => handleCreateOpenChange(true)}
-                        >
-                            <Dices className="w-4 h-4" />
-                            Generate Spellbook
-                        </Button>
+                <div className="flex items-center gap-3">
+                    {/* Desktop button (visible on sm+) */}
+                    <Button
+                        className="hidden sm:inline-flex"
+                        onClick={() => handleCreateOpenChange(true)}
+                    >
+                        <Dices className="w-4 h-4" />
+                        Generate Spellbook
+                    </Button>
 
-                        {/* Mobile FAB (visible only < sm) */}
-                        <Button
-                            onClick={() => handleCreateOpenChange(true)}
-                            aria-label="Generate Spellbook"
-                            size="icon"
-                            variant="default"
-                            className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
-                        >
-                            <Dices
-                                className="!w-7 !h-7"
-                                size={36}
-                            />
-                        </Button>
-                    </div>
-                )}
+                    {/* Mobile FAB (visible only < sm) */}
+                    <Button
+                        onClick={() => handleCreateOpenChange(true)}
+                        aria-label="Generate Spellbook"
+                        size="icon"
+                        variant="default"
+                        className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
+                    >
+                        <Dices
+                            className="!w-7 !h-7"
+                            size={36}
+                        />
+                    </Button>
+                </div>
 
                 {/* Create dialog (controlled) */}
                 <SpellbookGeneratorDialog
@@ -206,7 +204,7 @@ export default function SpellbookPage() {
                 // <PartiesGrid onEdit={(p) => openForEdit(p)} pendingIds={pendingIds} />
                 <div>Blah</div>
             ) : (
-                <PremiumUpsell unlockedItem="Spellbooks" />
+                <SpellbookUpsell />
             )}
         </div>
     );

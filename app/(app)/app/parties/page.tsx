@@ -9,7 +9,7 @@ import PartiesGrid from "./_components/PartiesGrid";
 import AddPartyDialogResponsive from "./_components/AddPartyResponsiveDialog";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
-import PartiesUpsell from "@/components/PremiumUpsell";
+import PartiesUpsell from "./_components/PartiesUpsell";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 export default function PartiesPage() {
@@ -142,7 +142,7 @@ export default function PartiesPage() {
                     pendingIds={pendingIds}
                 />
             ) : (
-                <PartiesUpsell unlockedItem="Parties" />
+                <PartiesUpsell />
             )}
         </div>
     );

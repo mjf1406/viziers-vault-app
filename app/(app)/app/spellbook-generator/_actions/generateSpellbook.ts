@@ -3,14 +3,12 @@
 // app/spellbook-generator/_actions/generateSpellbook.ts
 
 "use server";
-
-import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { resolveLevel, resolveSelections } from "../_functions/helpers";
 import { CLASSES, SCHOOLS } from "@/lib/5e-data";
 import dbServer from "@/server/db-server";
 import { cookies } from "next/headers";
 import { verifyHint } from "@/lib/hint";
+import { randomUUID } from "crypto";
 
 type GenerateOpts = {
     level: number | "random";
@@ -41,11 +39,22 @@ type Dnd5eSpell = {
     updatedAt?: Date;
 };
 
+type SpellbookGenerateResponse =
+    | string
+    | {
+          spells: Dnd5eSpell[];
+          options: {
+              level: GenerateOpts["level"];
+              schools: string[];
+              classes: string[];
+          };
+      };
+
 export default async function generateSpellbook(
     formData: FormData
-): Promise<void> {
+): Promise<SpellbookGenerateResponse> {
     try {
-        // --- auth: verify via signed vv_hint cookie ---
+        // --- auth: verify via signed vv_hint cookie (non-blocking for generation) ---
         const cookieStore = await cookies();
         const hintRaw = cookieStore.get("vv_hint")?.value ?? "";
         const secret = process.env.VV_COOKIE_SECRET || "";
@@ -56,26 +65,27 @@ export default async function generateSpellbook(
             // eslint-disable-next-line no-console
             console.log("generateSpellbook uid=", uid, "tier=", hint?.tier);
         }
-        if (!uid) {
-            throw new Error("Unauthorized: missing/invalid session");
-        }
 
-        const q = {
-            $users: {
-                $: { where: { id: uid } },
-                profile: {},
-            },
-        };
-        const users = await dbServer.query(q);
-        const userInfo = users?.$users?.[0];
-        if (process.env.VV_DEBUG) {
-            // eslint-disable-next-line no-console
-            console.log("generateSpellbook user fetched");
-        }
-        const authorized = userInfo.id === uid;
-        const planMatch = userInfo.profile?.plan === hint?.tier;
-        if (!authorized || !planMatch) {
-            throw new Error("401 Unauthorized");
+        // Try to fetch user + plan. If missing, we still allow generation but will not save.
+        let canSave = false;
+        let userIdForSave: string | null = null;
+        try {
+            if (uid) {
+                const users = await dbServer.query({
+                    $users: { $: { where: { id: uid } }, profile: {} },
+                });
+                const userInfo = users?.$users?.[0];
+                const tier = userInfo?.profile?.plan ?? null; // "free" | "basic" | "plus" | "pro" | null
+                const isPremium = ["basic", "plus", "pro"].includes(
+                    String(tier)
+                );
+                canSave = Boolean(uid) && isPremium;
+                userIdForSave = uid;
+            }
+        } catch (e) {
+            // Non-fatal: treat as anonymous/no-save
+            canSave = false;
+            userIdForSave = null;
         }
 
         // --- normalize form inputs ---
@@ -95,7 +105,6 @@ export default async function generateSpellbook(
 
         // Resolve "random" tokens into concrete values
         const levels = resolveLevel(level);
-        console.log("🚀 ~ generateSpellbook ~ levels:", levels);
         schools = resolveSelections(schools, SCHOOLS);
         classes = resolveSelections(classes, CLASSES);
 
@@ -134,8 +143,43 @@ export default async function generateSpellbook(
                 classes,
                 initialLength,
                 finalLength: spells.length,
+                canSave,
             });
         }
+
+        // --- Conditionally persist the generated spellbook for premium, logged-in users ---
+        if (canSave && userIdForSave) {
+            const id = randomUUID();
+            const createdAt = new Date();
+            const nameRaw = formData.get("name");
+            const name =
+                typeof nameRaw === "string" ? nameRaw.trim() : undefined;
+            const record = {
+                name: name || undefined,
+                createdAt,
+                options: { level, schools, classes },
+                spellCount: spells.length,
+                spells,
+                creatorId: userIdForSave,
+            } as any;
+
+            await dbServer.transact(
+                dbServer.tx.spellbooks[id]
+                    .create(record)
+                    .link({ $user: userIdForSave })
+            );
+            return id;
+        }
+
+        // If we didn't save (e.g., anonymous or free plan), return the spells and options
+        return {
+            spells,
+            options: {
+                level,
+                schools: schools as string[],
+                classes: classes as string[],
+            },
+        };
     } catch (err) {
         if (process.env.VV_DEBUG) {
             // eslint-disable-next-line no-console

@@ -26,6 +26,9 @@ import {
 import generateSpellbook from "../_actions/generateSpellbook";
 import { CLASSES, SCHOOLS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -65,6 +68,8 @@ export default function SpellbookGeneratorDialog({
     hideTitleOnMobile = false,
     onGenerate,
 }: SpellbookGeneratorDialogProps) {
+    const { user, plan } = useUser();
+    const isPaid = Boolean(plan && plan.toLowerCase() !== "free");
     const [openLocal, setOpenLocal] = useState<boolean>(!!defaultOpen);
     const isControlled = typeof open !== "undefined";
     const dialogOpen = isControlled ? open : openLocal;
@@ -73,6 +78,7 @@ export default function SpellbookGeneratorDialog({
         onOpenChange?.(v);
         if (!isControlled && !v) onClose?.();
     };
+    const router = useRouter();
 
     const [selectedLevel, setSelectedLevel] = useState<string>(
         initial?.level ? String(initial.level) : "random"
@@ -139,6 +145,7 @@ export default function SpellbookGeneratorDialog({
     }, [initial]);
 
     const [isGenerating, setIsGenerating] = useState(false);
+    const [name, setName] = useState<string>("");
 
     const allSchoolsSelected = selectedSchools.length === SCHOOLS.length;
     const allClassesSelected = selectedClasses.length === CLASSES.length;
@@ -210,6 +217,12 @@ export default function SpellbookGeneratorDialog({
         const formEl = e.currentTarget;
         const formData = new FormData(formEl);
 
+        if (isPaid && user?.id) {
+            formData.set("name", name.trim());
+        } else {
+            formData.delete("name");
+        }
+
         // No client credentials; server reads HTTP-only cookies
 
         const schoolsResult: string[] | "random" = schoolsRandom
@@ -236,8 +249,29 @@ export default function SpellbookGeneratorDialog({
                     : parseInt(selectedLevel, 10);
 
             // Call server action with FormData
-            await generateSpellbook(formData);
+            const result = await generateSpellbook(formData);
 
+            console.log("🚀 ~ submit ~ result:", result);
+            // If we created and saved a spellbook (premium logged-in), navigate immediately to its page
+            if (mode === "create" && typeof result === "string" && result) {
+                router.push(`/app/spellbook-generator/${result}`);
+                return;
+            }
+
+            // If free/guest (no saved ID), download CSV instead of redirecting
+            if (
+                typeof result !== "string" &&
+                result &&
+                Array.isArray(result.spells)
+            ) {
+                const csv = spellsToCsv(result.spells);
+                const fileName = buildSpellbookFilename(name || "Spellbook");
+                downloadCsv(csv, fileName);
+                setDialogOpen(false);
+                return;
+            }
+
+            // Otherwise, delegate to onGenerate callback if provided (e.g., edit flow)
             if (onGenerate) {
                 await onGenerate({
                     level,
@@ -254,6 +288,7 @@ export default function SpellbookGeneratorDialog({
                 });
             }
 
+            // Close dialog if we didn't navigate
             setDialogOpen(false);
         } catch (err: any) {
             console.error("generate error", err);
@@ -286,6 +321,52 @@ export default function SpellbookGeneratorDialog({
         }
     };
 
+    const spellsToCsv = (spells: any[]) => {
+        const headers = ["Name", "Level", "School", "Classes", "Source", "URL"];
+        const escape = (v: any) => {
+            const s = v == null ? "" : String(v);
+            const needsQuotes = /[",\n]/.test(s);
+            const escaped = s.replace(/"/g, '""');
+            return needsQuotes ? `"${escaped}"` : escaped;
+        };
+        const rows = spells
+            .slice()
+            .sort((a, b) => (a.level ?? 0) - (b.level ?? 0))
+            .map((sp) => [
+                sp.name ?? sp.NAME ?? "",
+                sp.level ?? "",
+                sp.school ?? "",
+                Array.isArray(sp.classes) ? sp.classes.join(";") : "",
+                sp.source ?? "",
+                sp.url ?? sp.LINK ?? "",
+            ]);
+        const lines = [headers, ...rows]
+            .map((r) => r.map(escape).join(","))
+            .join("\r\n");
+        return lines;
+    };
+
+    const buildSpellbookFilename = (base: string) => {
+        const stamp = new Date()
+            .toISOString()
+            .replace(/[:T]/g, "-")
+            .slice(0, 16);
+        const safe = base.trim() || "Spellbook";
+        return `${safe}-${stamp}`;
+    };
+
+    const downloadCsv = (csv: string, nameBase: string) => {
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${nameBase}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <Credenza
             open={dialogOpen}
@@ -309,6 +390,20 @@ export default function SpellbookGeneratorDialog({
                     </CredenzaHeader>
 
                     <CredenzaBody>
+                        {isPaid && user?.id ? (
+                            <div>
+                                <Label htmlFor="name">Name (optional)</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    placeholder="e.g., Neera's Apprentice Grimoire"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="mt-1"
+                                />
+                            </div>
+                        ) : null}
+
                         <div>
                             <Label htmlFor="level">Character Level</Label>
 

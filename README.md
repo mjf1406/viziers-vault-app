@@ -34,6 +34,13 @@
 
 ### 2025/09/18
 
+#### 14:33
+
+-   spellbook now saves if logged in and not free
+-   anonymous (not logged in) and free users can now generate spellbooks
+-   free and anon users just get the CSV downloaded automatically
+-   the URL for the premium members now has a DL as CSV button
+
 #### 12:49
 
 -   updated how the upsell cards work

@@ -8,12 +8,12 @@ import { BookOpen, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { id as genId } from "@instantdb/react";
-import { toast } from "sonner";
 import SpellbookGeneratorDialog, {
-    GenerateOpts,
+    type GenerateOpts,
 } from "./_components/GenSpellbookResponsiveDialog";
+import { toast } from "sonner";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
+import SpellbooksGrid from "./_components/SpellbooksGrid";
 
 export default function SpellbookPage() {
     const [createOpen, setCreateOpen] = useState(false);
@@ -58,7 +58,14 @@ export default function SpellbookPage() {
     };
 
     const openForEdit = (p: any) => {
-        setEditingParty(p);
+        // Normalize saved spellbook -> dialog expected shape
+        const normalized = {
+            ...p,
+            level: p?.level ?? p?.options?.level,
+            schools: p?.schools ?? p?.options?.schools,
+            classes: p?.classes ?? p?.options?.classes,
+        };
+        setEditingParty(normalized);
         setEditOpen(true);
     };
 
@@ -67,28 +74,7 @@ export default function SpellbookPage() {
         if (!v) setEditingParty(null);
     };
 
-    const handleCreateGenerate = async (opts: GenerateOpts) => {
-        if (!user?.id) {
-            toast.error("You must be signed in to create a spellbook");
-            return;
-        }
-
-        const newId = genId();
-        addPending(newId);
-
-        try {
-            // TODO: replace with your create logic (db.transact / API)
-            console.log("Create spellbook", newId, opts);
-            // Example: await api.createSpellbook({ id: newId, ownerId: user.id, ...opts })
-        } catch (err) {
-            console.error("Create failed", err);
-            toast.error("Create failed");
-        } finally {
-            removePending(newId);
-            setCreateOpen(false);
-            setModalOpen(0);
-        }
-    };
+    // Creation now handled by dialog's server action; no-op here
 
     const handleEditGenerate = async (opts: GenerateOpts) => {
         const id =
@@ -168,7 +154,6 @@ export default function SpellbookPage() {
                     hideTitleOnMobile={true}
                     addPending={addPending}
                     removePending={removePending}
-                    onGenerate={handleCreateGenerate}
                 />
 
                 {/* Edit dialog (conditioned on editingParty) */}
@@ -201,8 +186,10 @@ export default function SpellbookPage() {
             </div>
 
             {user && plan !== "Free" ? (
-                // <PartiesGrid onEdit={(p) => openForEdit(p)} pendingIds={pendingIds} />
-                <div>Blah</div>
+                <SpellbooksGrid
+                    onEdit={(p) => openForEdit(p)}
+                    pendingIds={pendingIds}
+                />
             ) : (
                 <SpellbookUpsell />
             )}

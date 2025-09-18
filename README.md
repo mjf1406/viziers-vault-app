@@ -34,9 +34,14 @@
 
 ### 2025/09/18
 
+#### 12:13
+
+-   just fixed boby in body by removing body tag from loading.tsx
+
 #### 11:47
 
 -   attempted fix of minified react error in prod. Let's see if it worked.
+    -   minified react error is sitll present in prod. It's likely the hydration error I'm getting in dev.
 -   fixed typo on /web/contact page
 -   adjusted verbiage in FeaturesExplainerSection
 

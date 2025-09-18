@@ -91,11 +91,20 @@ export default function PublicLanding() {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return (
-            date.toLocaleDateString() +
-            " " +
-            date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        );
+        const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "UTC",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+        return formatter.format(date);
+    };
+
+    const formatDateShort = (dateString: string) => {
+        return new Date(dateString).toISOString().slice(0, 10);
     };
 
     return (

@@ -24,11 +24,11 @@ export const PlanFeaturesSection = () => {
                     Details
                 </h2>
                 <h3 className="text-2xl md:text-3xl font-bold">
-                    What each plan includes — feature-by-feature
+                    A feature-by-feature breakdown of each plan
                 </h3>
                 <p className="md:w-1/2 mx-auto text-muted-foreground mt-3">
                     A thorough breakdown of every feature and which plan
-                    includes it. Service-only items are marked with "Service".
+                    includes it.
                 </p>
             </div>
 

@@ -23,38 +23,36 @@ export default function AppLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <body className="antialiased">
-            <GoogleClientProvider>
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <SidebarProvider>
-                        <AppSidebar />
-                        <SidebarInset>
-                            <SidebarHeader />
-                            <div>
-                                <main className="w-full">
-                                    <NuqsAdapter>
-                                        <SessionCookieSync />
-                                        {children}
-                                    </NuqsAdapter>
-                                </main>
-                            </div>
-                            <div className="relative">
-                                <div
-                                    className="absolute left-0 top-0 bottom-0 border-l"
-                                    aria-hidden
-                                />
-                                <FooterSection />
-                            </div>
-                            <Toaster richColors />
-                        </SidebarInset>
-                    </SidebarProvider>
-                </ThemeProvider>
-            </GoogleClientProvider>
-        </body>
+        <GoogleClientProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <SidebarProvider>
+                    <AppSidebar />
+                    <SidebarInset>
+                        <SidebarHeader />
+                        <div>
+                            <main className="w-full">
+                                <NuqsAdapter>
+                                    <SessionCookieSync />
+                                    {children}
+                                </NuqsAdapter>
+                            </main>
+                        </div>
+                        <div className="relative">
+                            <div
+                                className="absolute left-0 top-0 bottom-0 border-l"
+                                aria-hidden
+                            />
+                            <FooterSection />
+                        </div>
+                        <Toaster richColors />
+                    </SidebarInset>
+                </SidebarProvider>
+            </ThemeProvider>
+        </GoogleClientProvider>
     );
 }

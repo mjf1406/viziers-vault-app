@@ -1,6 +1,5 @@
 /** @format */
 
-import { ThemeProvider } from "@/components/theme/theme-provider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -19,23 +18,16 @@ export default function Layout({
     children: React.ReactNode;
 }>) {
     return (
-        <body
+        <div
             className={cn("min-h-screen bg-background w-full", inter.className)}
         >
-            <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
+            <Navbar />
+            <div
+                vaul-drawer-wrapper=""
+                className="bg-background"
             >
-                <Navbar />
-                <div
-                    vaul-drawer-wrapper=""
-                    className="bg-background"
-                >
-                    {children}
-                </div>
-            </ThemeProvider>
-        </body>
+                {children}
+            </div>
+        </div>
     );
 }

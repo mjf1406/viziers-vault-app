@@ -39,7 +39,7 @@ export const ContactSection = () => {
                         <p className="text-muted-foreground mb-4">
                             I&apos;m one person, the sole developer, so I rely
                             on the community to provide support if I am not
-                            available. Plesse join the Discord for support.
+                            available. Please join the Discord for support.
                         </p>
                         <Button
                             asChild

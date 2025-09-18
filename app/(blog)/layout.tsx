@@ -38,8 +38,9 @@ export default function Layout({
         const year = d ? String(d.getFullYear()) : "Undated";
         const monthIdx = d ? d.getMonth() : 0;
         const monthLabel = d
-            ? new Date(d.getFullYear(), monthIdx, 1).toLocaleString(undefined, {
+            ? new Date(d.getFullYear(), monthIdx, 1).toLocaleString("en-US", {
                   month: "long",
+                  timeZone: "UTC",
               })
             : "Unknown";
         if (!map.has(year)) map.set(year, new Map());

@@ -32,6 +32,14 @@
 
 ## Change Log
 
+### 2025/09/18
+
+#### 11:47
+
+-   attempted fix of minified react error in prod. Let's see if it worked.
+-   fixed typo on /web/contact page
+-   adjusted verbiage in FeaturesExplainerSection
+
 ### 2025/09/14
 
 #### 14:05

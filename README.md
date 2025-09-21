@@ -28,7 +28,6 @@
     -   [x] rate limiting with Upstash Redis
     -   [x] need Obsidian markdown to HTML function for the blog and docs
         -   [x] set up basic blog and docs
-    -   need to implement spellbook generator so that free users can use it, but the data is not saved and so that premium members get their own url that they can share with others if they want.
 
 ## Change Log
 

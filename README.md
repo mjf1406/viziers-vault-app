@@ -31,6 +31,11 @@
 
 ## Change Log
 
+### 2025/10/10 08:57
+
+-   the sign in button now properly only shows icon when sidebar is collapsed
+-   fixed type in partiesUpsell.tsx
+
 ### 2025/09/18
 
 #### 14:33

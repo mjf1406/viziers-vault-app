@@ -27,7 +27,7 @@ export default function PartiesUpsell({ className }: PartiesUpsellProps) {
                     <CardTitle>Unlock Parties</CardTitle>
                     <CardDescription>
                         Subscribe to <strong>Basic</strong> to create parties
-                        and enable cloud storage and persistent. Save time in
+                        and enable cloud storage and persistence. Save time in
                         the Encounter Generator by selecting pre-made parties
                         instead of inputting it every time.
                     </CardDescription>

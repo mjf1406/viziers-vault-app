@@ -8,6 +8,7 @@ import {
     Sidebar,
     SidebarInset,
     SidebarSeparator,
+    SidebarHeader,
 } from "@/components/ui/sidebar";
 import { LogoSidebar } from "@/components/brand/logo";
 import { TopbarDocsBlog } from "@/components/nav/TopbarDocsBlog";
@@ -45,9 +46,9 @@ export default function Layout({
                 collapsible="offcanvas"
                 className="hidden md:flex flex-col w-64 h-screen border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
             >
-                <div className="p-2">
+                <SidebarHeader>
                     <LogoSidebar />
-                </div>
+                </SidebarHeader>
                 <SidebarSeparator />
                 <SectionSidebarNav
                     label="Docs"

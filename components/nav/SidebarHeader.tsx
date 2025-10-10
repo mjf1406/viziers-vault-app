@@ -8,8 +8,14 @@ import { DiscordIcon } from "../brand/discord";
 
 export function SidebarHeader() {
     return (
-        <header className="sticky top-0 z-40 h-14 border-b bg-background/60 backdrop-blur">
-            <div className="flex h-14 items-center gap-2 px-3 md:px-4">
+        <header
+            className="sticky top-0 z-40 border-b bg-background/60 backdrop-blur"
+            style={{ height: "var(--app-header-height)" }}
+        >
+            <div
+                className="flex items-center gap-2 px-3 md:px-4"
+                style={{ height: "var(--app-header-height)" }}
+            >
                 <SidebarTrigger />
                 <div className="ml-auto hidden md:flex items-center gap-2">
                     <Button

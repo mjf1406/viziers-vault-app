@@ -52,6 +52,8 @@
 /*---break--- */
 
 :root {
+    /* Shared header height used by topbars and sidebar headers */
+    --app-header-height: 3.5rem; /* matches h-14 */
     --radius: 0.625rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);

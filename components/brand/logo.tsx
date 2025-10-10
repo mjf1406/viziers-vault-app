@@ -17,7 +17,7 @@ export function LogoTextOnly({}: React.HTMLAttributes<HTMLDivElement>) {
 
 export function LogoSidebar({}: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <SidebarMenu>
+        <SidebarMenu className="group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:items-center">
             <SidebarMenuItem>
                 <SidebarMenuButton
                     asChild
@@ -28,7 +28,7 @@ export function LogoSidebar({}: React.HTMLAttributes<HTMLDivElement>) {
                         className="flex h-12 items-center text-primary rounded-md text-sm font-medium transition-colors"
                     >
                         <Dices className="!h-8 !w-8 flex-shrink-0" />
-                        <span className="ml-1 text-xl font-bold">
+                        <span className="ml-1 text-xl font-bold group-data-[collapsible=icon]:sr-only">
                             Vizier's Vault
                         </span>
                     </Link>

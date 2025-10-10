@@ -31,6 +31,11 @@
 
 ## Change Log
 
+### 2025/10/10 09:47
+
+-   sidebar header height is now the same as the content header heights and the sidebar header height is consistent across all sidebar
+    states, like collapsed and expanded.
+
 ### 2025/10/10 09:33
 
 -   the plus button in the sidebar now is only visible when the user is logged in and on a plan that allows parties

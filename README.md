@@ -34,6 +34,7 @@
 ### 2025/10/10 09:18
 
 -   moved login page to /auth/login
+-   added region generator to tools.ts
 
 ### 2025/10/10 08:57
 

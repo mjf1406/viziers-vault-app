@@ -8,6 +8,8 @@
 
 ## To-do List
 
+### p1
+
 -   [ ] finished setting up the Discord server with
     -   [x] a forum for feature requests
     -   [x] a forum for bug reports
@@ -24,6 +26,11 @@
     -   [x] need Obsidian markdown to HTML function for the blog and docs
         -   [x] set up basic blog and docs
     -   [ ] make upgrade to basic in partiesUpsell.tsx and spellbookUpsell.tsx actually upgrade the user
+
+### p0
+
+-   [ ] set up custom urls in settings
+-   [ ] integrate custom urls into spellbook CSVs and reference URLSs
 
 ## Change Log
 

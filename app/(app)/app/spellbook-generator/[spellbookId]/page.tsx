@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Copy } from "lucide-react";
 import { toTitleCase } from "../_functions/helpers";
 import DownloadSpellbookCSVButton from "../_components/DownloadSpellbookCSVButton";
+import { buildSpellUrl } from "@/lib/urlBuilder";
+import { useUser } from "@/hooks/useUser";
 
 export default function SpellbookDetailPage() {
     const params = useParams();
@@ -20,6 +22,7 @@ export default function SpellbookDetailPage() {
     const { isLoading, error, data } = db.useQuery({
         spellbooks: { $: { where: { id: spellbookId }, limit: 1 } },
     });
+    const { settings } = useUser();
 
     const [copied, setCopied] = React.useState(false);
     const copyTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
@@ -73,6 +76,7 @@ export default function SpellbookDetailPage() {
     }
 
     const s = Array.isArray(data?.spellbooks) ? data?.spellbooks[0] : null;
+    const spellPrefs = (settings as any)?.urlPreferences?.spells ?? null;
     if (!s) {
         return (
             <div className="p-4 xl:p-10">
@@ -189,16 +193,23 @@ export default function SpellbookDetailPage() {
                                                     {sp.school}
                                                 </div>
                                             )}
-                                            {sp.url && (
-                                                <a
-                                                    href={sp.url}
-                                                    target="_blank"
-                                                    rel="noreferrer noopener"
-                                                    className="text-xs text-primary hover:underline"
-                                                >
-                                                    Open reference
-                                                </a>
-                                            )}
+                                            {(() => {
+                                                const href =
+                                                    buildSpellUrl(
+                                                        sp,
+                                                        spellPrefs
+                                                    ) || sp.url;
+                                                return href ? (
+                                                    <a
+                                                        href={href}
+                                                        target="_blank"
+                                                        rel="noreferrer noopener"
+                                                        className="text-xs text-primary hover:underline"
+                                                    >
+                                                        Open reference
+                                                    </a>
+                                                ) : null;
+                                            })()}
                                         </div>
                                     </div>
                                 ))}

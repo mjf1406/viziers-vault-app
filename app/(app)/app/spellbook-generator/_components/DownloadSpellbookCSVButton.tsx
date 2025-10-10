@@ -7,6 +7,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { toTitleCase } from "../_functions/helpers";
+import { useUser } from "@/hooks/useUser";
+import { buildSpellUrl, type SpellUrlPrefs } from "@/lib/urlBuilder";
 
 export type DownloadSpellbookCSVButtonProps = Omit<
     React.ComponentProps<typeof Button>,
@@ -18,7 +20,7 @@ export type DownloadSpellbookCSVButtonProps = Omit<
     labelSrOnly?: boolean;
 };
 
-export function spellsToCsv(spellsIn: any[]) {
+export function spellsToCsv(spellsIn: any[], prefs?: SpellUrlPrefs | null) {
     const headers = ["Name", "Level", "School", "Classes", "Source", "URL"];
     const escape = (v: any) => {
         const s = v == null ? "" : String(v);
@@ -35,7 +37,7 @@ export function spellsToCsv(spellsIn: any[]) {
             sp.school ?? "",
             Array.isArray(sp.classes) ? sp.classes.join(";") : "",
             sp.source ?? "",
-            sp.url ?? sp.LINK ?? "",
+            buildSpellUrl(sp, prefs) ?? sp.url ?? sp.LINK ?? "",
         ]);
     const lines = [headers, ...rows]
         .map((r) => r.map(escape).join(","))
@@ -73,11 +75,15 @@ export default function DownloadSpellbookCSVButton(
         ...buttonProps
     } = props;
 
+    const { settings } = useUser();
+    const spellPrefs: SpellUrlPrefs | null =
+        (settings?.urlPreferences as any)?.spells ?? null;
+
     const onClick = React.useCallback(() => {
-        const csv = spellsToCsv(spells ?? []);
+        const csv = spellsToCsv(spells ?? [], spellPrefs);
         const base = buildSpellbookFilename(spellbookName);
         downloadCsv(csv, base);
-    }, [spells, spellbookName]);
+    }, [spells, spellbookName, spellPrefs]);
 
     return (
         <Button

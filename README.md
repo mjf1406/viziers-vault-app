@@ -31,6 +31,8 @@
 
 -   [ ] integrate custom urls into spellbook CSVs and reference URLs
     -   [ ] is there a way to get these custom URLs to work with the shared pages?
+    -   sources from dndbeyond differ from those on 5e.tools... might have to scrape 5e.tools
+        -   need to update source to be ddb_source, ddb_source_short, and source_short
 
 ## Change Log
 

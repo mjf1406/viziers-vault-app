@@ -30,7 +30,8 @@
 ### p0
 
 -   [ ] set up custom urls in settings
--   [ ] integrate custom urls into spellbook CSVs and reference URLSs
+-   [ ] integrate custom urls into spellbook CSVs and reference URLs
+    -   [ ] is there a way to get these custom URLs to work with the shared pages?
 
 ## Change Log
 

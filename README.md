@@ -31,6 +31,10 @@
 
 ## Change Log
 
+### 2025/10/10 09:18
+
+-   moved login page to /auth/login
+
 ### 2025/10/10 08:57
 
 -   the sign in button now properly only shows icon when sidebar is collapsed

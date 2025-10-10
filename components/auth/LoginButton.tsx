@@ -55,7 +55,7 @@ const LoginButton = React.forwardRef<HTMLButtonElement, LoginButtonProps>(
     (
         {
             children,
-            loginPath = "/app/login",
+            loginPath = "/auth/login",
             fallback = "/app/dashboard",
             returnTo: returnToProp = null,
             gapPx = 8,

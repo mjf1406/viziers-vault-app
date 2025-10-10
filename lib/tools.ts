@@ -234,7 +234,7 @@ export const tools: Tool[] = [
         header: "My Battle Maps",
         description:
             "Create battle maps with geographical features, weather, and customizable grid settings.",
-        status: "Alpha 3",
+        status: "Alpha 4",
         icon: "Map",
         philosophy:
             "I really enjoy making battle maps for bosses or mini-bosses and I love Czepeku, Animated Battle Maps, Crossland, Neutral Party, and Eightfold Paper maps, but I do not enjoy making wilderness battle maps meant to be used for random encounters that happened in some random middle of nowhere wilderness during a campaign. I made this generator to generate random encounter wilderness battle maps. They do not replace boss or mini-boss battle maps in my campaign and it was never built with that intention.",
@@ -249,7 +249,7 @@ export const tools: Tool[] = [
         ],
         integrations: [],
         category: "Generator",
-        order: 5,
+        order: 6,
         url: "/app/battle-map-generator",
         mockCount: 12,
         mockRecentGenerations: [
@@ -286,12 +286,67 @@ export const tools: Tool[] = [
         ],
     },
     {
+        id: "region-generator",
+        title: "Region Generator",
+        header: "My Regions",
+        description:
+            "Generate smaller hexcrawl regions, like islands, peninsulas, bays, inland areas, and coastal regions.",
+        status: "Alpha 3",
+        icon: "MapPinned",
+        philosophy:
+            "I wanted a focused tool for compact hexcrawls that sit between a single encounter map and a full world hexmap. This produces playable regions that are easy to drop into campaigns, adventure hooks, and quick sandbox setups for session-length exploration.",
+        features: [
+            "Hex-scale region generation (coastal, island, inland, peninsula, bay)",
+            "Terrain and biome tiling",
+            "Settlement and POI placement with descriptions",
+            "Local weather and tide influences for coastal regions",
+            "Encounter hooks & short story seeds",
+            "VTT export and CSV of hex data",
+            "Adjustable density and scale (hex size / region size)",
+        ],
+        integrations: [
+            "Battle Map Generator",
+            "Encounter Generator",
+            "Party Management",
+        ],
+        category: "Generator",
+        order: 5,
+        url: "/app/region-generator",
+        mockCount: 4,
+        mockRecentGenerations: [
+            {
+                id: 30,
+                title: "Saltmarsh Archipelago",
+                generatedAt: "2024-01-16T09:00:00Z",
+                lastAccessedAt: "2024-01-16T11:20:00Z",
+            },
+            {
+                id: 31,
+                title: "Bracken Peninsular",
+                generatedAt: "2024-01-15T14:10:00Z",
+                lastAccessedAt: "2024-01-15T18:05:00Z",
+            },
+            {
+                id: 32,
+                title: "Glassbay Cove",
+                generatedAt: "2024-01-14T10:25:00Z",
+                lastAccessedAt: "2024-01-14T12:45:00Z",
+            },
+            {
+                id: 33,
+                title: "Highland Basin",
+                generatedAt: "2024-01-13T08:40:00Z",
+                lastAccessedAt: "2024-01-13T09:50:00Z",
+            },
+        ],
+    },
+    {
         id: "world-generator",
         title: "World Generator",
         header: "My Worlds",
         description:
             "Generate complete hex worlds with weather simulation, fog of war, and party tracking.",
-        status: "Alpha 4",
+        status: "Alpha 5",
         icon: "Globe",
         philosophy:
             "When I started brainstorming for this after creating the above generators, I discovered HexRoll, which is an AMAZING tool. Go give it a try now, please. It's fabulous. While it is fabulous, it doesn't work exactly how I run my hexcrawls and has some missing features, so I'm building this to generate entire worlds, both 2D and 3D with party tracking, simulated weather, detailed edit options with stamps and brushes and automatic rolls minimizing the friction as much as possible for game masters. Note that HexRoll has wonderful options for solo hexcrawlers and I do not intend on supporting solo hexcrawlers at all in the future, so if you're interested in playing on your own in a random hexworld, go use HexRoll. It's superb!",
@@ -308,9 +363,10 @@ export const tools: Tool[] = [
             "Encounter Generator",
             "Magic Shop Generator",
             "Party Management",
+            "Region Generator",
         ],
         category: "Generator",
-        order: 6,
+        order: 7,
         url: "/app/world-generator",
         mockCount: 3,
         mockRecentGenerations: [
@@ -340,7 +396,7 @@ export const tools: Tool[] = [
         header: "My Star Systems",
         description:
             "Create star systems with multiple worlds, planets, and celestial bodies.",
-        status: "Alpha 5",
+        status: "Alpha 6",
         icon: "Star",
         philosophy:
             "I haven't really thought much of this one other than it'd be super cool for those Spelljammer and sci-fi campaigns.",
@@ -363,7 +419,7 @@ export const tools: Tool[] = [
         header: "My Galaxies",
         description:
             "Generate entire galaxies with multiple star systems and cosmic structures.",
-        status: "Alpha 6",
+        status: "Alpha 7",
         icon: "Orbit",
         philosophy:
             "I just think it'd be super cool to make this with an awesome map that has a sort of super zoom from the galaxy to the star system to the planet to the continent to the region to the battle map / city / town / etc. Oh and Spelljammer and sci-fi campaigns in something like that would be dope.",

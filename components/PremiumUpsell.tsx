@@ -26,7 +26,7 @@ export default function PremiumUpsell({
     const { data } = useUser();
     const isLoggedIn = Boolean(data?.$users?.length);
 
-    const ctaHref = isLoggedIn ? "/app/account" : "/app/login";
+    const ctaHref = isLoggedIn ? "/app/account" : "/auth/login";
     const ctaLabel = isLoggedIn
         ? "Subscribe to Premium"
         : "Sign in to subscribe";

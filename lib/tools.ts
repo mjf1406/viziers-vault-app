@@ -12,6 +12,7 @@ export interface Tool {
         | "Alpha 4"
         | "Alpha 5"
         | "Alpha 6"
+        | "Alpha 7"
         | "Planned"
         | "TBD - A wild dream";
     icon: string;

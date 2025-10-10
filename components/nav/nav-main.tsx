@@ -34,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { useUser } from "@/hooks/useUser";
 
 const stripSuffix = (title: string) =>
     title.replace(" Generator", "").replace(" Management", "");
@@ -62,6 +63,10 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
     const allTools = availableTools.sort((a, b) =>
         stripSuffix(a.title).localeCompare(stripSuffix(b.title))
     );
+    const { plan } = useUser();
+    // Allowed plans for showing the Plus button on Party
+    const partyAllowedPlans = ["basic", "plus", "pro"];
+
     return (
         <Collapsible
             defaultOpen
@@ -85,6 +90,14 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                 );
                                 const isActive = pathname === href;
                                 const isDisabled = !tool.released;
+
+                                const isParty = tool.title
+                                    .toLowerCase()
+                                    .includes("party");
+
+                                const canShowPlus = isParty
+                                    ? partyAllowedPlans.includes(plan || "")
+                                    : true;
 
                                 return (
                                     <SidebarMenuItem
@@ -141,25 +154,33 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                 </Link>
                                             )}
                                         </SidebarMenuButton>
-                                        <SidebarMenuAction
-                                            asChild={!isDisabled}
-                                            className={cn(
-                                                isDisabled &&
-                                                    "opacity-40 cursor-not-allowed"
-                                            )}
-                                        >
-                                            {isDisabled ? (
-                                                <div>
-                                                    <Plus className="w-4 h-4" />
-                                                </div>
-                                            ) : (
-                                                <Link
-                                                    href={`${href}?modalOpen=1`}
-                                                >
-                                                    <Plus className="w-4 h-4" />
-                                                </Link>
-                                            )}
-                                        </SidebarMenuAction>
+
+                                        {/* Conditionally render the Plus action.
+                                            If canShowPlus is false we render a
+                                            spacer so layout doesn't jump. */}
+                                        {canShowPlus ? (
+                                            <SidebarMenuAction
+                                                asChild={!isDisabled}
+                                                className={cn(
+                                                    isDisabled &&
+                                                        "opacity-40 cursor-not-allowed"
+                                                )}
+                                            >
+                                                {isDisabled ? (
+                                                    <div>
+                                                        <Plus className="w-4 h-4" />
+                                                    </div>
+                                                ) : (
+                                                    <Link
+                                                        href={`${href}?modalOpen=1`}
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                    </Link>
+                                                )}
+                                            </SidebarMenuAction>
+                                        ) : (
+                                            <div className="w-4 h-4" />
+                                        )}
                                     </SidebarMenuItem>
                                 );
                             })}

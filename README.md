@@ -31,6 +31,10 @@
 
 ## Change Log
 
+### 2025/10/10 09:33
+
+-   the plus button in the sidebar now is only visible when the user is logged in and on a plan that allows parties
+
 ### 2025/10/10 09:18
 
 -   moved login page to /auth/login

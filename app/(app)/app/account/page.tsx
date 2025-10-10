@@ -35,9 +35,12 @@ export default function AccountPage() {
         plan: userPlanName,
         isLoading,
         error,
+        settings,
         signOut,
         data: useUserData,
     } = useUser();
+    console.log("🚀 ~ AccountPage ~ displayName:", displayName);
+    console.log("🚀 ~ AccountPage ~ settings:", settings);
 
     // client-side auth state from the client SDK
     const { user } = db.useAuth();

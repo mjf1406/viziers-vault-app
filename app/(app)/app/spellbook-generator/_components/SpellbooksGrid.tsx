@@ -4,7 +4,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+// Router not used here
 import db from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,8 @@ import {
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
 import Link from "next/link";
+import { toTitleCase } from "../_functions/helpers";
+import DownloadSpellbookCSVButton from "./DownloadSpellbookCSVButton";
 
 export default function SpellbooksGrid({
     onEdit,
@@ -32,8 +34,6 @@ export default function SpellbooksGrid({
     onEdit: (s: any) => void;
     pendingIds: Set<string>;
 }) {
-    const router = useRouter();
-
     const { isLoading, error, data } = db.useQuery({
         spellbooks: {},
     });
@@ -59,8 +59,21 @@ export default function SpellbooksGrid({
             spellCount:
                 s.spellCount ?? (Array.isArray(s.spells) ? s.spells.length : 0),
             options: s.options ?? {},
+            _raw: s,
         }))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    const toEditPayload = (r: any) => ({
+        id: r.id,
+        name: r.name ?? "",
+        classes: Array.isArray(r?.options?.classes) ? r.options.classes : [],
+        options: {
+            ...(r.options ?? {}),
+            classes: Array.isArray(r?.options?.classes)
+                ? r.options.classes
+                : [],
+        },
+    });
 
     if (!spellbooks.length) {
         return (
@@ -113,88 +126,108 @@ export default function SpellbooksGrid({
                             isPending ? "opacity-70 animate-pulse" : ""
                         }`}
                     >
-                        <CardHeader className="relative">
-                            <div className="flex items-start justify-between">
-                                <CardTitle className="flex items-center gap-3 pr-8 text-lg">
-                                    {/* Avatar removed — name is clickable now */}
+                        <CardHeader className="relative w-full mx-auto">
+                            <div className="flex items-start gap-4">
+                                <CardTitle className="flex items-center gap-3 text-lg flex-1 min-w-0">
                                     <Link
                                         href={`/app/spellbook-generator/${s.id}`}
-                                        className="text-left hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded"
+                                        className="text-left hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded break-words"
                                         title={`Open ${s.name}`}
                                     >
-                                        <span>{s.name}</span>
+                                        <span className="block">{s.name}</span>
                                     </Link>
 
                                     {isPending && (
-                                        <span className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted">
+                                        <span className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted whitespace-nowrap">
                                             Saving...
                                         </span>
                                     )}
                                 </CardTitle>
 
-                                {!isPending && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                            void handleCopyLink(s.id)
-                                        }
-                                        className="absolute w-8 h-8 p-0 top-4 right-20 hover:bg-gray-100"
-                                        title="Copy link"
-                                    >
-                                        <Link2 className="w-4 h-4" />
-                                    </Button>
-                                )}
-
-                                {!isPending && (
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onEdit(s)}
-                                        className="absolute w-8 h-8 p-0 top-4 right-12 hover:bg-gray-100"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                    </Button>
-                                )}
-
-                                {!isPending && (
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button
-                                                variant="destructive"
+                                <div className="flex items-center gap-0.5 shrink-0">
+                                    {!isPending && (
+                                        <>
+                                            <DownloadSpellbookCSVButton
+                                                spells={
+                                                    Array.isArray(s.spells)
+                                                        ? s.spells
+                                                        : []
+                                                }
+                                                spellbookName={
+                                                    s.name ?? "Spellbook"
+                                                }
+                                                variant="ghost"
                                                 size="sm"
-                                                className="absolute w-8 h-8 p-0 top-4 right-4"
+                                                className="w-8 h-8 p-0 hover:bg-gray-100"
+                                                labelSrOnly
+                                                title="Download CSV"
+                                            />
+
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    void handleCopyLink(s.id)
+                                                }
+                                                className="w-8 h-8 p-0 hover:bg-gray-100"
+                                                title="Copy link"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Link2 className="w-4 h-4" />
                                             </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>
-                                                    Delete Spellbook
-                                                </AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Are you sure you want to
-                                                    delete "{s.name}"? This
-                                                    cannot be undone.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>
-                                                    Cancel
-                                                </AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    onClick={() =>
-                                                        void handleDelete(s.id)
-                                                    }
-                                                    className="bg-red-600 hover:bg-red-700"
-                                                >
-                                                    Delete
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                )}
+
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() =>
+                                                    onEdit(s._raw ?? s)
+                                                }
+                                                className="w-8 h-8 p-0 hover:bg-gray-100"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="w-8 h-8 p-0"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Delete Spellbook
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Are you sure you
+                                                            want to delete "
+                                                            {s.name}"? This
+                                                            cannot be undone.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>
+                                                            Cancel
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={() =>
+                                                                void handleDelete(
+                                                                    s.id
+                                                                )
+                                                            }
+                                                            className="bg-red-600 hover:bg-red-700"
+                                                        >
+                                                            Delete
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </CardHeader>
 
@@ -218,7 +251,9 @@ export default function SpellbooksGrid({
                                                 variant="secondary"
                                                 className="text-xs"
                                             >
-                                                {classes.join(", ")}
+                                                {toTitleCase(
+                                                    classes.join(", ")
+                                                )}
                                             </Badge>
                                         )}
                                 </div>

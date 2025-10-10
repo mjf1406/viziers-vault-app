@@ -58,14 +58,34 @@ export default function SpellbookPage() {
     };
 
     const openForEdit = (p: any) => {
-        // Normalize saved spellbook -> dialog expected shape
-        const normalized = {
-            ...p,
-            level: p?.level ?? p?.options?.level,
-            schools: p?.schools ?? p?.options?.schools,
-            classes: p?.classes ?? p?.options?.classes,
-        };
-        setEditingParty(normalized);
+        // Prefer raw record if provided by the grid
+        const r = p?._raw ?? p ?? {};
+        const id = r.id ?? r._id ?? r.spellbookId ?? "";
+        const name = r.name ?? "Untitled Spellbook";
+
+        // Level in saved options is a number or "random"; fall back to "random"
+        const levelRaw = r.options?.level ?? r.level;
+        const level =
+            typeof levelRaw === "number" || levelRaw === "random"
+                ? levelRaw
+                : "random";
+
+        const schoolsRaw = r.options?.schools ?? r.schools ?? [];
+
+        // Only one class is supported; saved as uppercase in options. Normalize to title case.
+        const classesRaw = r.options?.classes ?? r.classes ?? [];
+        const firstClass = Array.isArray(classesRaw)
+            ? classesRaw[0]
+            : classesRaw ?? "";
+        const classes = typeof firstClass === "string" ? firstClass : "";
+
+        setEditingParty({
+            id,
+            name,
+            level,
+            schools: Array.isArray(schoolsRaw) ? schoolsRaw : [],
+            classes,
+        });
         setEditOpen(true);
     };
 
@@ -171,6 +191,7 @@ export default function SpellbookPage() {
                                 editingParty.id ??
                                 editingParty._id ??
                                 editingParty.spellbookId,
+                            name: editingParty.name ?? "",
                             level: editingParty.level,
                             schools: editingParty.schools,
                             classes: editingParty.classes,

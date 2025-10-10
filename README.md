@@ -29,34 +29,25 @@
 
 ### p0
 
--   [ ] set up custom urls in settings
 -   [ ] integrate custom urls into spellbook CSVs and reference URLs
     -   [ ] is there a way to get these custom URLs to work with the shared pages?
 
 ## Change Log
 
-### 2025/10/10 14:53
+### 2025/10/10
 
+-   set up custom URLs in settings
+-   spellbook title now wraps down instead of the action buttons covering it
+-   fixed edit mode in spellbook generation dialog not working due to changes
+-   refactored download csv button into its own component and added it to the spellbook card
 -   spellbooks now generate
 -   urls are now public and can be shared if the user is logged in and on a plan that allows url generation
 -   basic spellbook name generator created and added as a dice icon button next to the spellbook name input field
-
-### 2025/10/10 09:47
-
 -   sidebar header height is now the same as the content header heights and the sidebar header height is consistent across all sidebar
     states, like collapsed and expanded.
-
-### 2025/10/10 09:33
-
 -   the plus button in the sidebar now is only visible when the user is logged in and on a plan that allows parties
-
-### 2025/10/10 09:18
-
 -   moved login page to /auth/login
 -   added region generator to tools.ts
-
-### 2025/10/10 08:57
-
 -   the sign in button now properly only shows icon when sidebar is collapsed
 -   fixed type in partiesUpsell.tsx
 

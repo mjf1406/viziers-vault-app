@@ -26,10 +26,16 @@ import {
 import generateSpellbook from "../_actions/generateSpellbook";
 import { CLASSES, SCHOOLS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+// Input not used here
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import SpellbookNameField from "./SpellbookNameField";
+import {
+    buildSpellbookFilename,
+    downloadCsv,
+    spellsToCsv,
+} from "./DownloadSpellbookCSVButton";
+import { toTitleCase } from "../_functions/helpers";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -39,6 +45,7 @@ export type GenerateOpts = {
 
 type SpellbookInitial = {
     id?: string;
+    name?: string;
     level?: number | "random";
     schools?: string[] | "random";
     classes?: string[] | "random";
@@ -95,15 +102,22 @@ export default function SpellbookGeneratorDialog({
             : []
     );
 
-    // Classes: now we store a flag classesRandom and single selected class in array
     const [classesRandom, setClassesRandom] = useState<boolean>(
-        initial?.classes === "random" ? true : initial?.classes ? false : false
+        initial?.classes === "random"
     );
-    const [selectedClasses, setSelectedClasses] = useState<string[]>(
-        initial?.classes && initial?.classes !== "random"
-            ? [...initial.classes]
-            : ["Wizard"]
-    );
+    const [selectedClasses, setSelectedClasses] = useState<string[]>(() => {
+        if (initial?.classes === "random") return [];
+        const raw = Array.isArray(initial?.classes)
+            ? (initial!.classes as string[])
+            : typeof initial?.classes === "string" && initial?.classes
+            ? [initial!.classes as string]
+            : ["Wizard"];
+        // Normalize casing to match CLASSES values
+        const normalized = raw
+            .map((c) => toTitleCase(String(c)))
+            .filter((c) => CLASSES.includes(c));
+        return normalized.length ? normalized : ["Wizard"];
+    });
 
     // store previous selections so toggle Random on/off can restore
     const prevSchoolsRef = useRef<string[] | null>(null);
@@ -111,6 +125,7 @@ export default function SpellbookGeneratorDialog({
 
     useEffect(() => {
         if (initial) {
+            setName(initial.name ?? "");
             setSelectedLevel(initial.level ? String(initial.level) : "random");
 
             if (initial.schools === "random") {
@@ -129,13 +144,23 @@ export default function SpellbookGeneratorDialog({
                 setSelectedClasses([]);
             } else if (Array.isArray(initial.classes)) {
                 setClassesRandom(false);
-                setSelectedClasses([...initial.classes]);
+                const normalized = initial.classes
+                    .map((c) => toTitleCase(String(c)))
+                    .filter((c) => CLASSES.includes(c));
+                setSelectedClasses(normalized.length ? normalized : ["Wizard"]);
+            } else if (typeof initial.classes === "string" && initial.classes) {
+                setClassesRandom(false);
+                const single = toTitleCase(String(initial.classes));
+                setSelectedClasses(
+                    CLASSES.includes(single) ? [single] : ["Wizard"]
+                );
             } else {
                 setClassesRandom(false);
                 setSelectedClasses(["Wizard"]);
             }
         } else {
             // defaults when no initial provided
+            setName("");
             setSelectedLevel("random");
             setSchoolsRandom(true);
             setSelectedSchools([]);
@@ -146,7 +171,7 @@ export default function SpellbookGeneratorDialog({
     }, [initial]);
 
     const [isGenerating, setIsGenerating] = useState(false);
-    const [name, setName] = useState<string>("");
+    const [name, setName] = useState<string>(initial?.name ?? "");
 
     const allSchoolsSelected = selectedSchools.length === SCHOOLS.length;
 
@@ -316,52 +341,6 @@ export default function SpellbookGeneratorDialog({
         } finally {
             setIsGenerating(false);
         }
-    };
-
-    const spellsToCsv = (spells: any[]) => {
-        const headers = ["Name", "Level", "School", "Classes", "Source", "URL"];
-        const escape = (v: any) => {
-            const s = v == null ? "" : String(v);
-            const needsQuotes = /[",\n]/.test(s);
-            const escaped = s.replace(/"/g, '""');
-            return needsQuotes ? `"${escaped}"` : escaped;
-        };
-        const rows = spells
-            .slice()
-            .sort((a, b) => (a.level ?? 0) - (b.level ?? 0))
-            .map((sp) => [
-                sp.name ?? sp.NAME ?? sp.slug ?? "",
-                sp.level ?? "",
-                sp.school ?? "",
-                Array.isArray(sp.classes) ? sp.classes.join(";") : "",
-                sp.source ?? "",
-                sp.url ?? sp.LINK ?? "",
-            ]);
-        const lines = [headers, ...rows]
-            .map((r) => r.map(escape).join(","))
-            .join("\r\n");
-        return lines;
-    };
-
-    const buildSpellbookFilename = (base: string) => {
-        const stamp = new Date()
-            .toISOString()
-            .replace(/[:T]/g, "-")
-            .slice(0, 16);
-        const safe = base.trim() || "Spellbook";
-        return `${safe}-${stamp}`;
-    };
-
-    const downloadCsv = (csv: string, nameBase: string) => {
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${nameBase}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     };
 
     return (

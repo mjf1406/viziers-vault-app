@@ -28,7 +28,7 @@ export function useUser(initialUser?: User) {
         }
     }
 
-    const query = { $users: { profile: { $files: {} } } };
+    const query = { $users: { profile: { $files: {} }, settings: {} } };
     const { isLoading, error, data } = db.useQuery(query);
     const userInfo = data?.$users?.[0];
 
@@ -95,6 +95,7 @@ export function useUser(initialUser?: User) {
         displayEmail,
         avatarSrc,
         plan,
+        settings: userInfo?.settings[0] ?? null,
         signOut,
     };
 }

@@ -11,10 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, Copy } from "lucide-react";
 import { toTitleCase } from "../_functions/helpers";
+import DownloadSpellbookCSVButton from "../_components/DownloadSpellbookCSVButton";
 
 export default function SpellbookDetailPage() {
     const params = useParams();
-    const router = useRouter();
     const spellbookId = (params?.spellbookId as string) ?? "";
 
     const { isLoading, error, data } = db.useQuery({
@@ -86,52 +86,6 @@ export default function SpellbookDetailPage() {
     const classes: string[] = s?.options?.classes ?? [];
     const spells: any[] = Array.isArray(s?.spells) ? s.spells : [];
 
-    const spellsToCsv = (spellsIn: any[]) => {
-        const headers = ["Name", "Level", "School", "Classes", "Source", "URL"];
-        const escape = (v: any) => {
-            const s = v == null ? "" : String(v);
-            const needsQuotes = /[",\n]/.test(s);
-            const escaped = s.replace(/"/g, '""');
-            return needsQuotes ? `"${escaped}"` : escaped;
-        };
-        const rows = spellsIn
-            .slice()
-            .sort((a, b) => (a.level ?? 0) - (b.level ?? 0))
-            .map((sp) => [
-                sp.name ?? sp.NAME ?? sp.slug ?? "Unknown",
-                sp.level ?? "",
-                sp.school ?? "",
-                Array.isArray(sp.classes) ? sp.classes.join(";") : "",
-                sp.source ?? "",
-                sp.url ?? sp.LINK ?? "",
-            ]);
-        const lines = [headers, ...rows]
-            .map((r) => r.map(escape).join(","))
-            .join("\r\n");
-        return lines;
-    };
-
-    const downloadCsv = (csv: string, nameBase: string) => {
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${nameBase}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
-    const buildSpellbookFilename = (base: string) => {
-        const stamp = new Date()
-            .toISOString()
-            .replace(/[:T]/g, "-")
-            .slice(0, 16);
-        const safe = (base || "Spellbook").trim();
-        return `${safe}-${stamp}`;
-    };
-
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
@@ -142,20 +96,12 @@ export default function SpellbookDetailPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2 items-center">
-                    <Button
+                    <DownloadSpellbookCSVButton
+                        spells={spells}
+                        spellbookName={s.name ?? "Spellbook"}
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                            const csv = spellsToCsv(spells);
-                            const fileName = buildSpellbookFilename(
-                                s.name ?? "Spellbook"
-                            );
-                            downloadCsv(csv, fileName);
-                        }}
-                    >
-                        <Download className="h-4 w-4" />
-                        Download CSV
-                    </Button>
+                    />
 
                     <Button
                         variant="outline"

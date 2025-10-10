@@ -101,7 +101,9 @@ const _schema = i.schema({
             done: i.boolean().optional(),
             text: i.string().optional(),
         }),
-        settings: i.entity({}),
+        settings: i.entity({
+            urlPreferences: i.json().optional(),
+        }),
         battleMaps: i.entity({}),
         parties: i.entity({
             name: i.string(),
@@ -145,6 +147,10 @@ const _schema = i.schema({
         magicShopsUser: {
             forward: { on: "magicShops", has: "one", label: "$user" },
             reverse: { on: "$users", has: "many", label: "magicShops" },
+        },
+        settingsUser: {
+            forward: { on: "settings", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "settings" },
         },
         worldsUser: {
             forward: { on: "worlds", has: "one", label: "$user" },

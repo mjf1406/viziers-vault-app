@@ -5,12 +5,7 @@ import { NextResponse } from "next/server";
 import { enforceRateLimit } from "./lib/ratelimit";
 
 export const config = {
-    matcher: [
-        // Apply to everything under (app) group paths, which render as /app/*
-        "/app/:path*",
-        // And to api if present
-        "/api/:path*",
-    ],
+    matcher: ["/app/:path*", "/api/:path*"],
 };
 
 export async function middleware(req: NextRequest) {

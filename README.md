@@ -8,26 +8,22 @@
 
 ## To-do List
 
--   see if removing all Shadcn UI components from home page reduces First Load JS
--   finished setting up the Discord server with
+-   [ ] finished setting up the Discord server with
     -   [x] a forum for feature requests
     -   [x] a forum for bug reports
     -   [x] a forum for feedback
-    -   onboarding
-    -   auto-roles
-    -   add invite link to discord.tsx
+    -   [ ] onboarding
+    -   [ ] auto-roles
+    -   [ ] add invite link to discord.tsx
 -   Template is done and ready for the other sites requires
-    -   account page
+    -   [ ] account page
         -   [x] update name
-        -   [ ] update subscription
+        -   [ ] update subscription on Polar.sh
         -   [x] update avatar
-    -   payment integration with subscriptions
-        -   (Paddle)[https://www.paddle.com/]
-        -   (Coda)[https://www.coda.co/merchant-of-record/]
-        -   (LemonSqueezy)[https://www.lemonsqueezy.com/]
     -   [x] rate limiting with Upstash Redis
     -   [x] need Obsidian markdown to HTML function for the blog and docs
         -   [x] set up basic blog and docs
+    -   [ ] make upgrade to basic in partiesUpsell.tsx and spellbookUpsell.tsx actually upgrade the user
 
 ## Change Log
 

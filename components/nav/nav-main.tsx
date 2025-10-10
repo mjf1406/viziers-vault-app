@@ -19,41 +19,15 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { getAvailableTools } from "@/lib/tools";
-import {
-    Map,
-    Orbit,
-    Store,
-    Users,
-    BookOpen,
-    Star,
-    Globe,
-    Swords,
-    ChevronUp,
-    Plus,
-    MapPinned,
-} from "lucide-react";
+import { icons } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { useUser } from "@/hooks/useUser";
+import { ChevronUp, Plus } from "lucide-react";
 
 const stripSuffix = (title: string) =>
     title.replace(" Generator", "").replace(" Management", "");
-
-const getIconComponent = (iconName: string) => {
-    const iconMap: { [key: string]: any } = {
-        Map,
-        Orbit,
-        Store,
-        Users,
-        MapPinned,
-        BookOpen,
-        Star,
-        Globe,
-        Swords,
-    };
-    return iconMap[iconName] || Map;
-};
 
 type NavMainProps = {
     handleLinkClick?: () => void;
@@ -66,7 +40,6 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
         stripSuffix(a.title).localeCompare(stripSuffix(b.title))
     );
     const { plan } = useUser();
-    // Allowed plans for showing the Plus button on Party
     const partyAllowedPlans = ["basic", "plus", "pro"];
 
     return (
@@ -85,7 +58,11 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {allTools.map((tool) => {
-                                const Icon = getIconComponent(tool.icon);
+                                // runtime-safe lucide icon name (fallback to "Map")
+                                const safeIconName = (icons as any)[tool.icon]
+                                    ? (tool.icon as keyof typeof icons)
+                                    : ("Map" as keyof typeof icons);
+
                                 const href = tool.url.replace(
                                     "https://app.viziersvault.com",
                                     ""
@@ -122,7 +99,12 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                         >
                                             {isDisabled ? (
                                                 <div className="flex items-center w-full">
-                                                    <Icon className="h-4 w-4 flex-shrink-0 mr-2" />
+                                                    <Icon
+                                                        name={safeIconName}
+                                                        color="currentColor"
+                                                        size={16}
+                                                        className="h-4 w-4 flex-shrink-0 mr-2"
+                                                    />
                                                     <span className="ml-3">
                                                         {stripSuffix(
                                                             tool.title
@@ -141,7 +123,12 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                     onClick={handleLinkClick}
                                                     className="flex items-center w-full"
                                                 >
-                                                    <Icon className="h-4 w-4 flex-shrink-0" />
+                                                    <Icon
+                                                        name={safeIconName}
+                                                        color="currentColor"
+                                                        size={16}
+                                                        className="h-4 w-4 flex-shrink-0"
+                                                    />
                                                     <span className="ml-3">
                                                         {stripSuffix(
                                                             tool.title
@@ -157,9 +144,6 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                             )}
                                         </SidebarMenuButton>
 
-                                        {/* Conditionally render the Plus action.
-                                            If canShowPlus is false we render a
-                                            spacer so layout doesn't jump. */}
                                         {canShowPlus ? (
                                             <SidebarMenuAction
                                                 asChild={!isDisabled}

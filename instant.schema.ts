@@ -62,11 +62,11 @@ const _schema = i.schema({
             school: i.string().optional().indexed(),
             attackSave: i.string().optional(),
             damageEffect: i.string().optional(),
-            description: i.string().optional(),
             classes: i.json().optional().indexed(),
 
             // Provenance
             source: i.string().optional().indexed(),
+            sourceShort: i.string().optional().indexed(),
             url: i.string().optional(),
             updatedAt: i.date().optional().indexed(),
         }),

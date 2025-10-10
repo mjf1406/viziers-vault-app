@@ -4,6 +4,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import db from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
+import Link from "next/link";
 
 export default function SpellbooksGrid({
     onEdit,
@@ -30,7 +32,8 @@ export default function SpellbooksGrid({
     onEdit: (s: any) => void;
     pendingIds: Set<string>;
 }) {
-    // Query spellbooks
+    const router = useRouter();
+
     const { isLoading, error, data } = db.useQuery({
         spellbooks: {},
     });
@@ -113,12 +116,14 @@ export default function SpellbooksGrid({
                         <CardHeader className="relative">
                             <div className="flex items-start justify-between">
                                 <CardTitle className="flex items-center gap-3 pr-8 text-lg">
-                                    <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
-                                        {s.name?.charAt(0)?.toUpperCase() ??
-                                            "S"}
-                                    </div>
-
-                                    <span>{s.name}</span>
+                                    {/* Avatar removed — name is clickable now */}
+                                    <Link
+                                        href={`/app/spellbook-generator/${s.id}`}
+                                        className="text-left hover:underline focus:outline-none focus:ring-2 focus:ring-ring rounded"
+                                        title={`Open ${s.name}`}
+                                    >
+                                        <span>{s.name}</span>
+                                    </Link>
 
                                     {isPending && (
                                         <span className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted">

@@ -9,7 +9,8 @@ import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download } from "lucide-react";
+import { Download, Copy } from "lucide-react";
+import { toTitleCase } from "../_functions/helpers";
 
 export default function SpellbookDetailPage() {
     const params = useParams();
@@ -19,6 +20,48 @@ export default function SpellbookDetailPage() {
     const { isLoading, error, data } = db.useQuery({
         spellbooks: { $: { where: { id: spellbookId }, limit: 1 } },
     });
+
+    const [copied, setCopied] = React.useState(false);
+    const copyTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
+
+    React.useEffect(() => {
+        return () => {
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const copyUrlToClipboard = async () => {
+        const url = window.location.href;
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(url);
+            } else {
+                const ta = document.createElement("textarea");
+                ta.value = url;
+                ta.setAttribute("readonly", "");
+                ta.style.position = "absolute";
+                ta.style.left = "-9999px";
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+            }
+            setCopied(true);
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+            }
+            copyTimeoutRef.current = setTimeout(() => {
+                setCopied(false);
+                copyTimeoutRef.current = null;
+            }, 2000);
+        } catch (e) {
+            console.error("Failed to copy URL", e);
+        }
+    };
 
     if (isLoading) {
         return <div className="p-4 xl:p-10">Loading…</div>;
@@ -55,7 +98,7 @@ export default function SpellbookDetailPage() {
             .slice()
             .sort((a, b) => (a.level ?? 0) - (b.level ?? 0))
             .map((sp) => [
-                sp.name ?? sp.NAME ?? "",
+                sp.name ?? sp.NAME ?? sp.slug ?? "Unknown",
                 sp.level ?? "",
                 sp.school ?? "",
                 Array.isArray(sp.classes) ? sp.classes.join(";") : "",
@@ -113,48 +156,60 @@ export default function SpellbookDetailPage() {
                         <Download className="h-4 w-4" />
                         Download CSV
                     </Button>
-                    {typeof level !== "undefined" && (
-                        <Badge
-                            variant="secondary"
-                            className="text-xs"
-                        >
-                            Level{" "}
-                            {Array.isArray(level)
-                                ? level.join(", ")
-                                : String(level)}
-                        </Badge>
-                    )}
-                    {classes.length > 0 && (
-                        <Badge
-                            variant="secondary"
-                            className="text-xs"
-                        >
-                            {classes.join(", ")}
-                        </Badge>
-                    )}
-                    {schools.slice(0, 6).map((sc) => (
-                        <Badge
-                            key={sc}
-                            variant="outline"
-                            className="text-xs"
-                        >
-                            {sc}
-                        </Badge>
-                    ))}
-                    {schools.length > 6 && (
-                        <Badge
-                            variant="outline"
-                            className="text-xs"
-                        >
-                            +{schools.length - 6} more
-                        </Badge>
-                    )}
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={copyUrlToClipboard}
+                        aria-label="Copy URL to clipboard"
+                    >
+                        <Copy className="h-4 w-4" />
+                        {copied ? "Copied!" : "Copy URL"}
+                    </Button>
                 </div>
+            </div>
+            <div className="space-x-2">
+                {typeof level !== "undefined" && (
+                    <Badge
+                        variant="secondary"
+                        className="text-xs"
+                    >
+                        Level{" "}
+                        {Array.isArray(level)
+                            ? level.join(", ")
+                            : String(level)}
+                    </Badge>
+                )}
+                {classes.length > 0 && (
+                    <Badge
+                        variant="secondary"
+                        className="text-xs"
+                    >
+                        {toTitleCase(classes.join(", "))}
+                    </Badge>
+                )}
+                {schools.slice(0, 6).map((sc) => (
+                    <Badge
+                        key={sc}
+                        variant="outline"
+                        className="text-xs"
+                    >
+                        {sc}
+                    </Badge>
+                ))}
+                {schools.length > 6 && (
+                    <Badge
+                        variant="outline"
+                        className="text-xs"
+                    >
+                        +{schools.length - 6} more
+                    </Badge>
+                )}
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Spells ({spells.length})</CardTitle>
+                    <CardTitle>Spells: {spells.length}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {spells.length === 0 ? (
@@ -180,6 +235,7 @@ export default function SpellbookDetailPage() {
                                             <div className="font-medium">
                                                 {sp.name ??
                                                     sp.NAME ??
+                                                    toTitleCase(sp.slug) ??
                                                     "Unknown"}
                                             </div>
                                             {sp.school && (

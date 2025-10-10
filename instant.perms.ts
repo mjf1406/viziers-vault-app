@@ -74,7 +74,7 @@ const rules = {
     // -----------------------------
     dnd5e_magicItems: {
         allow: {
-            view: "false", // False means the admin SDK can still access
+            view: "true", // False means the admin SDK can still access
             create: "false",
             update: "false",
             delete: "false",
@@ -82,7 +82,7 @@ const rules = {
     },
     dnd5e_spells: {
         allow: {
-            view: "false",
+            view: "true",
             create: "false",
             update: "false",
             delete: "false",
@@ -90,7 +90,7 @@ const rules = {
     },
     dnd5e_bestiary: {
         allow: {
-            view: "false",
+            view: "true",
             create: "false",
             update: "false",
             delete: "false",
@@ -129,7 +129,7 @@ const rules = {
     },
     spellbooks: {
         allow: {
-            view: "isCreator",
+            view: "true",
             create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",

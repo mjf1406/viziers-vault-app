@@ -1,6 +1,6 @@
 /** @format */
 
-// app/spellbook-generator/_functions/utils.ts
+// app/spellbook-generator/_functions/helpers.ts
 
 import { MAX_LEVEL, MIN_LEVEL } from "@/lib/5e-data";
 
@@ -84,4 +84,12 @@ export function FisherYatesShuffle<T>(array: T[]): T[] {
         ];
     }
     return shuffledArray;
+}
+
+export function toTitleCase(s: string): string {
+    return s
+        .trim()
+        .toLowerCase()
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
 }

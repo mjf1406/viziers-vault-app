@@ -29,6 +29,7 @@ import { Dices, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
+import SpellbookNameField from "./SpellbookNameField";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -94,7 +95,7 @@ export default function SpellbookGeneratorDialog({
             : []
     );
 
-    // Classes: default to only Wizard per request
+    // Classes: now we store a flag classesRandom and single selected class in array
     const [classesRandom, setClassesRandom] = useState<boolean>(
         initial?.classes === "random" ? true : initial?.classes ? false : false
     );
@@ -148,7 +149,6 @@ export default function SpellbookGeneratorDialog({
     const [name, setName] = useState<string>("");
 
     const allSchoolsSelected = selectedSchools.length === SCHOOLS.length;
-    const allClassesSelected = selectedClasses.length === CLASSES.length;
 
     const toggleSchoolsRandom = (value: boolean) => {
         if (value) {
@@ -194,22 +194,8 @@ export default function SpellbookGeneratorDialog({
         );
     };
 
-    const handleToggleClass = (c: string, checked: boolean) => {
-        if (classesRandom) setClassesRandom(false);
-        setSelectedClasses((cur) =>
-            checked
-                ? cur.includes(c)
-                    ? cur
-                    : [...cur, c]
-                : cur.filter((x) => x !== c)
-        );
-    };
-
     const handleSelectAllSchools = () => setSelectedSchools([...SCHOOLS]);
     const handleClearSchools = () => setSelectedSchools([]);
-
-    const handleSelectAllClasses = () => setSelectedClasses([...CLASSES]);
-    const handleClearClasses = () => setSelectedClasses([]);
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -241,12 +227,23 @@ export default function SpellbookGeneratorDialog({
             return;
         }
 
+        // If level is "random", pick a numeric level client-side (1-20),
+        // update both the form data and the visible selectedLevel so the
+        // server receives a concrete numeric level.
+        let chosenLevel: number;
+        if (selectedLevel === "random") {
+            chosenLevel = Math.floor(Math.random() * 20) + 1; // 1..20
+            formData.set("level", String(chosenLevel));
+            // Update visible selection so the hidden input and UI reflect the chosen value
+            setSelectedLevel(String(chosenLevel));
+        } else {
+            chosenLevel = parseInt(selectedLevel, 10);
+            formData.set("level", String(chosenLevel));
+        }
+
         setIsGenerating(true);
         try {
-            const level =
-                selectedLevel === "random"
-                    ? "random"
-                    : parseInt(selectedLevel, 10);
+            const level: number = chosenLevel;
 
             // Call server action with FormData
             const result = await generateSpellbook(formData);
@@ -333,7 +330,7 @@ export default function SpellbookGeneratorDialog({
             .slice()
             .sort((a, b) => (a.level ?? 0) - (b.level ?? 0))
             .map((sp) => [
-                sp.name ?? sp.NAME ?? "",
+                sp.name ?? sp.NAME ?? sp.slug ?? "",
                 sp.level ?? "",
                 sp.school ?? "",
                 Array.isArray(sp.classes) ? sp.classes.join(";") : "",
@@ -389,19 +386,15 @@ export default function SpellbookGeneratorDialog({
                         </CredenzaTitle>
                     </CredenzaHeader>
 
-                    <CredenzaBody>
+                    <CredenzaBody className="space-y-5">
                         {isPaid && user?.id ? (
-                            <div>
-                                <Label htmlFor="name">Name (optional)</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="e.g., Neera's Apprentice Grimoire"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="mt-1"
-                                />
-                            </div>
+                            <SpellbookNameField
+                                value={name}
+                                onChange={setName}
+                                id="name"
+                                nameAttr="name"
+                                placeholder="e.g., Neera's Apprentice Grimoire"
+                            />
                         ) : null}
 
                         <div>
@@ -442,7 +435,65 @@ export default function SpellbookGeneratorDialog({
                                 value={selectedLevel}
                             />
                         </div>
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <Label>Class</Label>
+                            </div>
 
+                            {/* Class select now includes Random as the first item.
+                                When Random is selected we set classesRandom = true
+                                and selectedClasses = []; otherwise we set selectedClasses = [value]. */}
+                            <Select
+                                value={
+                                    classesRandom
+                                        ? "random"
+                                        : selectedClasses[0] ?? "Wizard"
+                                }
+                                onValueChange={(v) => {
+                                    if (v === "random") {
+                                        // switch to random
+                                        toggleClassesRandom(true);
+                                    } else {
+                                        // any manual selection cancels random
+                                        if (classesRandom)
+                                            toggleClassesRandom(false);
+                                        setSelectedClasses([v]);
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="mt-1 w-full">
+                                    <SelectValue placeholder="Select class" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="random">
+                                        Random
+                                    </SelectItem>
+                                    {CLASSES.map((c) => (
+                                        <SelectItem
+                                            key={c}
+                                            value={c}
+                                        >
+                                            {c}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Hidden input for server: "random" or classes[] */}
+                            {classesRandom ? (
+                                <input
+                                    type="hidden"
+                                    name="classes"
+                                    value="random"
+                                />
+                            ) : (
+                                <input
+                                    type="hidden"
+                                    name="classes[]"
+                                    value={selectedClasses[0] ?? "Wizard"}
+                                />
+                            )}
+                        </div>
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <Label>Schools of Magic</Label>
@@ -516,84 +567,6 @@ export default function SpellbookGeneratorDialog({
                                                 }
                                             />
                                             <Label htmlFor={id}>{s}</Label>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <Label>Classes</Label>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox
-                                            id="classes-random"
-                                            name="classes-random"
-                                            checked={classesRandom}
-                                            onCheckedChange={(v) =>
-                                                toggleClassesRandom(v === true)
-                                            }
-                                        />
-                                        <Label htmlFor="classes-random">
-                                            Random
-                                        </Label>
-                                    </div>
-
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                            classesRandom
-                                                ? handleSelectAllClasses()
-                                                : allClassesSelected
-                                                ? handleClearClasses()
-                                                : handleSelectAllClasses()
-                                        }
-                                        disabled={classesRandom}
-                                    >
-                                        {allClassesSelected
-                                            ? "Clear"
-                                            : "Select All"}
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {classesRandom && (
-                                <input
-                                    type="hidden"
-                                    name="classes"
-                                    value="random"
-                                />
-                            )}
-
-                            <div className="grid grid-cols-2 gap-2">
-                                {CLASSES.map((c) => {
-                                    const id = `class-${c.replace(
-                                        /\s+/g,
-                                        "-"
-                                    )}`;
-                                    const checked = selectedClasses.includes(c);
-                                    return (
-                                        <div
-                                            key={c}
-                                            className="flex items-center gap-2 text-sm"
-                                        >
-                                            <Checkbox
-                                                id={id}
-                                                name="classes[]"
-                                                value={c}
-                                                checked={checked}
-                                                disabled={classesRandom}
-                                                onCheckedChange={(v) =>
-                                                    handleToggleClass(
-                                                        c,
-                                                        v === true
-                                                    )
-                                                }
-                                            />
-                                            <Label htmlFor={id}>{c}</Label>
                                         </div>
                                     );
                                 })}

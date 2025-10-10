@@ -27,6 +27,12 @@
 
 ## Change Log
 
+### 2025/10/10 14:53
+
+-   spellbooks now generate
+-   urls are now public and can be shared if the user is logged in and on a plan that allows url generation
+-   basic spellbook name generator created and added as a dice icon button next to the spellbook name input field
+
 ### 2025/10/10 09:47
 
 -   sidebar header height is now the same as the content header heights and the sidebar header height is consistent across all sidebar

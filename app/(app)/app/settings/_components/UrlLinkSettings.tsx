@@ -16,6 +16,12 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 type ProviderKey = "dndbeyond" | "open5e" | "5eTools" | "custom";
 
@@ -113,9 +119,11 @@ function buildPreview(
             const filled = argPattern
                 .replaceAll("${SPELL_NAME}", nameWith)
                 .replaceAll("${SPELL_NAME_LOWER}", nameWithLower)
+                .replaceAll("${SPELL_NAME_SLUG}", sample.slug || "")
                 .replaceAll("${ITEM_NAME}", nameWith)
                 .replaceAll("${MONSTER_NAME}", nameWith)
-                .replaceAll("${SOURCE_SHORT}", sample.sourceShort || "");
+                .replaceAll("${SOURCE_SHORT}", sample.sourceShort || "")
+                .replaceAll("${SOURCE}", (sample as any).source || "");
             return `${base}${filled}`;
         }
         default:
@@ -194,6 +202,19 @@ export default function UrlLinkSettings() {
                 <CardTitle>Reference Link Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    <div>
+                        Configure how links are generated for spells, magic
+                        items, and monsters. Choose a provider or select Custom
+                        and set a Base URL, an Argument pattern, and a Space
+                        replacement. Per-type examples are provided below.
+                    </div>
+                    <div className="text-xs">
+                        Note: D&amp;D Beyond links require numeric IDs (e.g.,
+                        https://www.dndbeyond.com/magic-items/5370-adamantine-armor).
+                        Exact links generally need scraped IDs.
+                    </div>
+                </div>
                 <Section
                     title="Spells"
                     sectionKey="spells"
@@ -238,6 +259,7 @@ function Section({
     ) => void;
 }) {
     const p = prefs[sectionKey];
+    const [examplesOpen, setExamplesOpen] = React.useState(false);
 
     const providerLabel = (k: ProviderKey) =>
         k === "dndbeyond" ? "D&D Beyond" : "Custom";
@@ -307,11 +329,122 @@ function Section({
                                     : "${MONSTER_NAME} or ${MONSTER_NAME}_${SOURCE_SHORT}"
                             }
                         />
-                        <div className="text-xs text-muted-foreground">
-                            Available variables: ${"{SPELL_NAME}"}, $
-                            {"{SPELL_NAME_LOWER}"}, ${"{ITEM_NAME}"}, $
-                            {"{MONSTER_NAME}"}, ${"{SOURCE_SHORT}"}
-                        </div>
+                        {sectionKey === "spells" ? (
+                            <Collapsible
+                                open={examplesOpen}
+                                onOpenChange={setExamplesOpen}
+                            >
+                                <CollapsibleTrigger className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                                    <ChevronUp
+                                        className={
+                                            "h-3.5 w-3.5 transition-transform " +
+                                            (examplesOpen ? "rotate-180" : "")
+                                        }
+                                    />
+                                    {examplesOpen
+                                        ? "Hide examples and variables"
+                                        : "Show examples and variables"}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2 overflow-x-auto">
+                                    <table className="w-full text-xs border border-border">
+                                        <thead className="bg-muted/50">
+                                            <tr>
+                                                <th className="p-2 text-left">
+                                                    Variable
+                                                </th>
+                                                <th className="p-2 text-left">
+                                                    Example
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td className="p-2 font-mono">
+                                                    ${"{SPELL_NAME}"}
+                                                </td>
+                                                <td className="p-2">
+                                                    Melf's Acid Arrow
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 font-mono">
+                                                    ${"{SPELL_NAME_LOWER}"}
+                                                </td>
+                                                <td className="p-2">
+                                                    melf's acid arrow
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 font-mono">
+                                                    ${"{SPELL_NAME_SLUG}"}
+                                                </td>
+                                                <td className="p-2">
+                                                    melfs-acid-arrow
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 font-mono">
+                                                    ${"{SOURCE}"}
+                                                </td>
+                                                <td className="p-2">
+                                                    Player's Handbook (2024)
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 font-mono">
+                                                    ${"{SOURCE_SHORT}"}
+                                                </td>
+                                                <td className="p-2">xphb</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </CollapsibleContent>
+                            </Collapsible>
+                        ) : null}
+                        {sectionKey === "items" ? (
+                            <Collapsible
+                                open={examplesOpen}
+                                onOpenChange={setExamplesOpen}
+                            >
+                                <CollapsibleTrigger className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                                    <ChevronDown
+                                        className={
+                                            "h-3.5 w-3.5 transition-transform " +
+                                            (examplesOpen ? "rotate-180" : "")
+                                        }
+                                    />
+                                    {examplesOpen
+                                        ? "Hide examples and variables"
+                                        : "Show examples and variables"}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2 text-xs text-muted-foreground">
+                                    Variables typically include ${"{ITEM_NAME}"}{" "}
+                                    and ${"{SOURCE_SHORT}"}.
+                                </CollapsibleContent>
+                            </Collapsible>
+                        ) : null}
+                        {sectionKey === "monsters" ? (
+                            <Collapsible
+                                open={examplesOpen}
+                                onOpenChange={setExamplesOpen}
+                            >
+                                <CollapsibleTrigger className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                                    <ChevronDown
+                                        className={
+                                            "h-3.5 w-3.5 transition-transform " +
+                                            (examplesOpen ? "rotate-180" : "")
+                                        }
+                                    />
+                                    {examplesOpen
+                                        ? "Hide examples and variables"
+                                        : "Show examples and variables"}
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-2 text-xs text-muted-foreground">
+                                    Variables typically include $
+                                    {"{MONSTER_NAME}"} and ${"{SOURCE_SHORT}"}.
+                                </CollapsibleContent>
+                            </Collapsible>
+                        ) : null}
                     </div>
                 ) : null}
 
@@ -331,23 +464,7 @@ function Section({
                 ) : null}
             </div>
 
-            <div className="text-xs text-muted-foreground">
-                {p.provider === "dndbeyond" && (
-                    <div>
-                        D&amp;D Beyond links require IDs (e.g.,
-                        https://www.dndbeyond.com/magic-items/5370-adamantine-armor).
-                        Scraped data is needed to build exact links.
-                    </div>
-                )}
-                {/* Open5e and 5eTools provider-specific hints removed */}
-                {p.provider === "custom" && (
-                    <div>
-                        Examples: base URLs like "https://open5e.com/spells/"
-                        and arguments like ${"{SPELL_NAME}"}. Replace spaces
-                        with your input (e.g., "-", "%20", or " ").
-                    </div>
-                )}
-            </div>
+            {/* Per-type instructions removed; see card header instructions */}
 
             <div className="text-xs">
                 <span className="text-muted-foreground">Preview:</span>{" "}

@@ -36,6 +36,10 @@
 
 ## Change Log
 
+### 2025/10/11
+
+-   UI and UX improvements to to the reference link providers in settings
+
 ### 2025/10/10
 
 -   set up custom URLs in settings

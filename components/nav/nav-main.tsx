@@ -30,6 +30,7 @@ import {
     Swords,
     ChevronUp,
     Plus,
+    MapPinned,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
@@ -45,6 +46,7 @@ const getIconComponent = (iconName: string) => {
         Orbit,
         Store,
         Users,
+        MapPinned,
         BookOpen,
         Star,
         Globe,

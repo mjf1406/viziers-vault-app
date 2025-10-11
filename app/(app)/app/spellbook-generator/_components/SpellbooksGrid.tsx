@@ -24,7 +24,7 @@ import {
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
 import Link from "next/link";
-import { toTitleCase } from "../_functions/helpers";
+import { toTitleCase } from "@/lib/utils";
 import DownloadSpellbookCSVButton from "./DownloadSpellbookCSVButton";
 
 export default function SpellbooksGrid({

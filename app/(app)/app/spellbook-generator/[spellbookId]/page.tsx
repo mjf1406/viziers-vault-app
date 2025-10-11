@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, Copy } from "lucide-react";
-import { toTitleCase } from "../_functions/helpers";
+import { toTitleCase } from "@/lib/utils";
 import DownloadSpellbookCSVButton from "../_components/DownloadSpellbookCSVButton";
 import { buildSpellUrl } from "@/lib/urlBuilder";
 import { useUser } from "@/hooks/useUser";

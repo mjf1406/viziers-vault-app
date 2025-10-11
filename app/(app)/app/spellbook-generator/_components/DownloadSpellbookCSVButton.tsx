@@ -6,7 +6,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { toTitleCase } from "../_functions/helpers";
+import { toTitleCase } from "@/lib/utils";
 import { useUser } from "@/hooks/useUser";
 import { buildSpellUrl, type SpellUrlPrefs } from "@/lib/urlBuilder";
 

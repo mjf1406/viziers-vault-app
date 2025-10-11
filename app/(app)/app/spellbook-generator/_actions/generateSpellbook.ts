@@ -6,10 +6,14 @@
 
 import {
     FisherYatesShuffle,
-    resolveLevel,
     resolveSelections,
     toTitleCase,
-} from "../_functions/helpers";
+    dedupeBy,
+    takeRandom,
+    toNumber,
+    clampNumber,
+} from "@/lib/utils";
+import { resolveLevel } from "@/lib/5e-utils";
 import { CLASSES, SCHOOLS, SPELLS_PER_LEVEL } from "@/lib/5e-data";
 import dbServer from "@/server/db-server";
 import { cookies } from "next/headers";
@@ -99,10 +103,10 @@ export default async function generateSpellbook(
         }
 
         // Determine character level (max of levels, clamped 1..20)
-        const characterLevel = clamp(
+        const characterLevel = clampNumber(
             Math.max(
                 ...(resolved.levels || [])
-                    .map((n) => toNum(n))
+                    .map((n) => toNumber(n))
                     .filter((n) => n >= 0)
             ),
             1,
@@ -206,13 +210,13 @@ function selectSpellsForSpellbook(
 
     // Dedupe pools and enforce max level
     const cantripsPool = dedupeBy(
-        cantrips.filter((s) => toNum(s.level) === 0),
+        cantrips.filter((s) => toNumber(s.level) === 0),
         (s) => s.dndbeyondId || s.slug || s.name || ""
     );
 
     const leveledPool = dedupeBy(
         leveledSpells.filter((s) => {
-            const lvl = toNum(s.level);
+            const lvl = toNumber(s.level);
             return lvl > 0 && lvl <= maxSpellLevel;
         }),
         (s) => s.dndbeyondId || s.slug || s.name || ""
@@ -226,8 +230,8 @@ function selectSpellsForSpellbook(
 
     // Stable ordering: level asc, then name asc
     selected.sort((a, b) => {
-        const la = toNum(a.level);
-        const lb = toNum(b.level);
+        const la = toNumber(a.level);
+        const lb = toNumber(b.level);
         if (la !== lb) return la - lb;
         return (a.name || "").localeCompare(b.name || "");
     });
@@ -235,34 +239,7 @@ function selectSpellsForSpellbook(
     return selected;
 }
 
-function toNum(v: unknown): number {
-    const n = typeof v === "number" ? v : parseInt(String(v || 0), 10);
-    return Number.isFinite(n) ? n : 0;
-}
-
-function clamp(n: number, min: number, max: number): number {
-    return Math.min(Math.max(n, min), max);
-}
-
-function takeRandom<T>(arr: T[], count: number): T[] {
-    if (count <= 0) return [];
-    if (!arr || arr.length === 0) return [];
-    const n = Math.min(count, arr.length);
-    return FisherYatesShuffle(arr).slice(0, n);
-}
-
-function dedupeBy<T>(arr: T[], keyFn: (t: T) => string): T[] {
-    const seen = new Set<string>();
-    const out: T[] = [];
-    for (const item of arr) {
-        const k = keyFn(item);
-        if (!k) continue;
-        if (seen.has(k)) continue;
-        seen.add(k);
-        out.push(item);
-    }
-    return out;
-}
+// toNumber, clampNumber, takeRandom, dedupeBy imported from utils
 
 async function getAuthAndSaveEligibility(): Promise<{
     uid: string;

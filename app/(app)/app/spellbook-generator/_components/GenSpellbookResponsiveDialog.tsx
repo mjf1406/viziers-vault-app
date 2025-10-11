@@ -35,7 +35,7 @@ import {
     downloadCsv,
     spellsToCsv,
 } from "./DownloadSpellbookCSVButton";
-import { toTitleCase } from "../_functions/helpers";
+import { toTitleCase } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
 

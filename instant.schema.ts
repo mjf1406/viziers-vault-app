@@ -46,17 +46,18 @@ const _schema = i.schema({
             dndbeyondId: i.string().unique().indexed(),
 
             // Naming
-            name: i.string().optional().indexed(), // human-readable name (if available)
-            slug: i.string().optional().indexed(), // e.g. "abi-dalzims-horrid-wilting"
+            name: i.string().optional().indexed(),
+            nameLower: i.string().optional().indexed(), // ADD THIS
+            slug: i.string().optional().indexed(),
 
             // Spell data
-            levelText: i.string().optional(), // e.g. "8th", "Cantrip"
-            level: i.number().optional().indexed(), // numeric (8 for "8th", 0 for Cantrip)
+            levelText: i.string().optional(),
+            level: i.number().optional().indexed(),
             castingTime: i.string().optional().indexed(),
             range: i.string().optional().indexed(),
             area: i.string().optional().indexed(),
             areaShape: i.string().optional().indexed(),
-            components: i.string().optional().indexed(), // e.g. "V, S, M"
+            components: i.string().optional().indexed(),
             materialComponents: i.string().optional(),
             duration: i.string().optional().indexed(),
             school: i.string().optional().indexed(),
@@ -68,6 +69,9 @@ const _schema = i.schema({
             source: i.string().optional().indexed(),
             sourceShort: i.string().optional().indexed(),
             url: i.string().optional(),
+
+            // Timestamps
+            createdAt: i.date().optional().indexed(), // ADD THIS
             updatedAt: i.date().optional().indexed(),
         }),
 

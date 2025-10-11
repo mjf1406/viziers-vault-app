@@ -29,8 +29,8 @@ function normalizeSourceShort(raw: unknown): string {
     const s = String(raw || "").trim();
     if (!s) return "";
 
-    // If already an acronym (e.g. PHB, XGE, XPHB)
-    if (/^[A-Za-z]{2,6}$/.test(s)) {
+    // If already an acronym (e.g. phb, xge, ftd)
+    if (/^[a-z]{2,6}$/i.test(s)) {
         return s.toLowerCase();
     }
 
@@ -45,11 +45,14 @@ function normalizeSourceShort(raw: unknown): string {
         "monster manual": "mm",
         "xanathar's guide to everything": "xge",
         "xanathars guide to everything": "xge",
-        "tasha's cauldron of everything": "tcoe",
-        "tashas cauldron of everything": "tcoe",
+        "tasha's cauldron of everything": "tce",
+        "tashas cauldron of everything": "tce",
         "sword coast adventurer's guide": "scag",
         "sword coast adventurers guide": "scag",
         "mordenkainen presents: monsters of the multiverse": "mpmm",
+        "elemental evil player's companion": "xge",
+        "fizban's treasury of dragons": "ftd",
+        "strixhaven: a curriculum of chaos": "sato",
     };
     const key = s.toLowerCase();
     if (map[key]) return map[key];
@@ -70,43 +73,67 @@ export function buildSpellUrl(
     prefs?: SpellUrlPrefs | null
 ): string | null {
     const provider = (prefs?.provider ?? "dndbeyond").toString();
-
-    // Try strict D&D Beyond: requires id and slug
+    // D&D Beyond provider
     if (provider === "dndbeyond") {
-        const id = spell?.dndbeyondId || spell?.dndbeyond_id;
-        const slugRaw = spell?.slug || spell?.SLUG || spell?.name;
-        if (!id || !slugRaw) return null;
-        const slug = String(slugRaw).toLowerCase().replace(/\s+/g, "-");
+        // If we already have the full URL, use it directly
+        if (spell?.url && typeof spell.url === "string") {
+            return spell.url;
+        }
+
+        // Otherwise construct from dndbeyondId and slug
+        const id = spell?.dndbeyondId;
+        const slug = spell?.slug;
+
+        if (!id || !slug) return null;
+
         return `https://www.dndbeyond.com/spells/${id}-${slug}`;
     }
 
-    // Default/custom template
-    const baseUrl = prefs?.baseUrl ?? "https://open5e.com/spells/";
-    const argPattern = prefs?.argPattern ?? "${SPELL_NAME}";
+    // Custom template provider
+    const baseUrl = prefs?.baseUrl ?? "https://5e.tools/spells.html#";
+    const argPattern =
+        prefs?.argPattern ?? "${SPELL_NAME_LOWER}_${SOURCE_SHORT}";
     const spaceReplacement =
         typeof prefs?.spaceReplacement === "string"
-            ? prefs!.spaceReplacement!
-            : "-";
+            ? prefs.spaceReplacement
+            : "%20";
 
-    const nameRaw = spell?.name || spell?.NAME || spell?.slug || "";
-    const sourceShortRaw = spell?.sourceShort || spell?.source || "";
+    // Get fields from spell object - try multiple field name variations
+    const spellName = spell?.name || spell?.NAME || "";
+    const spellNameLower =
+        spell?.nameLower || spell?.name_lower || spellName.toLowerCase();
+    const slug = spell?.slug || spell?.SLUG || "";
+    const sourceShortRaw =
+        spell?.sourceShort ||
+        spell?.source_short ||
+        spell?.source ||
+        spell?.SOURCE ||
+        "";
 
-    const toToken = (s: string) =>
-        String(s || "").replace(/\s+/g, spaceReplacement);
+    if (!spellName && !slug) return null;
 
-    const spellName = String(nameRaw);
+    // Apply space replacement (respect user's setting)
+    const toToken = (s: string) => {
+        return String(s || "").replace(/\s+/g, spaceReplacement);
+    };
+
     const token = toToken(spellName);
-    const tokenLower = token.toLowerCase();
+    const tokenLower = toToken(spellNameLower);
+    const slugToken = slug; // Slug is pre-formatted
     const sourceShort = normalizeSourceShort(sourceShortRaw);
 
     // Apply replacements per argument pattern
     let filled = String(argPattern);
     filled = filled.replaceAll("${SPELL_NAME}", token);
     filled = filled.replaceAll("${SPELL_NAME_LOWER}", tokenLower);
-    // Also replace item/monster tokens defensively using the same name
+    filled = filled.replaceAll("${SPELL_NAME_SLUG}", slugToken);
+    filled = filled.replaceAll("${SLUG}", slugToken);
+    filled = filled.replaceAll("${SOURCE_SHORT}", sourceShort);
+    filled = filled.replaceAll("${SOURCE}", sourceShortRaw);
+
+    // Defensive replacements for items/monsters
     filled = filled.replaceAll("${ITEM_NAME}", token);
     filled = filled.replaceAll("${MONSTER_NAME}", token);
-    filled = filled.replaceAll("${SOURCE_SHORT}", sourceShort);
 
     return `${baseUrl}${filled}`;
 }

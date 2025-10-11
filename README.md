@@ -38,6 +38,8 @@
 
 ### 2025/10/11
 
+-   updated spells data and urls and csv outputs.
+-   custom urls now work properly
 -   UI and UX improvements to to the reference link providers in settings
 
 ### 2025/10/10

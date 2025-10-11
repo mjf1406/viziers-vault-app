@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import MagicShopNameField from "./MagicShopNameField";
 import WorldSelect from "./WorldSelect";
 import SettlementSelect from "./SettlementSelect";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type GenerateMagicShopOpts = {
     population:
@@ -180,6 +181,8 @@ export default function MagicShopGeneratorDialog({
         }
     };
 
+    const defaultTab = isPaid ? "by-settlement" : "by-population";
+
     return (
         <Credenza
             open={dialogOpen}
@@ -213,54 +216,73 @@ export default function MagicShopGeneratorDialog({
                             />
                         ) : null}
 
-                        {/* Step 1: Either choose population OR world+settlement */}
-                        <div className="space-y-2">
-                            <Label>
-                                Pick a world and settlement (optional)
-                            </Label>
-                            <WorldSelect
-                                value={worldId ?? undefined}
-                                onChange={(v) => {
-                                    setWorldId(v);
-                                    setSettlementId(null);
-                                }}
-                            />
-                            <div className="mt-2">
-                                <SettlementSelect
-                                    worldId={worldId}
-                                    value={settlementId ?? undefined}
-                                    onChange={(v) => setSettlementId(v)}
-                                />
-                            </div>
-                        </div>
+                        <Tabs
+                            defaultValue={defaultTab}
+                            className="w-full"
+                        >
+                            <TabsList>
+                                <TabsTrigger
+                                    value="by-population"
+                                    className="w-1/2"
+                                >
+                                    By population
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="by-settlement"
+                                    className="w-1/2"
+                                >
+                                    By world & city
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <div>
-                            <Label htmlFor="population">Population</Label>
-                            <Select
-                                value={population}
-                                onValueChange={(v) => setPopulation(v as any)}
+                            <TabsContent
+                                value="by-population"
+                                className="space-y-3"
                             >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Random" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random">
-                                        Random
-                                    </SelectItem>
-                                    <SelectItem value="hamlet">
-                                        Hamlet
-                                    </SelectItem>
-                                    <SelectItem value="village">
-                                        Village
-                                    </SelectItem>
-                                    <SelectItem value="town">Town</SelectItem>
-                                    <SelectItem value="city">City</SelectItem>
-                                    <SelectItem value="metropolis">
-                                        Metropolis
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                                <div>
+                                    <Label htmlFor="population">
+                                        Population
+                                    </Label>
+                                    <input
+                                        id="population"
+                                        className="mt-1 w-full rounded border px-3 py-2"
+                                        inputMode="numeric"
+                                        type="number"
+                                        placeholder="e.g., 20000"
+                                        onChange={(e) => {
+                                            // Set world/settlement null when typing population
+                                            setWorldId(null);
+                                            setSettlementId(null);
+                                            setPopulation("random");
+                                        }}
+                                    />
+                                </div>
+                            </TabsContent>
+
+                            <TabsContent
+                                value="by-settlement"
+                                className="space-y-3"
+                            >
+                                <div className="space-y-2">
+                                    <Label>Pick a world</Label>
+                                    <WorldSelect
+                                        value={worldId ?? undefined}
+                                        onChange={(v) => {
+                                            setWorldId(v);
+                                            setSettlementId(null);
+                                        }}
+                                    />
+                                    <div className="mt-2">
+                                        <Label>Pick a city</Label>
+                                        <SettlementSelect
+                                            worldId={worldId}
+                                            value={settlementId ?? undefined}
+                                            onChange={(v) => setSettlementId(v)}
+                                        />
+                                    </div>
+                                </div>
+                            </TabsContent>
+                        </Tabs>
 
                         {/* Next steps */}
                         <div>

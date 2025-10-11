@@ -49,3 +49,4 @@ export default function MagicShopUpsell({ className }: MagicShopUpsellProps) {
         </div>
     );
 }
+

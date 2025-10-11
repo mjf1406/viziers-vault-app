@@ -73,14 +73,13 @@ export function buildSpellUrl(
     prefs?: SpellUrlPrefs | null
 ): string | null {
     const provider = (prefs?.provider ?? "dndbeyond").toString();
+
     // D&D Beyond provider
     if (provider === "dndbeyond") {
-        // If we already have the full URL, use it directly
         if (spell?.url && typeof spell.url === "string") {
             return spell.url;
         }
 
-        // Otherwise construct from dndbeyondId and slug
         const id = spell?.dndbeyondId;
         const slug = spell?.slug;
 
@@ -90,6 +89,25 @@ export function buildSpellUrl(
     }
 
     // Custom template provider
+    const sourceShortRaw =
+        spell?.sourceShort ||
+        spell?.source_short ||
+        spell?.source ||
+        spell?.SOURCE ||
+        "";
+
+    // Fallback to spell.url if source is missing
+    if (!sourceShortRaw && spell?.url && typeof spell.url === "string") {
+        return spell.url;
+    }
+
+    const spellName = spell?.name || spell?.NAME || "";
+    const spellNameLower =
+        spell?.nameLower || spell?.name_lower || spellName.toLowerCase();
+    const slug = spell?.slug || spell?.SLUG || "";
+
+    if (!spellName && !slug) return null;
+
     const baseUrl = prefs?.baseUrl ?? "https://5e.tools/spells.html#";
     const argPattern =
         prefs?.argPattern ?? "${SPELL_NAME_LOWER}_${SOURCE_SHORT}";
@@ -98,42 +116,23 @@ export function buildSpellUrl(
             ? prefs.spaceReplacement
             : "%20";
 
-    // Get fields from spell object - try multiple field name variations
-    const spellName = spell?.name || spell?.NAME || "";
-    const spellNameLower =
-        spell?.nameLower || spell?.name_lower || spellName.toLowerCase();
-    const slug = spell?.slug || spell?.SLUG || "";
-    const sourceShortRaw =
-        spell?.sourceShort ||
-        spell?.source_short ||
-        spell?.source ||
-        spell?.SOURCE ||
-        "";
-
-    if (!spellName && !slug) return null;
-
-    // Apply space replacement (respect user's setting)
-    const toToken = (s: string) => {
-        return String(s || "").replace(/\s+/g, spaceReplacement);
-    };
+    const toToken = (s: string) =>
+        String(s || "").replace(/\s+/g, spaceReplacement);
 
     const token = toToken(spellName);
     const tokenLower = toToken(spellNameLower);
-    const slugToken = slug; // Slug is pre-formatted
+    const slugToken = slug;
     const sourceShort = normalizeSourceShort(sourceShortRaw);
 
-    // Apply replacements per argument pattern
-    let filled = String(argPattern);
-    filled = filled.replaceAll("${SPELL_NAME}", token);
-    filled = filled.replaceAll("${SPELL_NAME_LOWER}", tokenLower);
-    filled = filled.replaceAll("${SPELL_NAME_SLUG}", slugToken);
-    filled = filled.replaceAll("${SLUG}", slugToken);
-    filled = filled.replaceAll("${SOURCE_SHORT}", sourceShort);
-    filled = filled.replaceAll("${SOURCE}", sourceShortRaw);
-
-    // Defensive replacements for items/monsters
-    filled = filled.replaceAll("${ITEM_NAME}", token);
-    filled = filled.replaceAll("${MONSTER_NAME}", token);
+    let filled = String(argPattern)
+        .replaceAll("${SPELL_NAME}", token)
+        .replaceAll("${SPELL_NAME_LOWER}", tokenLower)
+        .replaceAll("${SPELL_NAME_SLUG}", slugToken)
+        .replaceAll("${SLUG}", slugToken)
+        .replaceAll("${SOURCE_SHORT}", sourceShort)
+        .replaceAll("${SOURCE}", sourceShortRaw)
+        .replaceAll("${ITEM_NAME}", token)
+        .replaceAll("${MONSTER_NAME}", token);
 
     return `${baseUrl}${filled}`;
 }

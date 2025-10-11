@@ -31,14 +31,27 @@ const _schema = i.schema({
         // ----------------------
 
         dnd5e_magicItems: i.entity({
+            // D&D Beyond primary key
             dndbeyondId: i.string().unique().indexed(),
+
+            // Naming
             name: i.string().indexed(),
+            nameLower: i.string().optional().indexed(),
+            slug: i.string().optional().indexed(),
+
+            // Item data
             rarity: i.string().optional().indexed(),
             type: i.string().optional().indexed(),
             attunement: i.string().optional().indexed(),
             notes: i.string().optional(),
+
+            // Provenance
             source: i.string().optional().indexed(),
+            sourceShort: i.string().optional().indexed(),
             url: i.string().optional(),
+
+            // Timestamps
+            createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
         }),
         dnd5e_spells: i.entity({
@@ -47,7 +60,7 @@ const _schema = i.schema({
 
             // Naming
             name: i.string().optional().indexed(),
-            nameLower: i.string().optional().indexed(), // ADD THIS
+            nameLower: i.string().optional().indexed(),
             slug: i.string().optional().indexed(),
 
             // Spell data
@@ -71,7 +84,7 @@ const _schema = i.schema({
             url: i.string().optional(),
 
             // Timestamps
-            createdAt: i.date().optional().indexed(), // ADD THIS
+            createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
         }),
 
@@ -81,6 +94,8 @@ const _schema = i.schema({
 
             // Naming
             name: i.string().optional().indexed(), // e.g. 'The Demogorgon' (unescaped)
+            nameLower: i.string().optional().indexed(), // e.g. 'the demogorgon' (unescaped, lower case)
+            slug: i.string().optional().indexed(), // e.g. 'the-demogorgon' (escaped)
 
             // Stat block basics
             crText: i.string().optional(), // e.g. "1/2", "8"
@@ -92,7 +107,11 @@ const _schema = i.schema({
 
             // Provenance
             source: i.string().optional().indexed(),
+            sourceShort: i.string().optional().indexed(),
             url: i.string().optional(),
+
+            // Timestamps
+            createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
         }),
 

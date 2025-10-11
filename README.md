@@ -31,6 +31,7 @@
 
 ### 2025/10/11
 
+-   added magic item data with new columns for use in custom urls
 -   added legacy checkbox and source filters to spellbook generation dialog
 -   added settings upsell to settings page when not logged in or on free plan
 -   updated spells data and urls and csv outputs.

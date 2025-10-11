@@ -20,6 +20,8 @@ type GenerateOpts = {
     level: number | "random";
     schools: string[] | "random";
     classes: string[] | "random";
+    sourceShorts?: string[];
+    excludeLegacy?: boolean;
 };
 
 type Dnd5eSpell = {
@@ -41,6 +43,7 @@ type Dnd5eSpell = {
     description?: string;
     classes?: string[];
     source?: string;
+    sourceShort?: string;
     url?: string;
     updatedAt?: Date;
 };
@@ -53,6 +56,8 @@ type SpellbookGenerateResponse =
               level: GenerateOpts["level"];
               schools: string[];
               classes: string[];
+              sourceShorts?: string[];
+              excludeLegacy?: boolean;
           };
       };
 
@@ -77,11 +82,21 @@ export default async function generateSpellbook(
 
         // Fetch leveled spells and cantrips separately, then filter by class
         const [leveledRaw, cantripsRaw] = await Promise.all([
-            fetchSpells(resolved.levels, resolved.schools),
-            fetchCantrips(resolved.schools),
+            fetchSpells(resolved.levels, resolved.schools, parsed.sourceShorts),
+            fetchCantrips(resolved.schools, parsed.sourceShorts),
         ]);
-        const leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
-        const cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
+        let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
+        let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
+
+        // Apply legacy exclusion if requested (default true from client)
+        if (parsed.excludeLegacy) {
+            const isLegacySchool = (s: unknown) =>
+                String(s || "")
+                    .trim()
+                    .toLowerCase() === "legacy";
+            leveled = leveled.filter((s) => !isLegacySchool(s.school));
+            cantrips = cantrips.filter((s) => !isLegacySchool(s.school));
+        }
 
         // Determine character level (max of levels, clamped 1..20)
         const characterLevel = clamp(
@@ -131,6 +146,8 @@ export default async function generateSpellbook(
                     level: parsed.level,
                     schools: resolved.schools,
                     classes: resolved.classes,
+                    sourceShorts: parsed.sourceShorts,
+                    excludeLegacy: parsed.excludeLegacy,
                 },
                 formData,
             });
@@ -144,6 +161,8 @@ export default async function generateSpellbook(
                 level: parsed.level,
                 schools: resolved.schools,
                 classes: resolved.classes,
+                sourceShorts: parsed.sourceShorts,
+                excludeLegacy: parsed.excludeLegacy,
             },
         };
     } catch (err) {
@@ -302,6 +321,8 @@ function parseFormDataToOptions(formData: FormData): {
     level: GenerateOpts["level"];
     schools: GenerateOpts["schools"];
     classes: GenerateOpts["classes"];
+    sourceShorts: string[];
+    excludeLegacy: boolean;
     name?: string;
 } {
     const rawLevel = formData.get("level")?.toString() ?? "random";
@@ -318,10 +339,18 @@ function parseFormDataToOptions(formData: FormData): {
         ? "random"
         : formData.getAll("classes[]").map(String);
 
+    const sourceShorts = formData
+        .getAll("sourceShorts[]")
+        .map((s) => String(s).toLowerCase()) as string[];
+
+    const excludeLegacy =
+        formData.get("excludeLegacyNormalized")?.toString() === "1" ||
+        formData.get("excludeLegacy")?.toString() === "on";
+
     const nameRaw = formData.get("name");
     const name = typeof nameRaw === "string" ? nameRaw.trim() : undefined;
 
-    return { level, schools, classes, name };
+    return { level, schools, classes, sourceShorts, excludeLegacy, name };
 }
 
 function resolveOptions(
@@ -349,7 +378,8 @@ async function dbQuery<T>(q: unknown): Promise<T | null> {
 
 async function fetchSpells(
     levels: number[],
-    schools: string[]
+    schools: string[],
+    sourceShorts?: string[]
 ): Promise<Dnd5eSpell[]> {
     const query = {
         dnd5e_spells: {
@@ -357,6 +387,9 @@ async function fetchSpells(
                 where: {
                     level: { $in: levels },
                     school: { $in: schools },
+                    ...(Array.isArray(sourceShorts) && sourceShorts.length
+                        ? { sourceShort: { $in: sourceShorts } }
+                        : {}),
                     // classes: { $in: classes }, // Not supported by the backend
                 },
             },
@@ -368,13 +401,19 @@ async function fetchSpells(
     return spells;
 }
 
-async function fetchCantrips(schools: string[]): Promise<Dnd5eSpell[]> {
+async function fetchCantrips(
+    schools: string[],
+    sourceShorts?: string[]
+): Promise<Dnd5eSpell[]> {
     const query = {
         dnd5e_spells: {
             $: {
                 where: {
                     level: { $in: [0] },
                     school: { $in: schools },
+                    ...(Array.isArray(sourceShorts) && sourceShorts.length
+                        ? { sourceShort: { $in: sourceShorts } }
+                        : {}),
                 },
             },
         },
@@ -406,6 +445,8 @@ async function saveSpellbookRecord(args: {
         level: GenerateOpts["level"];
         schools: string[];
         classes: string[];
+        sourceShorts?: string[];
+        excludeLegacy?: boolean;
     };
     formData: FormData;
 }): Promise<string> {

@@ -24,7 +24,7 @@ import {
     CredenzaTitle,
 } from "@/components/ui/credenza";
 import generateSpellbook from "../_actions/generateSpellbook";
-import { CLASSES, SCHOOLS } from "@/lib/5e-data";
+import { CLASSES, SCHOOLS, SOURCE_SHORTS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
 // Input not used here
 import { useUser } from "@/hooks/useUser";
@@ -36,6 +36,8 @@ import {
     spellsToCsv,
 } from "./DownloadSpellbookCSVButton";
 import { toTitleCase } from "../_functions/helpers";
+import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -174,6 +176,15 @@ export default function SpellbookGeneratorDialog({
     const [name, setName] = useState<string>(initial?.name ?? "");
 
     const allSchoolsSelected = selectedSchools.length === SCHOOLS.length;
+
+    // Sources: default to all selected
+    const [selectedSources, setSelectedSources] = useState<string[]>([
+        ...SOURCE_SHORTS,
+    ]);
+    const allSourcesSelected = selectedSources.length === SOURCE_SHORTS.length;
+
+    // Exclude Legacy (default on)
+    const [excludeLegacy, setExcludeLegacy] = useState<boolean>(true);
 
     const toggleSchoolsRandom = (value: boolean) => {
         if (value) {
@@ -414,6 +425,7 @@ export default function SpellbookGeneratorDialog({
                                 value={selectedLevel}
                             />
                         </div>
+
                         <div>
                             <div className="flex items-center justify-between mb-2">
                                 <Label>Class</Label>
@@ -550,6 +562,99 @@ export default function SpellbookGeneratorDialog({
                                     );
                                 })}
                             </div>
+                        </div>
+
+                        {/* Source shorts */}
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <Label>Sources</Label>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() =>
+                                            allSourcesSelected
+                                                ? setSelectedSources([])
+                                                : setSelectedSources([
+                                                      ...SOURCE_SHORTS,
+                                                  ])
+                                        }
+                                    >
+                                        {allSourcesSelected
+                                            ? "Clear"
+                                            : "Select All"}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Hidden inputs for selected sources so server always receives them */}
+                            <div className="grid grid-cols-3 gap-2">
+                                {SOURCE_SHORTS.map((s) => {
+                                    const id = `source-${s}`;
+                                    const checked = selectedSources.includes(s);
+                                    return (
+                                        <div
+                                            key={s}
+                                            className="flex items-center gap-2 text-sm"
+                                        >
+                                            <Checkbox
+                                                id={id}
+                                                name="sourceShorts[]"
+                                                value={s}
+                                                checked={checked}
+                                                onCheckedChange={(v) =>
+                                                    setSelectedSources((cur) =>
+                                                        v === true
+                                                            ? cur.includes(s)
+                                                                ? cur
+                                                                : [...cur, s]
+                                                            : cur.filter(
+                                                                  (x) => x !== s
+                                                              )
+                                                    )
+                                                }
+                                            />
+                                            <Label htmlFor={id}>
+                                                {s.toUpperCase()}
+                                            </Label>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Exclude Legacy */}
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <Label htmlFor="exclude-legacy">
+                                    Exclude Legacy
+                                </Label>
+                                <div className="flex items-center gap-3">
+                                    <Switch
+                                        id="exclude-legacy-switch"
+                                        checked={excludeLegacy}
+                                        onCheckedChange={(v) =>
+                                            setExcludeLegacy(v === true)
+                                        }
+                                    />
+                                    <Toggle
+                                        aria-label="Exclude Legacy"
+                                        pressed={excludeLegacy}
+                                        onPressedChange={(v) =>
+                                            setExcludeLegacy(v === true)
+                                        }
+                                    >
+                                        Exclude Legacy
+                                    </Toggle>
+                                </div>
+                            </div>
+                            {/* Submit a hidden normalized value to simplify server parsing */}
+                            <input
+                                type="hidden"
+                                name="excludeLegacyNormalized"
+                                value={excludeLegacy ? "1" : "0"}
+                            />
                         </div>
                     </CredenzaBody>
 

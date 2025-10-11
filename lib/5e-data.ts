@@ -13,6 +13,26 @@ export const SCHOOLS = [
     "Transmutation",
 ];
 
+// Common short source codes observed in data and mappings
+export const SOURCE_SHORTS = [
+    // 2024 Core
+    "xphb", // Player's Handbook (2024)
+    // 2014 Core and classics
+    "phb",
+    "dmg",
+    "mm",
+    // Popular supplements
+    "xge", // Xanathar's Guide to Everything / Elemental Evil mapping
+    "tce", // Tasha's Cauldron of Everything
+    "scag", // Sword Coast Adventurer's Guide
+    "mpmm", // Mordenkainen Presents: Monsters of the Multiverse
+    "ftd", // Fizban's Treasury of Dragons
+    "sato", // Strixhaven: A Curriculum of Chaos
+    // Additional codes seen in dataset/examples
+    "aag",
+    "bmt",
+];
+
 export const CLASSES = [
     "Artificer",
     "Bard",

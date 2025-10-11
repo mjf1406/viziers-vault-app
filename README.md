@@ -31,6 +31,8 @@
 
 ### 2025/10/11
 
+-   getting started on magic shop generator
+-   CSV output is fixed now for spellbooks
 -   added more names, adjectives, and nouns to the spellbook name generator
 -   added createdAt date and time to spellbook cards
 -   added magic item data with new columns for use in custom urls

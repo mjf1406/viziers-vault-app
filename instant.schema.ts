@@ -145,7 +145,22 @@ const _schema = i.schema({
             creatorId: i.string().optional().indexed(),
         }),
         magicShops: i.entity({}),
-        worlds: i.entity({}),
+        worlds: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
+            creatorId: i.string().optional().indexed(),
+        }),
+        settlements: i.entity({
+            name: i.string(),
+            population: i.number().optional().indexed(),
+            wealth: i.string().optional().indexed(), // poor, modest, prosperous, opulent
+            magicLevel: i.string().optional().indexed(), // low, moderate, high, legendary
+            shopTypes: i.json().optional(), // ["magic", "general", ...]
+            createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
+            creatorId: i.string().optional().indexed(),
+        }),
         starSystems: i.entity({}),
         galaxies: i.entity({}),
     },
@@ -178,6 +193,14 @@ const _schema = i.schema({
         worldsUser: {
             forward: { on: "worlds", has: "one", label: "$user" },
             reverse: { on: "$users", has: "many", label: "worlds" },
+        },
+        settlementsUser: {
+            forward: { on: "settlements", has: "one", label: "$user" },
+            reverse: { on: "$users", has: "many", label: "settlements" },
+        },
+        settlementsWorld: {
+            forward: { on: "settlements", has: "one", label: "world" },
+            reverse: { on: "worlds", has: "many", label: "settlements" },
         },
         starSystemsUser: {
             forward: { on: "starSystems", has: "one", label: "$user" },

@@ -21,7 +21,7 @@ export type DownloadSpellbookCSVButtonProps = Omit<
 };
 
 export function spellsToCsv(spellsIn: any[], prefs?: SpellUrlPrefs | null) {
-    const headers = ["Name", "Level", "School", "Classes", "Source", "URL"];
+    const headers = ["NAME", "LEVEL", "SCHOOL", "URL"];
     const escape = (v: any) => {
         const s = v == null ? "" : String(v);
         const needsQuotes = /[",\n]/.test(s);
@@ -35,8 +35,6 @@ export function spellsToCsv(spellsIn: any[], prefs?: SpellUrlPrefs | null) {
             sp.name ?? sp.NAME ?? toTitleCase(sp.slug) ?? "Unknown",
             sp.level ?? "",
             sp.school ?? "",
-            Array.isArray(sp.classes) ? sp.classes.join(";") : "",
-            sp.source ?? "",
             buildSpellUrl(sp, prefs) ?? sp.url ?? sp.LINK ?? "",
         ]);
     const lines = [headers, ...rows]

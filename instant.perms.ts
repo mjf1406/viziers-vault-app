@@ -154,6 +154,15 @@ const rules = {
         },
         bind: commonBind,
     },
+    settlements: {
+        allow: {
+            view: "isCreator",
+            create: "isAuthenticated && isPremium",
+            update: "isCreator && isStillCreator",
+            delete: "isCreator",
+        },
+        bind: commonBind,
+    },
     starSystems: {
         allow: {
             view: "isCreator",

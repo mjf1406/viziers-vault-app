@@ -28,3 +28,4 @@ export function resolveLevel(level?: number | "random" | string): number[] {
         (_, i) => MIN_LEVEL + i
     );
 }
+

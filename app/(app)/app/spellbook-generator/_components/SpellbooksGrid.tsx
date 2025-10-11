@@ -119,6 +119,9 @@ export default function SpellbooksGrid({
                 const level = s?.options?.level;
                 const schools = s?.options?.schools ?? [];
                 const classes = s?.options?.classes ?? [];
+                const createdAtLocal = s?.createdAt
+                    ? new Date(s.createdAt as any).toLocaleString()
+                    : null;
                 return (
                     <Card
                         key={s.id}
@@ -282,6 +285,12 @@ export default function SpellbooksGrid({
                                             </Badge>
                                         )}
                                 </div>
+
+                                {createdAtLocal && (
+                                    <div className="text-xs text-gray-500">
+                                        Created: {createdAtLocal}
+                                    </div>
+                                )}
 
                                 <div className="pt-2 text-xs text-gray-500">
                                     Total Spells: {s.spellCount}

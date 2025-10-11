@@ -31,6 +31,8 @@
 
 ### 2025/10/11
 
+-   added more names, adjectives, and nouns to the spellbook name generator
+-   added createdAt date and time to spellbook cards
 -   added magic item data with new columns for use in custom urls
 -   added legacy checkbox and source filters to spellbook generation dialog
 -   added settings upsell to settings page when not logged in or on free plan
@@ -159,6 +161,7 @@
 
 ### 2025/08/29
 
+-   added MagicShopNameField.tsx
 -   added a loading state on /app/parties for useUser
 -   added a basic account page at /app/account
 -   made the sidebar collapse to icons

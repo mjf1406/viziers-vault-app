@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dices } from "lucide-react";
 
-export type SpellbookNameFieldProps = {
+export type MagicShopNameFieldProps = {
     value: string;
     onChange: (v: string) => void;
     id?: string;
@@ -144,6 +144,28 @@ const FIRST_NAMES = [
     "Helios",
     "Miron",
     "Sableus",
+    "Magnus",
+    "Violetta",
+    "Rinoa",
+    "Fenn",
+    "Anwen",
+    "Garrick",
+    "Isidore",
+    "Luthien",
+    "Morden",
+    "Nox",
+    "Oriel",
+    "Pax",
+    "Quilla",
+    "Rook",
+    "Selene",
+    "Thessaly",
+    "Uther",
+    "Vanya",
+    "Yves",
+    "Zephyr",
+    "Alina",
+    "Belgar",
 ];
 
 const ADJECTIVES = [
@@ -227,33 +249,72 @@ const ADJECTIVES = [
     "Starlit",
     "Brimstone",
     "Runewrought",
+    "Lucky",
+    "Dusty",
+    "Antique",
+    "Rare",
+    "Curious",
+    "Twilit",
+    "Feytouched",
+    "Runic",
+    "Magisterial",
+    "Prismatic",
+    "Mossy",
+    "Rustic",
+    "Golden",
+    "Silken",
+    "Mystic",
+    "Fabled",
+    "Arcadian",
+    "Clockwork",
+    "Everburning",
+    "Songbound",
+    "Lantern-lit",
 ];
 
-const NOUNS = [
-    "Grimoire",
-    "Tome",
-    "Codex",
-    "Manuscript",
-    "Compendium",
-    "Lexicon",
-    "Treatise",
-    "Primer",
-    "Spellbook",
-    "Scroll",
-    "Chronicle",
+const SHOP_NOUNS = [
+    "Emporium",
+    "Curio",
+    "Curios",
+    "Curiosities",
+    "Apothecary",
+    "Oddities",
+    "Bazaar",
+    "Atelier",
+    "Mercantile",
+    "Parlor",
+    "Wares",
+    "Wonders",
+    "Trinkets",
+    "Antiques",
+    "General Store",
+    "Outfitter",
+    "Supply",
+    "Gifts",
+    "Artifacts",
+    "Relics",
+    "Vault",
+    "Cellar",
+    "Workshop",
+    "Boutique",
+    "Exchange",
+    "Galleria",
+    "Studio",
     "Archive",
-    "Journal",
-    "Ledger",
-    "Bestiary",
-    "Almanac",
-    "Folio",
-    "Opus",
-    "Atlas",
-    "Dossier",
-    "Vademecum",
-    "Enchiridion",
-    "Manual",
-    "Concordance",
+    "Cabinet",
+    "Shoppe",
+    "House",
+    "Market",
+    "Stall",
+    "Alcove",
+    "Nook",
+    "Niche",
+    "Menagerie",
+    "Arcanum",
+    "Arcana",
+    "Spellworks",
+    "Enchantery",
+    "Charmshop",
     "Phylactery",
 ];
 
@@ -261,25 +322,70 @@ function pick<T>(arr: T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function randomSpellbookName(): string {
-    const name = pick(FIRST_NAMES);
-    const possessive = name.endsWith("s") ? `${name}'` : `${name}'s`;
-    const useAdj = Math.random() < 0.65;
-    const adjective = useAdj ? `${pick(ADJECTIVES)} ` : "";
-    const noun = pick(NOUNS);
-    return `${possessive} ${adjective}${noun}`;
+function pickTwoDifferent<T>(arr: T[]): [T, T] {
+    if (arr.length < 2) return [arr[0], arr[0]];
+    const a = pick(arr);
+    let b = pick(arr);
+    // ensure different when possible
+    let attempts = 0;
+    while (b === a && attempts < 10) {
+        b = pick(arr);
+        attempts++;
+    }
+    return [a, b];
 }
 
-export default function SpellbookNameField({
+export function randomMagicShopName(): string {
+    const name = pick(FIRST_NAMES);
+    const lastChar = name.slice(-1).toLowerCase();
+    const possessive = lastChar === "s" ? `${name}'` : `${name}'s`;
+    const roll = Math.random();
+
+    // helper to optionally include an adjective
+    const maybeAdj = (prob = 0.7) =>
+        Math.random() < prob ? `${pick(ADJECTIVES)} ` : "";
+
+    if (roll < 0.45) {
+        // Owner possessive: "Neera's Gilded Emporium"
+        return `${possessive} ${maybeAdj()}${pick(SHOP_NOUNS)}`;
+    }
+
+    if (roll < 0.7) {
+        // The-style: "The Moonlit Parlor"
+        return `The ${maybeAdj()}${pick(SHOP_NOUNS)}`;
+    }
+
+    if (roll < 0.82) {
+        // Compound: "Gilded Curios & Whispered Wares"
+        const [adj1, adj2] = pickTwoDifferent(ADJECTIVES);
+        const [noun1, noun2] = pickTwoDifferent(SHOP_NOUNS);
+        return `${adj1} ${noun1} & ${adj2} ${noun2}`;
+    }
+
+    if (roll < 0.9) {
+        // "The Emporium of Kael"
+        return `The ${pick(SHOP_NOUNS)} of ${name}`;
+    }
+
+    if (roll < 0.96) {
+        // House of-style: "House of Moonshadowed Wonders"
+        return `House of ${maybeAdj(0.9)}${pick(SHOP_NOUNS)}`;
+    }
+
+    // fallback simple: "Gilded Emporium" or "Arcana"
+    return `${maybeAdj(0.85)}${pick(SHOP_NOUNS)}`;
+}
+
+export default function MagicShopNameField({
     value,
     onChange,
-    id = "name",
-    nameAttr = "name",
-    placeholder = "e.g., Neera's Apprentice Grimoire",
-    label = "Name (optional)",
+    id = "shopName",
+    nameAttr = "shopName",
+    placeholder = "e.g., Neera's Gilded Emporium",
+    label = "Shop name (optional)",
     className,
-    buttonAriaLabel = "Randomize name",
-}: SpellbookNameFieldProps) {
+    buttonAriaLabel = "Randomize shop name",
+}: MagicShopNameFieldProps) {
     return (
         <div className={className}>
             <Label htmlFor={id}>{label}</Label>
@@ -298,7 +404,7 @@ export default function SpellbookNameField({
                     variant="outline"
                     aria-label={buttonAriaLabel}
                     title={buttonAriaLabel}
-                    onClick={() => onChange(randomSpellbookName())}
+                    onClick={() => onChange(randomMagicShopName())}
                 >
                     <Dices className="h-4 w-4" />
                 </Button>

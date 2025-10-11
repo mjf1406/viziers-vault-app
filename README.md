@@ -27,10 +27,6 @@
         -   [x] set up basic blog and docs
     -   [ ] make upgrade to basic in partiesUpsell.tsx and spellbookUpsell.tsx actually upgrade the user
 
-### p0
-
--   blah blah
-
 ## Change Log
 
 ### 2025/10/11

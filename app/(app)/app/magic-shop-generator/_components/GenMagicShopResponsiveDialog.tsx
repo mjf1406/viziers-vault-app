@@ -293,35 +293,37 @@ export default function MagicShopGeneratorDialog({
                                 value="by-settlement"
                                 className="space-y-3"
                             >
-                                <div className="space-y-2">
-                                    <div className="flex items-end justify-between gap-2">
-                                        <div className="flex-1 space-y-2">
-                                            <Label>Pick a world</Label>
-                                            <WorldSelect
-                                                value={worldId ?? undefined}
-                                                onChange={(v) => {
-                                                    setWorldId(v);
-                                                    setSettlementId(null);
-                                                }}
-                                            />
+                                <FieldGroup className="flex !flex-row gap-4">
+                                    <Field className="">
+                                        <FieldLabel>Pick a world</FieldLabel>
+                                        <div className="flex items-center gap-1">
+                                            <div className="flex-1">
+                                                <WorldSelect
+                                                    value={worldId ?? undefined}
+                                                    onChange={(v) => {
+                                                        setWorldId(v);
+                                                        setSettlementId(null);
+                                                    }}
+                                                    placeholder="Select world"
+                                                />
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                aria-label="Create world"
+                                                onClick={() =>
+                                                    setWorldDialogOpen(true)
+                                                }
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            className="mt-6"
-                                            onClick={() =>
-                                                setWorldDialogOpen(true)
-                                            }
-                                        >
-                                            <Plus className="mr-1 h-4 w-4" />{" "}
-                                            Create world
-                                        </Button>
-                                    </div>
-                                    <div className="mt-2">
-                                        <div className="flex items-end justify-between gap-2">
-                                            <div className="flex-1 space-y-2">
-                                                <Label>Pick a city</Label>
+                                    </Field>
+                                    <Field className="">
+                                        <FieldLabel>Pick a city</FieldLabel>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1">
                                                 <SettlementSelect
                                                     worldId={worldId}
                                                     value={
@@ -331,27 +333,28 @@ export default function MagicShopGeneratorDialog({
                                                     onChange={(v) =>
                                                         setSettlementId(v)
                                                     }
+                                                    placeholder="Select settlement"
                                                 />
                                             </div>
-                                            {worldId ? (
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="mt-6"
-                                                    onClick={() =>
-                                                        setSettlementDialogOpen(
-                                                            true
-                                                        )
-                                                    }
-                                                >
-                                                    <Plus className="mr-1 h-4 w-4" />{" "}
-                                                    Create settlement
-                                                </Button>
-                                            ) : null}
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                aria-label="Create settlement"
+                                                onClick={() =>
+                                                    setSettlementDialogOpen(
+                                                        true
+                                                    )
+                                                }
+                                                disabled={!worldId}
+                                                aria-disabled={!worldId}
+                                                className="disabled:cursor-not-allowed"
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                    </div>
-                                </div>
+                                    </Field>
+                                </FieldGroup>
                             </TabsContent>
                         </Tabs>
 

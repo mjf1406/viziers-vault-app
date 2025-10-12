@@ -31,7 +31,7 @@
 
 ### 2025/10/12
 
--   Generated magic shop dialog done
+-   Generate magic shop dialog done
 -   create settlement dialog done
 -   create world dialog done
 

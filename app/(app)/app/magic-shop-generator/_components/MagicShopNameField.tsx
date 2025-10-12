@@ -388,7 +388,12 @@ export default function MagicShopNameField({
 }: MagicShopNameFieldProps) {
     return (
         <div className={className}>
-            <Label htmlFor={id}>{label}</Label>
+            <Label
+                htmlFor={id}
+                className="mb-2"
+            >
+                {label}
+            </Label>
             <div className="mt-1 flex items-center gap-2">
                 <Input
                     id={id}

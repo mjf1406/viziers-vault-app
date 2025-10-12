@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,13 +22,26 @@ import {
     CredenzaHeader,
     CredenzaTitle,
 } from "@/components/ui/credenza";
-import { Dices, Loader2 } from "lucide-react";
+import { Dices, Loader2, Plus } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import MagicShopNameField from "./MagicShopNameField";
 import WorldSelect from "./WorldSelect";
 import SettlementSelect from "./SettlementSelect";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import WealthRadio from "@/components/settlements/WealthRadio";
+import MagicnessRadio from "@/components/settlements/MagicnessRadio";
+import StockTypesCheckboxes from "@/components/settlements/StockTypesCheckboxes";
+import CreateWorldResponsiveDialog from "@/app/(app)/app/world-generator/_components/CreateWorldResponsiveDialog";
+import CreateSettlementResponsiveDialog from "@/app/(app)/app/world-generator/_components/CreateSettlementResponsiveDialog";
+import { NumberStepperInput } from "@/components/ui/number-stepper";
+import db from "@/lib/db";
+import type {
+    MagicnessLevel,
+    WealthLevel,
+    ShopType,
+} from "@/lib/constants/settlements";
 
 export type GenerateMagicShopOpts = {
     population:
@@ -38,13 +51,13 @@ export type GenerateMagicShopOpts = {
         | "city"
         | "metropolis"
         | "random";
-    wealth: "poor" | "modest" | "prosperous" | "opulent" | "random";
-    magicLevel: "low" | "moderate" | "high" | "legendary" | "random";
+    wealth: WealthLevel | "random";
+    magicness: MagicnessLevel | "random";
+    stockTypes?: ShopType[] | null;
     worldId?: string | null;
     settlementId?: string | null;
     quantity?: number;
     overrideWealth?: GenerateMagicShopOpts["wealth"] | null;
-    overrideMagicLevel?: GenerateMagicShopOpts["magicLevel"] | null;
     stockIntensity?: "sparse" | "normal" | "lush";
 };
 
@@ -53,7 +66,7 @@ type MagicShopInitial = {
     name?: string;
     population?: GenerateMagicShopOpts["population"];
     wealth?: GenerateMagicShopOpts["wealth"];
-    magicLevel?: GenerateMagicShopOpts["magicLevel"];
+    magicness?: GenerateMagicShopOpts["magicness"];
 };
 
 type MagicShopGeneratorDialogProps = {
@@ -100,23 +113,40 @@ export default function MagicShopGeneratorDialog({
     const [wealth, setWealth] = useState<GenerateMagicShopOpts["wealth"]>(
         (initial?.wealth as any) ?? "random"
     );
-    const [magicLevel, setMagicLevel] = useState<
-        GenerateMagicShopOpts["magicLevel"]
-    >((initial?.magicLevel as any) ?? "random");
+    const [magicness, setMagicness] = useState<
+        GenerateMagicShopOpts["magicness"]
+    >((initial?.magicness as any) ?? "random");
+    const [stockTypes, setStockTypes] = useState<ShopType[]>([]);
 
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [worldId, setWorldId] = useState<string | null>(null);
     const [settlementId, setSettlementId] = useState<string | null>(null);
-    const [quantity, setQuantity] = useState<string>("1");
+    const [quantity, setQuantity] = useState<number | null>(1);
     const [overrideWealth, setOverrideWealth] = useState<
         GenerateMagicShopOpts["wealth"] | null
-    >(null);
-    const [overrideMagic, setOverrideMagic] = useState<
-        GenerateMagicShopOpts["magicLevel"] | null
     >(null);
     const [stockIntensity, setStockIntensity] = useState<
         "sparse" | "normal" | "lush"
     >("normal");
+    const [worldDialogOpen, setWorldDialogOpen] = useState(false);
+    const [settlementDialogOpen, setSettlementDialogOpen] = useState(false);
+
+    // Load worlds with settlements so we can map a selected city -> its attributes
+    const { data: worldsData } = db.useQuery({ worlds: { settlements: {} } });
+    const allSettlements = useMemo(() => {
+        const worlds = (worldsData?.worlds ?? []) as any[];
+        return worlds.flatMap((w: any) => (w?.settlements ?? []) as any[]);
+    }, [worldsData]);
+
+    // When a settlement is selected, auto-populate wealth, magicness, and stock types
+    useEffect(() => {
+        if (!settlementId) return;
+        const s = allSettlements.find((s: any) => s.id === settlementId);
+        if (!s) return;
+        if (s.wealth) setWealth(s.wealth);
+        if (s.magicness) setMagicness(s.magicness);
+        if (Array.isArray(s.shopTypes)) setStockTypes(s.shopTypes);
+    }, [settlementId, allSettlements]);
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -130,6 +160,18 @@ export default function MagicShopGeneratorDialog({
             return choices[Math.floor(Math.random() * choices.length)];
         };
 
+        // basic validation
+        const qtyRaw = typeof quantity === "number" ? quantity : 1;
+        const qty = Math.min(10, Math.max(1, Number(qtyRaw) || 1));
+        if (!Number.isFinite(qty) || qty < 1 || qty > 10) {
+            toast.error("Please enter a valid quantity");
+            return;
+        }
+        if (!stockTypes || stockTypes.length === 0) {
+            toast.error("Please select at least one stock type");
+            return;
+        }
+
         const resolvedPopulation = resolveRandom(population as any, [
             "hamlet",
             "village",
@@ -137,18 +179,9 @@ export default function MagicShopGeneratorDialog({
             "city",
             "metropolis",
         ]) as GenerateMagicShopOpts["population"];
-        const resolvedWealth = resolveRandom(wealth as any, [
-            "poor",
-            "modest",
-            "prosperous",
-            "opulent",
-        ]) as GenerateMagicShopOpts["wealth"];
-        const resolvedMagic = resolveRandom(magicLevel as any, [
-            "low",
-            "moderate",
-            "high",
-            "legendary",
-        ]) as GenerateMagicShopOpts["magicLevel"];
+        const resolvedWealth = wealth as GenerateMagicShopOpts["wealth"];
+        const resolvedMagicness =
+            magicness as GenerateMagicShopOpts["magicness"];
 
         setIsGenerating(true);
         try {
@@ -156,12 +189,12 @@ export default function MagicShopGeneratorDialog({
             const payload: GenerateMagicShopOpts = {
                 population: resolvedPopulation,
                 wealth: resolvedWealth,
-                magicLevel: resolvedMagic,
+                magicness: resolvedMagicness,
+                stockTypes: stockTypes ?? undefined,
                 worldId,
                 settlementId,
-                quantity: Math.max(1, Number(quantity) || 1),
+                quantity: qty,
                 overrideWealth,
-                overrideMagicLevel: overrideMagic,
                 stockIntensity,
             };
 
@@ -239,24 +272,21 @@ export default function MagicShopGeneratorDialog({
                                 value="by-population"
                                 className="space-y-3"
                             >
-                                <div>
-                                    <Label htmlFor="population">
+                                <Field>
+                                    <FieldLabel htmlFor="population">
                                         Population
-                                    </Label>
-                                    <input
+                                    </FieldLabel>
+                                    <NumberStepperInput
                                         id="population"
-                                        className="mt-1 w-full rounded border px-3 py-2"
-                                        inputMode="numeric"
-                                        type="number"
                                         placeholder="e.g., 20000"
-                                        onChange={(e) => {
-                                            // Set world/settlement null when typing population
+                                        onValueChange={() => {
                                             setWorldId(null);
                                             setSettlementId(null);
                                             setPopulation("random");
                                         }}
+                                        min={0}
                                     />
-                                </div>
+                                </Field>
                             </TabsContent>
 
                             <TabsContent
@@ -264,99 +294,114 @@ export default function MagicShopGeneratorDialog({
                                 className="space-y-3"
                             >
                                 <div className="space-y-2">
-                                    <Label>Pick a world</Label>
-                                    <WorldSelect
-                                        value={worldId ?? undefined}
-                                        onChange={(v) => {
-                                            setWorldId(v);
-                                            setSettlementId(null);
-                                        }}
-                                    />
+                                    <div className="flex items-end justify-between gap-2">
+                                        <div className="flex-1 space-y-2">
+                                            <Label>Pick a world</Label>
+                                            <WorldSelect
+                                                value={worldId ?? undefined}
+                                                onChange={(v) => {
+                                                    setWorldId(v);
+                                                    setSettlementId(null);
+                                                }}
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            className="mt-6"
+                                            onClick={() =>
+                                                setWorldDialogOpen(true)
+                                            }
+                                        >
+                                            <Plus className="mr-1 h-4 w-4" />{" "}
+                                            Create world
+                                        </Button>
+                                    </div>
                                     <div className="mt-2">
-                                        <Label>Pick a city</Label>
-                                        <SettlementSelect
-                                            worldId={worldId}
-                                            value={settlementId ?? undefined}
-                                            onChange={(v) => setSettlementId(v)}
-                                        />
+                                        <div className="flex items-end justify-between gap-2">
+                                            <div className="flex-1 space-y-2">
+                                                <Label>Pick a city</Label>
+                                                <SettlementSelect
+                                                    worldId={worldId}
+                                                    value={
+                                                        settlementId ??
+                                                        undefined
+                                                    }
+                                                    onChange={(v) =>
+                                                        setSettlementId(v)
+                                                    }
+                                                />
+                                            </div>
+                                            {worldId ? (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="mt-6"
+                                                    onClick={() =>
+                                                        setSettlementDialogOpen(
+                                                            true
+                                                        )
+                                                    }
+                                                >
+                                                    <Plus className="mr-1 h-4 w-4" />{" "}
+                                                    Create settlement
+                                                </Button>
+                                            ) : null}
+                                        </div>
                                     </div>
                                 </div>
                             </TabsContent>
                         </Tabs>
 
                         {/* Next steps */}
-                        <div>
-                            <Label htmlFor="quantity">Quantity of shops</Label>
-                            <input
-                                id="quantity"
-                                className="mt-1 w-full rounded border px-3 py-2"
-                                inputMode="numeric"
-                                value={quantity}
-                                onChange={(e) => setQuantity(e.target.value)}
+                        <FieldGroup>
+                            <Field>
+                                <FieldLabel htmlFor="quantity">
+                                    Quantity of shops
+                                </FieldLabel>
+                                <NumberStepperInput
+                                    id="quantity"
+                                    value={quantity ?? undefined}
+                                    onValueChange={(v) =>
+                                        setQuantity(
+                                            typeof v === "number"
+                                                ? Math.min(10, Math.max(1, v))
+                                                : 1
+                                        )
+                                    }
+                                    min={1}
+                                    max={10}
+                                />
+                            </Field>
+                        </FieldGroup>
+
+                        <div className="space-y-2">
+                            <Label>Wealth</Label>
+                            <WealthRadio
+                                value={wealth}
+                                onChange={(v) => setWealth(v as any)}
+                                includeRandom
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Magicness</Label>
+                            <MagicnessRadio
+                                value={magicness}
+                                onChange={(v) => setMagicness(v as any)}
+                                includeRandom
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Stock Types</Label>
+                            <StockTypesCheckboxes
+                                values={stockTypes}
+                                onChange={setStockTypes}
                             />
                         </div>
 
-                        <div>
-                            <Label>Wealth override (optional)</Label>
-                            <Select
-                                value={overrideWealth ?? "__default__"}
-                                onValueChange={(v) =>
-                                    setOverrideWealth(
-                                        v === "__default__" ? null : (v as any)
-                                    )
-                                }
-                            >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Use settlement/world default" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="__default__">
-                                        Default
-                                    </SelectItem>
-                                    <SelectItem value="poor">Poor</SelectItem>
-                                    <SelectItem value="modest">
-                                        Modest
-                                    </SelectItem>
-                                    <SelectItem value="prosperous">
-                                        Prosperous
-                                    </SelectItem>
-                                    <SelectItem value="opulent">
-                                        Opulent
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div>
-                            <Label>Magicness override (optional)</Label>
-                            <Select
-                                value={overrideMagic ?? "__default__"}
-                                onValueChange={(v) =>
-                                    setOverrideMagic(
-                                        v === "__default__" ? null : (v as any)
-                                    )
-                                }
-                            >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Use settlement/world default" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="__default__">
-                                        Default
-                                    </SelectItem>
-                                    <SelectItem value="low">Low</SelectItem>
-                                    <SelectItem value="moderate">
-                                        Moderate
-                                    </SelectItem>
-                                    <SelectItem value="high">High</SelectItem>
-                                    <SelectItem value="legendary">
-                                        Legendary
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div>
+                        <div className="space-y-2">
                             <Label>Shop stock for this generation</Label>
                             <Select
                                 value={stockIntensity}
@@ -379,81 +424,50 @@ export default function MagicShopGeneratorDialog({
                             </Select>
                         </div>
 
-                        <div>
-                            <Label htmlFor="wealth">Wealth</Label>
-                            <Select
-                                value={wealth}
-                                onValueChange={(v) => setWealth(v as any)}
-                            >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Random" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random">
-                                        Random
-                                    </SelectItem>
-                                    <SelectItem value="poor">Poor</SelectItem>
-                                    <SelectItem value="modest">
-                                        Modest
-                                    </SelectItem>
-                                    <SelectItem value="prosperous">
-                                        Prosperous
-                                    </SelectItem>
-                                    <SelectItem value="opulent">
-                                        Opulent
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div>
-                            <Label htmlFor="magicLevel">Magic Level</Label>
-                            <Select
-                                value={magicLevel}
-                                onValueChange={(v) => setMagicLevel(v as any)}
-                            >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue placeholder="Random" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random">
-                                        Random
-                                    </SelectItem>
-                                    <SelectItem value="low">Low</SelectItem>
-                                    <SelectItem value="moderate">
-                                        Moderate
-                                    </SelectItem>
-                                    <SelectItem value="high">High</SelectItem>
-                                    <SelectItem value="legendary">
-                                        Legendary
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <CreateWorldResponsiveDialog
+                            open={worldDialogOpen}
+                            onOpenChange={setWorldDialogOpen}
+                            onCreated={(id) => {
+                                setWorldId(id);
+                                setWorldDialogOpen(false);
+                            }}
+                        />
+                        <CreateSettlementResponsiveDialog
+                            open={settlementDialogOpen}
+                            onOpenChange={setSettlementDialogOpen}
+                            defaultWorldId={worldId ?? undefined}
+                            onCreated={(sid, wid) => {
+                                setWorldId(wid);
+                                setSettlementId(sid);
+                                setSettlementDialogOpen(false);
+                            }}
+                        />
                     </CredenzaBody>
 
-                    <CredenzaFooter className="flex items-center justify-between gap-3">
+                    <CredenzaFooter>
                         <CredenzaClose asChild>
                             <Button
                                 type="button"
                                 variant="outline"
-                                disabled={isGenerating}
+                                className="flex-1"
                             >
                                 Cancel
                             </Button>
                         </CredenzaClose>
                         <Button
                             type="submit"
+                            className="flex-1"
                             disabled={isGenerating}
                         >
                             {isGenerating ? (
                                 <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Generating...
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Generate Magic Shop
                                 </>
                             ) : (
                                 <>
-                                    <Dices className="mr-2 h-4 w-4" /> Generate
+                                    <Dices className="h-4 w-4" />
+                                    Generate Magic Shop
                                 </>
                             )}
                         </Button>

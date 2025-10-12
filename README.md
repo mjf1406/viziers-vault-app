@@ -29,6 +29,12 @@
 
 ## Change Log
 
+### 2025/10/12
+
+-   Generated magic shop dialog done
+-   create settlement dialog done
+-   create world dialog done
+
 ### 2025/10/11
 
 -   getting started on magic shop generator

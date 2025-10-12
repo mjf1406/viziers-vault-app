@@ -155,7 +155,7 @@ const _schema = i.schema({
             name: i.string(),
             population: i.number().optional().indexed(),
             wealth: i.string().optional().indexed(), // poor, modest, prosperous, opulent
-            magicLevel: i.string().optional().indexed(), // low, moderate, high, legendary
+            magicness: i.string().optional().indexed(), // low, moderate, high, legendary
             shopTypes: i.json().optional(), // ["magic", "general", ...]
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),

@@ -24,13 +24,21 @@ export default function SettlementSelect({
     placeholder?: string;
 }) {
     const { isLoading, error, data } = db.useQuery({
-        settlements: {},
+        worlds: { settlements: {} },
     });
 
     const settlements = useMemo(() => {
-        const all = (data?.settlements ?? []) as any[];
-        const filtered = worldId ? all.filter((s) => s.world === worldId) : all;
-        return filtered.map((s) => ({ id: s.id, name: s.name || "Untitled" }));
+        const worlds = (data?.worlds ?? []) as any[];
+        if (worldId) {
+            const w = worlds.find((w: any) => w.id === worldId);
+            const list = ((w?.settlements ?? []) as any[]).map((s) => ({
+                id: s.id,
+                name: s.name || "Untitled",
+            }));
+            return list;
+        }
+        const all = worlds.flatMap((w: any) => (w?.settlements ?? []) as any[]);
+        return all.map((s: any) => ({ id: s.id, name: s.name || "Untitled" }));
     }, [data, worldId]);
 
     return (

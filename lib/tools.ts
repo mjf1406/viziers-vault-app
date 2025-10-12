@@ -39,7 +39,7 @@ export const tools: Tool[] = [
         title: "Magic Shop Generator",
         header: "My Magic Shops",
         description:
-            "Generate magic shops based on city population, wealth, and magic level.",
+            "Generate magic shops based on city population, wealth, and magicness.",
         status: "Alpha 1",
         icon: "Store",
         released: "new",
@@ -47,7 +47,7 @@ export const tools: Tool[] = [
             "I love to run roguelite D&D campaigns, where everything is randomly generated. This started just for basic magic items, but quickly expanded to everything that can be purchased in D&D 5e due to a player buying just a few too many spell components and completely wrecking the world. You remember this, don't you, Juno?",
         features: [
             "Population-based inventory",
-            "Wealth and magic level scaling",
+            "Wealth and magicness scaling",
             "Custom world and city creation",
             "CSV export",
             "Permalink generation (Premium)",

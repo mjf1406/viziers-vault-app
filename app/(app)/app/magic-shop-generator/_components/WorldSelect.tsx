@@ -24,7 +24,7 @@ export default function WorldSelect({
     placeholder?: string;
 }) {
     const { isLoading, error, data } = db.useQuery({
-        worlds: {},
+        worlds: { settlements: {} },
     });
 
     const worlds = (data?.worlds ?? []).map((w: any) => ({

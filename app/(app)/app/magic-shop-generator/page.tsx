@@ -61,14 +61,14 @@ export default function MagicShopGeneratorPage() {
         const name = r.name ?? "Untitled Shop";
         const population = r.options?.population ?? "random";
         const wealth = r.options?.wealth ?? "random";
-        const magicLevel = r.options?.magicLevel ?? "random";
+        const magicness = r.options?.magicness ?? "random";
 
         setEditingShop({
             id,
             name,
             population,
             wealth,
-            magicLevel,
+            magicness,
         });
         setEditOpen(true);
     };
@@ -171,7 +171,7 @@ export default function MagicShopGeneratorPage() {
                             name: editingShop.name ?? "",
                             population: editingShop.population,
                             wealth: editingShop.wealth,
-                            magicLevel: editingShop.magicLevel,
+                            magicness: editingShop.magicness,
                         }}
                         open={editOpen}
                         onOpenChange={handleEditOpenChange}

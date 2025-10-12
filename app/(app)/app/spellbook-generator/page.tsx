@@ -122,17 +122,6 @@ export default function SpellbookPage() {
         }
     };
 
-    if (isLoading)
-        return (
-            <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
-                <Loader2
-                    className="animate-spin"
-                    size={124}
-                />
-                Loading parties...
-            </div>
-        );
-
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
@@ -167,17 +156,26 @@ export default function SpellbookPage() {
                 </div>
 
                 {/* Create dialog (controlled) */}
-                <SpellbookGeneratorDialog
-                    mode="create"
-                    open={createOpen}
-                    onOpenChange={handleCreateOpenChange}
-                    hideTitleOnMobile={true}
-                    addPending={addPending}
-                    removePending={removePending}
-                />
+                {isLoading ? (
+                    <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
+                        <Loader2
+                            className="animate-spin"
+                            size={124}
+                        />
+                        Loading parties...
+                    </div>
+                ) : (
+                    <SpellbookGeneratorDialog
+                        mode="create"
+                        open={createOpen}
+                        onOpenChange={handleCreateOpenChange}
+                        hideTitleOnMobile={true}
+                        addPending={addPending}
+                        removePending={removePending}
+                    />
+                )}
 
-                {/* Edit dialog (conditioned on editingParty) */}
-                {editingParty && (
+                {!isLoading && editingParty && (
                     <SpellbookGeneratorDialog
                         key={
                             "spellbook-edit-" +

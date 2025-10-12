@@ -75,7 +75,9 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                     .includes("party");
 
                                 const canShowPlus = isParty
-                                    ? partyAllowedPlans.includes(plan || "")
+                                    ? partyAllowedPlans.includes(
+                                          (plan || "").toLowerCase()
+                                      )
                                     : true;
 
                                 return (

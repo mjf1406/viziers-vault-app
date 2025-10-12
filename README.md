@@ -31,6 +31,7 @@
 
 ### 2025/10/12
 
+-   fixed party plus sidebar button for premium
 -   Generate magic shop dialog done
 -   create settlement dialog done
 -   create world dialog done

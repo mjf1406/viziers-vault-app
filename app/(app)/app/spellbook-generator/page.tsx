@@ -3,13 +3,13 @@
 // app/parties/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { BookOpen, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { GenerateOpts } from "./_components/GenSpellbookResponsiveDialog";
 import { toast } from "sonner";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
@@ -17,10 +17,7 @@ import SpellbooksGrid from "./_components/SpellbooksGrid";
 
 const SpellbookGeneratorDialog = dynamic(
     () => import("./_components/GenSpellbookResponsiveDialog"),
-    {
-        ssr: false,
-        loading: () => <Skeleton className="h-10 w-40 rounded-md" />,
-    }
+    { ssr: false }
 );
 
 export default function SpellbookPage() {
@@ -173,42 +170,50 @@ export default function SpellbookPage() {
                         Loading parties...
                     </div>
                 ) : (
-                    <SpellbookGeneratorDialog
-                        mode="create"
-                        open={createOpen}
-                        onOpenChange={handleCreateOpenChange}
-                        hideTitleOnMobile={true}
-                        addPending={addPending}
-                        removePending={removePending}
-                    />
+                    <Suspense
+                        fallback={<Skeleton className="h-10 w-[200px]" />}
+                    >
+                        <SpellbookGeneratorDialog
+                            mode="create"
+                            open={createOpen}
+                            onOpenChange={handleCreateOpenChange}
+                            hideTitleOnMobile={true}
+                            addPending={addPending}
+                            removePending={removePending}
+                        />
+                    </Suspense>
                 )}
 
                 {!isLoading && editingParty && (
-                    <SpellbookGeneratorDialog
-                        key={
-                            "spellbook-edit-" +
-                            (editingParty.id ??
-                                editingParty._id ??
-                                String(Date.now()))
-                        }
-                        mode="edit"
-                        initial={{
-                            id:
-                                editingParty.id ??
-                                editingParty._id ??
-                                editingParty.spellbookId,
-                            name: editingParty.name ?? "",
-                            level: editingParty.level,
-                            schools: editingParty.schools,
-                            classes: editingParty.classes,
-                        }}
-                        open={editOpen}
-                        onOpenChange={handleEditOpenChange}
-                        hideTitleOnMobile={true}
-                        addPending={addPending}
-                        removePending={removePending}
-                        onGenerate={handleEditGenerate}
-                    />
+                    <Suspense
+                        fallback={<Skeleton className="h-10 w-[200px]" />}
+                    >
+                        <SpellbookGeneratorDialog
+                            key={
+                                "spellbook-edit-" +
+                                (editingParty.id ??
+                                    editingParty._id ??
+                                    String(Date.now()))
+                            }
+                            mode="edit"
+                            initial={{
+                                id:
+                                    editingParty.id ??
+                                    editingParty._id ??
+                                    editingParty.spellbookId,
+                                name: editingParty.name ?? "",
+                                level: editingParty.level,
+                                schools: editingParty.schools,
+                                classes: editingParty.classes,
+                            }}
+                            open={editOpen}
+                            onOpenChange={handleEditOpenChange}
+                            hideTitleOnMobile={true}
+                            addPending={addPending}
+                            removePending={removePending}
+                            onGenerate={handleEditGenerate}
+                        />
+                    </Suspense>
                 )}
             </div>
 
@@ -223,3 +228,5 @@ export default function SpellbookPage() {
         </div>
     );
 }
+
+/** @format */

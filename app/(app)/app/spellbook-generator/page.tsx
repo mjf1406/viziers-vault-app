@@ -8,12 +8,20 @@ import { BookOpen, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import SpellbookGeneratorDialog, {
-    type GenerateOpts,
-} from "./_components/GenSpellbookResponsiveDialog";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { GenerateOpts } from "./_components/GenSpellbookResponsiveDialog";
 import { toast } from "sonner";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
 import SpellbooksGrid from "./_components/SpellbooksGrid";
+
+const SpellbookGeneratorDialog = dynamic(
+    () => import("./_components/GenSpellbookResponsiveDialog"),
+    {
+        ssr: false,
+        loading: () => <Skeleton className="h-10 w-40 rounded-md" />,
+    }
+);
 
 export default function SpellbookPage() {
     const [createOpen, setCreateOpen] = useState(false);

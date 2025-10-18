@@ -29,6 +29,10 @@
 
 ## Change Log
 
+### 2025/10/18
+
+-   testing dynamic import of large components to reduce initial page load size and removal of loading.tsx
+
 ### 2025/10/12
 
 -   fixed party plus sidebar button for premium

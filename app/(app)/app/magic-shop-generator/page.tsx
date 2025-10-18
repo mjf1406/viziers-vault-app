@@ -7,12 +7,20 @@ import { Store, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import MagicShopGeneratorDialog, {
-    type GenerateMagicShopOpts,
-} from "./_components/GenMagicShopResponsiveDialog";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsiveDialog";
 import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
+
+const MagicShopGeneratorDialog = dynamic(
+    () => import("./_components/GenMagicShopResponsiveDialog"),
+    {
+        ssr: false,
+        loading: () => <Skeleton className="h-10 w-40 rounded-md" />,
+    }
+);
 
 export default function MagicShopGeneratorPage() {
     const [createOpen, setCreateOpen] = useState(false);

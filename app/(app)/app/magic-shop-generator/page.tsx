@@ -2,22 +2,16 @@
 
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import dynamic from "next/dynamic";
-import { Store, Dices, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Store, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsiveDialog";
 import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
-
-const MagicShopGeneratorDialog = dynamic(
-    () => import("./_components/GenMagicShopResponsiveDialog"),
-    { ssr: false }
-);
+import MagicShopGeneratorDialog from "./_components/GenMagicShopResponsiveDialog";
 
 export default function MagicShopGeneratorPage() {
     const [createOpen, setCreateOpen] = useState(false);
@@ -139,59 +133,43 @@ export default function MagicShopGeneratorPage() {
                     </Button>
                 </div>
 
-                {isLoading ? (
-                    <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
-                        <Loader2
-                            className="animate-spin"
-                            size={124}
-                        />
-                        Loading shops...
-                    </div>
-                ) : (
-                    <Suspense
-                        fallback={<Skeleton className="h-10 w-[200px]" />}
-                    >
-                        <MagicShopGeneratorDialog
-                            mode="create"
-                            open={createOpen}
-                            onOpenChange={handleCreateOpenChange}
-                            hideTitleOnMobile={true}
-                            addPending={addPending}
-                            removePending={removePending}
-                        />
-                    </Suspense>
+                {!isLoading && (
+                    <MagicShopGeneratorDialog
+                        mode="create"
+                        open={createOpen}
+                        onOpenChange={handleCreateOpenChange}
+                        hideTitleOnMobile={true}
+                        addPending={addPending}
+                        removePending={removePending}
+                    />
                 )}
 
                 {!isLoading && editingShop && (
-                    <Suspense
-                        fallback={<Skeleton className="h-10 w-[200px]" />}
-                    >
-                        <MagicShopGeneratorDialog
-                            key={
-                                "magic-shop-edit-" +
-                                (editingShop.id ??
-                                    editingShop._id ??
-                                    String(Date.now()))
-                            }
-                            mode="edit"
-                            initial={{
-                                id:
-                                    editingShop.id ??
-                                    editingShop._id ??
-                                    editingShop.magicShopId,
-                                name: editingShop.name ?? "",
-                                population: editingShop.population,
-                                wealth: editingShop.wealth,
-                                magicness: editingShop.magicness,
-                            }}
-                            open={editOpen}
-                            onOpenChange={handleEditOpenChange}
-                            hideTitleOnMobile={true}
-                            addPending={addPending}
-                            removePending={removePending}
-                            onGenerate={handleEditGenerate}
-                        />
-                    </Suspense>
+                    <MagicShopGeneratorDialog
+                        key={
+                            "magic-shop-edit-" +
+                            (editingShop.id ??
+                                editingShop._id ??
+                                String(Date.now()))
+                        }
+                        mode="edit"
+                        initial={{
+                            id:
+                                editingShop.id ??
+                                editingShop._id ??
+                                editingShop.magicShopId,
+                            name: editingShop.name ?? "",
+                            population: editingShop.population,
+                            wealth: editingShop.wealth,
+                            magicness: editingShop.magicness,
+                        }}
+                        open={editOpen}
+                        onOpenChange={handleEditOpenChange}
+                        hideTitleOnMobile={true}
+                        addPending={addPending}
+                        removePending={removePending}
+                        onGenerate={handleEditGenerate}
+                    />
                 )}
             </div>
 

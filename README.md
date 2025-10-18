@@ -31,6 +31,7 @@
 
 ### 2025/10/18
 
+-   removed dynamic imports and instead use loading.tsx with skeletons resembling the UI being loaded
 -   testing dynamic import of large components to reduce initial page load size and removal of loading.tsx
 
 ### 2025/10/12

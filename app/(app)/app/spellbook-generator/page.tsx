@@ -4,18 +4,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Dices, Loader2 } from "lucide-react";
+import { BookOpen, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
 import SpellbooksGrid from "./_components/SpellbooksGrid";
-import dynamic from "next/dynamic";
-
-const SpellbookGeneratorDialog = dynamic(
-    () => import("./_components/GenSpellbookResponsiveDialog"),
-    { ssr: false }
-);
+import SpellbookGeneratorDialog from "./_components/GenSpellbookResponsiveDialog";
 
 // Separate component for data-dependent content
 function SpellbookContent({
@@ -59,17 +54,6 @@ export default function SpellbookPage() {
             setCreateOpen(false);
         }
     }, [modalOpen, createOpen]);
-
-    if (isLoading)
-        return (
-            <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
-                <Loader2
-                    className="animate-spin"
-                    size={124}
-                />
-                Loading spellbooks...
-            </div>
-        );
 
     const addPending = (id: string) => {
         setPendingIds((prev) => {
@@ -163,16 +147,18 @@ export default function SpellbookPage() {
                 </div>
 
                 {/* Create dialog (controlled) */}
-                <SpellbookGeneratorDialog
-                    mode="create"
-                    open={createOpen}
-                    onOpenChange={handleCreateOpenChange}
-                    hideTitleOnMobile={true}
-                    addPending={addPending}
-                    removePending={removePending}
-                />
+                {!isLoading && (
+                    <SpellbookGeneratorDialog
+                        mode="create"
+                        open={createOpen}
+                        onOpenChange={handleCreateOpenChange}
+                        hideTitleOnMobile={true}
+                        addPending={addPending}
+                        removePending={removePending}
+                    />
+                )}
 
-                {editingParty && (
+                {!isLoading && editingParty && (
                     <SpellbookGeneratorDialog
                         key={
                             "spellbook-edit-" +

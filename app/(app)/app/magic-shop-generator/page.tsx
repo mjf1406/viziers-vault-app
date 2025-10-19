@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Store, Dices, Loader2 } from "lucide-react";
+import { Store, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -11,12 +11,7 @@ import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsive
 import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
-import dynamic from "next/dynamic";
-
-const MagicShopGeneratorDialog = dynamic(
-    () => import("./_components/GenMagicShopResponsiveDialog"),
-    { ssr: false }
-);
+import MagicShopGeneratorDialog from "./_components/GenMagicShopResponsiveDialog";
 
 // Separate component for data-dependent content
 function MagicShopContent({
@@ -59,17 +54,6 @@ export default function MagicShopGeneratorPage() {
             setCreateOpen(false);
         }
     }, [modalOpen, createOpen]);
-
-    if (isLoading)
-        return (
-            <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
-                <Loader2
-                    className="animate-spin"
-                    size={124}
-                />
-                Loading magic shops...
-            </div>
-        );
 
     const addPending = (id: string) => {
         setPendingIds((prev) => {
@@ -171,16 +155,18 @@ export default function MagicShopGeneratorPage() {
                     </Button>
                 </div>
 
-                <MagicShopGeneratorDialog
-                    mode="create"
-                    open={createOpen}
-                    onOpenChange={handleCreateOpenChange}
-                    hideTitleOnMobile={true}
-                    addPending={addPending}
-                    removePending={removePending}
-                />
+                {!isLoading && (
+                    <MagicShopGeneratorDialog
+                        mode="create"
+                        open={createOpen}
+                        onOpenChange={handleCreateOpenChange}
+                        hideTitleOnMobile={true}
+                        addPending={addPending}
+                        removePending={removePending}
+                    />
+                )}
 
-                {editingShop && (
+                {!isLoading && editingShop && (
                     <MagicShopGeneratorDialog
                         key={
                             "magic-shop-edit-" +

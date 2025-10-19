@@ -169,6 +169,12 @@
 .prose input[type="checkbox"] {
     margin-right: 0.5rem;
 }
+/* Strike-through checked task list items */
+.prose li.task-list-item:has(input[type="checkbox"]:checked) > p,
+.prose li.task-list-item:has(input[type="checkbox"]:checked) > span,
+.prose li.task-list-item:has(input[type="checkbox"]:checked) {
+    text-decoration: line-through;
+}
 .prose :where(h1, h2, h3, h4) {
     scroll-margin-top: 6rem;
 }

@@ -31,6 +31,7 @@
 
 ### 2025/10/19
 
+-   render roadmap from the R2 bucket file on build time
 -   UI: added pre-made worlds and settlements to magic shop generator
 -   BUG: finally fixed the loading.tsx being shown on every page load in prod except dashboard and parties by explicitly setting prefetch to true on all Link components in nav-main.tsx
 -   UI: edit spellbook only allows the changing of the name now

@@ -379,3 +379,102 @@ export async function renderMarkdown(
 export function listParams(section: "docs" | "blog"): { slug: string[] }[] {
     return listSectionSlugs(section).map((parts) => ({ slug: parts }));
 }
+
+// Render a raw markdown string (e.g., fetched from external storage) using the
+// same Obsidian-friendly pipeline as above. Since we are not on the filesystem,
+// we parse frontmatter from the string and convert Obsidian embeds to standard
+// markdown image links without section-relative rewriting.
+export async function renderMarkdownString(
+    markdown: string,
+    opts?: { assetsBaseUrl?: string }
+): Promise<RenderedMarkdown> {
+    const { content, data } = matter(markdown);
+
+    // Normalize single-line $$...$$ expressions into display blocks
+    const normalized = content.replace(
+        /^[\t ]*\$\$(.+?)\$\$[\t ]*$/gm,
+        (_m, expr) => {
+            return `$$\n${expr}\n$$`;
+        }
+    );
+
+    // Convert Obsidian image embeds ![[...]] into standard markdown images
+    const withEmbeds = normalized.replace(
+        /!\[\[([^\]]+)\]\]/g,
+        (_m, target: string) => {
+            const cleanTarget = target.trim();
+            const href = opts?.assetsBaseUrl
+                ? `${opts.assetsBaseUrl.replace(/\/$/, "")}/${cleanTarget}`
+                : cleanTarget;
+            return `![](${href})`;
+        }
+    );
+
+    // Remove the first H1 from the document to avoid duplicate titles
+    function remarkRemoveFirstH1() {
+        return (tree: any) => {
+            let removed = false;
+            visit(tree, "heading", (node, index, parent) => {
+                if (
+                    !removed &&
+                    (node as any).depth === 1 &&
+                    parent &&
+                    typeof index === "number"
+                ) {
+                    (parent as any).children.splice(index, 1);
+                    removed = true;
+                }
+            });
+        };
+    }
+
+    // Collect headings and assign slug ids that will survive into HTML
+    const collectedHeadings: Array<{
+        id: string;
+        text: string;
+        depth: number;
+    }> = [];
+    function remarkCollectHeadings() {
+        return (tree: any) => {
+            visit(tree, "heading", (node: any) => {
+                const depth: number = node.depth;
+                if (!Array.isArray(node.children)) return;
+                const text = node.children
+                    .filter((c: any) => c.type === "text" || c.value)
+                    .map((c: any) => (c.value ?? c.alt ?? "").toString())
+                    .join("")
+                    .trim();
+                if (!text) return;
+                const baseId = slugify(text);
+                let id = baseId;
+                // De-duplicate ids (rare but possible on long pages)
+                let i = 2;
+                while (collectedHeadings.some((h) => h.id === id)) {
+                    id = `${baseId}-${i++}`;
+                }
+                // Ensure id is attached so rehype-stringify emits it on the element
+                (node as any).data = (node as any).data || {};
+                (node as any).data.hProperties =
+                    (node as any).data.hProperties || {};
+                (node as any).data.hProperties.id = id;
+                collectedHeadings.push({ id, text, depth });
+            });
+        };
+    }
+
+    const vfile = await remark()
+        .use(gfm)
+        .use(remarkMath)
+        .use(remarkRemoveFirstH1)
+        .use(remarkCollectHeadings)
+        .use(remarkRehype)
+        .use(rehypeKatex)
+        .use(rehypeStringify)
+        .process(withEmbeds);
+
+    return {
+        html: String(vfile),
+        frontmatter: data,
+        headings: collectedHeadings,
+    };
+}

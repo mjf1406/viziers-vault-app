@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Store, Dices } from "lucide-react";
+import { Store, Dices, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -54,6 +54,17 @@ export default function MagicShopGeneratorPage() {
             setCreateOpen(false);
         }
     }, [modalOpen, createOpen]);
+
+    if (isLoading)
+        return (
+            <div className="p-4 xl:p-10 min-h-dvh flex flex-col items-center justify-center text-center">
+                <Loader2
+                    className="animate-spin"
+                    size={124}
+                />
+                Loading magic shops...
+            </div>
+        );
 
     const addPending = (id: string) => {
         setPendingIds((prev) => {
@@ -155,18 +166,16 @@ export default function MagicShopGeneratorPage() {
                     </Button>
                 </div>
 
-                {!isLoading && (
-                    <MagicShopGeneratorDialog
-                        mode="create"
-                        open={createOpen}
-                        onOpenChange={handleCreateOpenChange}
-                        hideTitleOnMobile={true}
-                        addPending={addPending}
-                        removePending={removePending}
-                    />
-                )}
+                <MagicShopGeneratorDialog
+                    mode="create"
+                    open={createOpen}
+                    onOpenChange={handleCreateOpenChange}
+                    hideTitleOnMobile={true}
+                    addPending={addPending}
+                    removePending={removePending}
+                />
 
-                {!isLoading && editingShop && (
+                {editingShop && (
                     <MagicShopGeneratorDialog
                         key={
                             "magic-shop-edit-" +

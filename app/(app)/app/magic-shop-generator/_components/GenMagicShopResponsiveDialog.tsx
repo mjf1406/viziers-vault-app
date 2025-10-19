@@ -37,6 +37,7 @@ import CreateWorldResponsiveDialog from "@/app/(app)/app/world-generator/_compon
 import CreateSettlementResponsiveDialog from "@/app/(app)/app/world-generator/_components/CreateSettlementResponsiveDialog";
 import { NumberStepperInput } from "@/components/ui/number-stepper";
 import db from "@/lib/db";
+import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import type {
     MagicnessLevel,
     WealthLevel,
@@ -135,7 +136,22 @@ export default function MagicShopGeneratorDialog({
     const { data: worldsData } = db.useQuery({ worlds: { settlements: {} } });
     const allSettlements = useMemo(() => {
         const worlds = (worldsData?.worlds ?? []) as any[];
-        return worlds.flatMap((w: any) => (w?.settlements ?? []) as any[]);
+        const dbSettlements = worlds.flatMap(
+            (w: any) => (w?.settlements ?? []) as any[]
+        );
+
+        const premadeSettlements = PREMADE_WORLDS.flatMap((w) =>
+            (w.settlements ?? []).map((s) => ({
+                // synthesize an id that won't collide with DB ids
+                id: `${w.id}:${s.name}`,
+                name: s.name,
+                wealth: s.wealth,
+                magicness: s.magicness,
+                shopTypes: s.shopTypes,
+            }))
+        );
+
+        return [...premadeSettlements, ...dbSettlements];
     }, [worldsData]);
 
     // When a settlement is selected, auto-populate wealth, magicness, and stock types
@@ -321,7 +337,9 @@ export default function MagicShopGeneratorDialog({
                                         </div>
                                     </Field>
                                     <Field className="">
-                                        <FieldLabel>Pick a city</FieldLabel>
+                                        <FieldLabel>
+                                            Pick a settlement
+                                        </FieldLabel>
                                         <div className="flex items-center gap-2">
                                             <div className="flex-1">
                                                 <SettlementSelect

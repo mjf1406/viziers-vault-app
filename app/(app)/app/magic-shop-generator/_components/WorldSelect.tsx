@@ -4,10 +4,14 @@
 
 import React from "react";
 import db from "@/lib/db";
+import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
+    SelectSeparator,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -27,10 +31,17 @@ export default function WorldSelect({
         worlds: { settlements: {} },
     });
 
-    const worlds = (data?.worlds ?? []).map((w: any) => ({
+    const dbWorlds = (data?.worlds ?? []).map((w: any) => ({
         id: w.id,
         name: w.name || "Untitled",
     }));
+
+    const premadeWorlds = PREMADE_WORLDS.map((w) => ({
+        id: w.id,
+        name: w.name,
+    }));
+
+    const worlds = [...premadeWorlds, ...dbWorlds];
 
     return (
         <Select
@@ -42,14 +53,35 @@ export default function WorldSelect({
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="__none__">None</SelectItem>
-                {worlds.map((w) => (
-                    <SelectItem
-                        key={w.id}
-                        value={w.id}
-                    >
-                        {w.name}
-                    </SelectItem>
-                ))}
+                {dbWorlds.length ? (
+                    <>
+                        {premadeWorlds.length ? <SelectSeparator /> : null}
+                        <SelectGroup>
+                            <SelectLabel>My worlds</SelectLabel>
+                            {dbWorlds.map((w) => (
+                                <SelectItem
+                                    key={`db-${w.id}`}
+                                    value={w.id}
+                                >
+                                    {w.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </>
+                ) : null}
+                {premadeWorlds.length ? (
+                    <SelectGroup>
+                        <SelectLabel>Pre-made worlds</SelectLabel>
+                        {premadeWorlds.map((w) => (
+                            <SelectItem
+                                key={`premade-${w.id}`}
+                                value={w.id}
+                            >
+                                {w.name}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                ) : null}
             </SelectContent>
         </Select>
     );

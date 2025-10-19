@@ -26,7 +26,6 @@ import { tx } from "@instantdb/react";
 import Link from "next/link";
 import { toTitleCase } from "@/lib/utils";
 import DownloadSpellbookCSVButton from "./DownloadSpellbookCSVButton";
-import { useGeneratorData } from "../../../_components/GeneratorDataProvider";
 
 export default function SpellbooksGrid({
     onEdit,
@@ -35,9 +34,9 @@ export default function SpellbooksGrid({
     onEdit: (s: any) => void;
     pendingIds: Set<string>;
 }) {
-    // Use data from context instead of local query
-    const { spellbooks: spellbooksQuery } = useGeneratorData();
-    const { isLoading, error, data } = spellbooksQuery;
+    const { isLoading, error, data } = db.useQuery({
+        spellbooks: {},
+    });
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading spellbooks…</div>;

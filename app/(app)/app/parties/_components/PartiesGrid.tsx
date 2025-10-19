@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
-import { useGeneratorData } from "../../../_components/GeneratorDataProvider";
 
 export default function PartiesGrid({
     onEdit,
@@ -31,9 +30,10 @@ export default function PartiesGrid({
     onEdit: (p: any) => void;
     pendingIds: Set<string>;
 }) {
-    // Use data from context instead of local query
-    const { parties: partiesQuery } = useGeneratorData();
-    const { isLoading, error, data } = partiesQuery;
+    // Query parties; each party contains its own $files object
+    const { isLoading, error, data } = db.useQuery({
+        parties: { $files: {} },
+    });
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading parties…</div>;

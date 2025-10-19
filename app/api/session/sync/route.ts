@@ -14,11 +14,21 @@ export async function POST(req: Request) {
     const allowedOrigins = new Set([
         "http://localhost:3000",
         "https://viziersvault.com",
+        "https://www.viziersvault.com",
     ]);
     const originOk = [...allowedOrigins].some(
         (o) => origin === o || referer.startsWith(o)
     );
     if (!originOk) {
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.error(
+                "[session/sync] Origin check failed. Origin:",
+                origin,
+                "Referer:",
+                referer
+            );
+        }
         return NextResponse.json(
             { ok: false, error: "Forbidden" },
             { status: 403 }
@@ -42,6 +52,18 @@ export async function POST(req: Request) {
     const users = await dbServer.query(q);
     const profilePlan = users?.$users?.[0]?.profile?.plan as string | undefined;
     const tier = resolveTierFromPlans(profilePlan);
+
+    if (process.env.VV_DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log(
+            "[session/sync] Success. userId:",
+            userId,
+            "tier:",
+            tier,
+            "plan:",
+            profilePlan
+        );
+    }
 
     const res = NextResponse.json({ ok: true });
     const maxAge = 60 * 60 * 24 * 7; // 7 days

@@ -339,7 +339,19 @@ async function getAuthAndSaveEligibility(): Promise<{
 
     if (process.env.VV_DEBUG) {
         // eslint-disable-next-line no-console
-        console.log("generateSpellbook uid=", uid, "tier=", hint?.tier);
+        console.log(
+            "generateSpellbook auth check:",
+            "uid=",
+            uid || "(empty)",
+            "tier=",
+            hint?.tier || "(none)",
+            "hasSecret=",
+            !!secret,
+            "hasCookie=",
+            !!hintRaw,
+            "hintValid=",
+            !!hint
+        );
     }
 
     // Fetch user + plan; if missing, still allow generation but do not save
@@ -367,9 +379,26 @@ async function getAuthAndSaveEligibility(): Promise<{
                 tier === "basic" || tier === "plus" || tier === "pro";
             canSave = Boolean(uid) && isPremium;
             userIdForSave = uid;
+
+            if (process.env.VV_DEBUG) {
+                // eslint-disable-next-line no-console
+                console.log(
+                    "generateSpellbook user lookup success:",
+                    "isPremium=",
+                    isPremium,
+                    "tier=",
+                    tier,
+                    "canSave=",
+                    canSave
+                );
+            }
         }
-    } catch (_e) {
+    } catch (e) {
         // Non-fatal: treat as anonymous/no-save
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.error("generateSpellbook user lookup error:", e);
+        }
         canSave = false;
         userIdForSave = null;
     }

@@ -291,7 +291,6 @@ export default function SpellbookGeneratorDialog({
 
             // Close dialog and show success
             setDialogOpen(false);
-            toast.success("Spellbook renamed!");
             return;
         }
 

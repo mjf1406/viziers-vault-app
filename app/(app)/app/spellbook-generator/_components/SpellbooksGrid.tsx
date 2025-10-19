@@ -94,7 +94,6 @@ export default function SpellbooksGrid({
     const handleDelete = async (id: string) => {
         try {
             await db.transact(tx.spellbooks[id].delete());
-            toast.success("Spellbook deleted");
         } catch (err) {
             console.error("Delete spellbook failed:", err);
             toast.error("Delete failed");

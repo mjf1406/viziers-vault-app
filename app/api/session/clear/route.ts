@@ -10,11 +10,21 @@ export async function POST(req: Request) {
     const allowedOrigins = new Set([
         "http://localhost:3000",
         "https://viziersvault.com",
+        "https://www.viziersvault.com",
     ]);
     const originOk = [...allowedOrigins].some(
         (o) => origin === o || referer.startsWith(o)
     );
     if (!originOk) {
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.error(
+                "[session/clear] Origin check failed. Origin:",
+                origin,
+                "Referer:",
+                referer
+            );
+        }
         return NextResponse.json(
             { ok: false, error: "Forbidden" },
             { status: 403 }

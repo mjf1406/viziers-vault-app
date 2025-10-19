@@ -34,6 +34,7 @@
 -   UI: edit spellbook only allows the changing of the name now
 -   BUG: spellbooks generated are now saved correctly when on basic, plus, or pro plans
 -   UX: user is no longer pushed to the spellbook page after generating it. Instead, a toast notification is shown and the dialog is closed.
+-   BUG: session api now works in prod at www.viziersvault.com
 
 ### 2025/10/18
 

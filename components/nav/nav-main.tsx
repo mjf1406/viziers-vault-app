@@ -124,6 +124,7 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                     href={href}
                                                     onClick={handleLinkClick}
                                                     className="flex items-center w-full"
+                                                    prefetch={true}
                                                 >
                                                     <Icon
                                                         name={safeIconName}
@@ -161,6 +162,7 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                 ) : (
                                                     <Link
                                                         href={`${href}?modalOpen=1`}
+                                                        prefetch={true}
                                                     >
                                                         <Plus className="w-4 h-4" />
                                                     </Link>

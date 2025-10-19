@@ -3,7 +3,7 @@
 // app/parties/page.tsx
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
@@ -11,8 +11,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
 import SpellbooksGrid from "./_components/SpellbooksGrid";
 import SpellbookGeneratorDialog from "./_components/GenSpellbookResponsiveDialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 // Separate component for data-dependent content
 function SpellbookContent({
@@ -33,49 +31,6 @@ function SpellbookContent({
             onEdit={onEdit}
             pendingIds={pendingIds}
         />
-    );
-}
-
-// Skeleton for the grid while data loads
-function SpellbookGridSkeleton() {
-    return (
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-                <Card
-                    key={i}
-                    className="hover:shadow-md transition-shadow"
-                >
-                    <CardHeader className="relative w-full mx-auto">
-                        <div className="flex items-start gap-4">
-                            <Skeleton className="h-6 flex-1" />
-                            <div className="flex items-center gap-0.5 shrink-0">
-                                <Skeleton className="w-8 h-8 rounded" />
-                                <Skeleton className="w-8 h-8 rounded" />
-                                <Skeleton className="w-8 h-8 rounded" />
-                                <Skeleton className="w-8 h-8 rounded" />
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            <div className="flex flex-wrap gap-1">
-                                <Skeleton className="h-5 w-16 rounded-full" />
-                                <Skeleton className="h-5 w-20 rounded-full" />
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                                <Skeleton className="h-5 w-24 rounded-full" />
-                                <Skeleton className="h-5 w-20 rounded-full" />
-                                <Skeleton className="h-5 w-28 rounded-full" />
-                            </div>
-                            <Skeleton className="h-4 w-48" />
-                            <div className="pt-2">
-                                <Skeleton className="h-4 w-32" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
     );
 }
 
@@ -231,12 +186,10 @@ export default function SpellbookPage() {
                 )}
             </div>
 
-            <Suspense fallback={<SpellbookGridSkeleton />}>
-                <SpellbookContent
-                    onEdit={(p) => openForEdit(p)}
-                    pendingIds={pendingIds}
-                />
-            </Suspense>
+            <SpellbookContent
+                onEdit={(p) => openForEdit(p)}
+                pendingIds={pendingIds}
+            />
         </div>
     );
 }

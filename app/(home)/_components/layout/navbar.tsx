@@ -58,6 +58,10 @@ const routeList: RouteProps[] = [
         label: "Pricing",
     },
     {
+        href: "/web/roadmap",
+        label: "Roadmap",
+    },
+    {
         href: "/web/team",
         label: "Team",
     },

@@ -302,7 +302,7 @@ export default function SpellbookGeneratorDialog({
             const result = await generateSpellbook(formData);
             if (mode === "create" && typeof result === "string" && result) {
                 // router.push(`/app/spellbook-generator/${result}`);
-                toast.success("Spellbook created successfully");
+                setDialogOpen(false);
                 return;
             }
 
@@ -316,7 +316,6 @@ export default function SpellbookGeneratorDialog({
                 const fileName = buildSpellbookFilename(name || "Spellbook");
                 downloadCsv(csv, fileName);
                 setDialogOpen(false);
-                toast.success("Spellbook downloaded");
                 return;
             }
             setDialogOpen(false);

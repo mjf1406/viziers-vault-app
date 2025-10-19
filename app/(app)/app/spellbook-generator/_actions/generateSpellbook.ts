@@ -67,6 +67,89 @@ type SpellbookGenerateResponse =
 
 type AllowedPlan = "free" | "basic" | "plus" | "pro";
 
+/**
+ * Generate spells only without saving to database
+ * Used for client-side updates
+ */
+export async function generateSpellsOnly(formData: FormData): Promise<{
+    spells: Dnd5eSpell[];
+    options: {
+        level: GenerateOpts["level"];
+        schools: string[];
+        classes: string[];
+        sourceShorts?: string[];
+        excludeLegacy?: boolean;
+    };
+}> {
+    try {
+        // Parse incoming form
+        const parsed = parseFormDataToOptions(formData);
+
+        // Resolve "random" tokens to concrete values
+        const resolved = resolveOptions(
+            parsed.level,
+            parsed.schools,
+            parsed.classes
+        );
+
+        // Fetch leveled spells and cantrips separately, then filter by class
+        const [leveledRaw, cantripsRaw] = await Promise.all([
+            fetchSpells(resolved.levels, resolved.schools, parsed.sourceShorts),
+            fetchCantrips(resolved.schools, parsed.sourceShorts),
+        ]);
+        let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
+        let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
+
+        // Apply legacy exclusion if requested (default true from client)
+        if (parsed.excludeLegacy) {
+            const isLegacySchool = (s: unknown) =>
+                String(s || "")
+                    .trim()
+                    .toLowerCase() === "legacy";
+            leveled = leveled.filter((s) => !isLegacySchool(s.school));
+            cantrips = cantrips.filter((s) => !isLegacySchool(s.school));
+        }
+
+        // Determine character level (max of levels, clamped 1..20)
+        const characterLevel = clampNumber(
+            Math.max(
+                ...(resolved.levels || [])
+                    .map((n) => toNumber(n))
+                    .filter((n) => n >= 0)
+            ),
+            1,
+            20
+        );
+
+        // Single-class selection (resolveOptions enforces min/max:1)
+        const playerClass = resolved.classes?.[0] ?? "";
+
+        const spellbook = selectSpellsForSpellbook(
+            cantrips,
+            leveled,
+            playerClass,
+            characterLevel
+        );
+
+        return {
+            spells: spellbook,
+            options: {
+                level: parsed.level,
+                schools: resolved.schools,
+                classes: resolved.classes,
+                sourceShorts: parsed.sourceShorts,
+                excludeLegacy: parsed.excludeLegacy,
+            },
+        };
+    } catch (err) {
+        if (process.env.VV_DEBUG) {
+            // eslint-disable-next-line no-console
+            console.error("generateSpellsOnly error:", err);
+        }
+        throw err;
+    }
+}
+
 export default async function generateSpellbook(
     formData: FormData
 ): Promise<SpellbookGenerateResponse> {

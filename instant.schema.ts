@@ -139,6 +139,7 @@ const _schema = i.schema({
         spellbooks: i.entity({
             name: i.string().optional(),
             createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
             options: i.json().optional(),
             spellCount: i.number().optional(),
             spells: i.json().optional(),

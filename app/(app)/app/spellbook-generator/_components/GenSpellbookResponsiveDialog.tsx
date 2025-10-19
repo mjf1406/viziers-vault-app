@@ -26,7 +26,7 @@ import {
 import generateSpellbook from "../_actions/generateSpellbook";
 import { CLASSES, SCHOOLS, SOURCE_SHORTS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
-// Input not used here
+import db from "@/lib/db";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import SpellbookNameField from "./SpellbookNameField";
@@ -277,17 +277,32 @@ export default function SpellbookGeneratorDialog({
             formData.set("level", String(chosenLevel));
         }
 
+        // Handle edit mode - instant name update using InstantDB
+        if (mode === "edit" && initial?.id) {
+            const spellbookId = initial.id;
+
+            // Instant update - no server call needed!
+            db.transact(
+                db.tx.spellbooks[spellbookId].update({
+                    name: name.trim() || undefined,
+                    updatedAt: new Date(),
+                })
+            );
+
+            // Close dialog and show success
+            setDialogOpen(false);
+            toast.success("Spellbook renamed!");
+            return;
+        }
+
+        // Handle create mode - needs loading state since we navigate after
         setIsGenerating(true);
         try {
             const level: number = chosenLevel;
-
-            // Call server action with FormData
             const result = await generateSpellbook(formData);
-
-            console.log("🚀 ~ submit ~ result:", result);
-            // If we created and saved a spellbook (premium logged-in), navigate immediately to its page
             if (mode === "create" && typeof result === "string" && result) {
-                router.push(`/app/spellbook-generator/${result}`);
+                // router.push(`/app/spellbook-generator/${result}`);
+                toast.success("Spellbook created successfully");
                 return;
             }
 
@@ -301,27 +316,9 @@ export default function SpellbookGeneratorDialog({
                 const fileName = buildSpellbookFilename(name || "Spellbook");
                 downloadCsv(csv, fileName);
                 setDialogOpen(false);
+                toast.success("Spellbook downloaded");
                 return;
             }
-
-            // Otherwise, delegate to onGenerate callback if provided (e.g., edit flow)
-            if (onGenerate) {
-                await onGenerate({
-                    level,
-                    schools: schoolsResult,
-                    classes: classesResult,
-                });
-            } else {
-                console.log("generate", {
-                    level,
-                    schools: schoolsResult,
-                    classes: classesResult,
-                    mode,
-                    initialId: initial?.id,
-                });
-            }
-
-            // Close dialog if we didn't navigate
             setDialogOpen(false);
         } catch (err: any) {
             console.error("generate error", err);
@@ -371,7 +368,7 @@ export default function SpellbookGeneratorDialog({
                             }
                         >
                             {mode === "edit"
-                                ? "Edit Spellbook"
+                                ? "Rename Spellbook"
                                 : "Generate Spellbook"}
                         </CredenzaTitle>
                     </CredenzaHeader>
@@ -387,275 +384,302 @@ export default function SpellbookGeneratorDialog({
                             />
                         ) : null}
 
-                        <div>
-                            <Label htmlFor="level">Character Level</Label>
+                        {/* Only show generation options in create mode */}
+                        {mode === "create" && (
+                            <>
+                                <div>
+                                    <Label htmlFor="level">
+                                        Character Level
+                                    </Label>
 
-                            <Select
-                                value={selectedLevel}
-                                onValueChange={(v) => setSelectedLevel(v)}
-                            >
-                                <SelectTrigger
-                                    id="level"
-                                    className="mt-1 w-full"
-                                >
-                                    <SelectValue placeholder="Select level" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    <SelectItem value="random">
-                                        Random
-                                    </SelectItem>
-                                    {Array.from(
-                                        { length: 20 },
-                                        (_, i) => i + 1
-                                    ).map((n) => (
-                                        <SelectItem
-                                            key={n}
-                                            value={String(n)}
+                                    <Select
+                                        value={selectedLevel}
+                                        onValueChange={(v) =>
+                                            setSelectedLevel(v)
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            id="level"
+                                            className="mt-1 w-full"
                                         >
-                                            {n}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                            <SelectValue placeholder="Select level" />
+                                        </SelectTrigger>
 
-                            <input
-                                type="hidden"
-                                name="level"
-                                value={selectedLevel}
-                            />
-                        </div>
+                                        <SelectContent>
+                                            <SelectItem value="random">
+                                                Random
+                                            </SelectItem>
+                                            {Array.from(
+                                                { length: 20 },
+                                                (_, i) => i + 1
+                                            ).map((n) => (
+                                                <SelectItem
+                                                    key={n}
+                                                    value={String(n)}
+                                                >
+                                                    {n}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
 
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <Label>Class</Label>
-                            </div>
+                                    <input
+                                        type="hidden"
+                                        name="level"
+                                        value={selectedLevel}
+                                    />
+                                </div>
 
-                            {/* Class select now includes Random as the first item.
-                                When Random is selected we set classesRandom = true
-                                and selectedClasses = []; otherwise we set selectedClasses = [value]. */}
-                            <Select
-                                value={
-                                    classesRandom
-                                        ? "random"
-                                        : selectedClasses[0] ?? "Wizard"
-                                }
-                                onValueChange={(v) => {
-                                    if (v === "random") {
-                                        // switch to random
-                                        toggleClassesRandom(true);
-                                    } else {
-                                        // any manual selection cancels random
-                                        if (classesRandom)
-                                            toggleClassesRandom(false);
-                                        setSelectedClasses([v]);
-                                    }
-                                }}
-                            >
-                                <SelectTrigger className="mt-1 w-full">
-                                    <SelectValue placeholder="Select class" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="random">
-                                        Random
-                                    </SelectItem>
-                                    {CLASSES.map((c) => (
-                                        <SelectItem
-                                            key={c}
-                                            value={c}
-                                        >
-                                            {c}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {/* Hidden input for server: "random" or classes[] */}
-                            {classesRandom ? (
-                                <input
-                                    type="hidden"
-                                    name="classes"
-                                    value="random"
-                                />
-                            ) : (
-                                <input
-                                    type="hidden"
-                                    name="classes[]"
-                                    value={selectedClasses[0] ?? "Wizard"}
-                                />
-                            )}
-                        </div>
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <Label>Schools of Magic</Label>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox
-                                            id="schools-random"
-                                            name="schools-random"
-                                            checked={schoolsRandom}
-                                            onCheckedChange={(v) =>
-                                                toggleSchoolsRandom(v === true)
-                                            }
-                                        />
-                                        <Label htmlFor="schools-random">
-                                            Random
-                                        </Label>
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <Label>Class</Label>
                                     </div>
 
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                            schoolsRandom
-                                                ? handleSelectAllSchools()
-                                                : allSchoolsSelected
-                                                ? handleClearSchools()
-                                                : handleSelectAllSchools()
+                                    {/* Class select now includes Random as the first item.
+                                When Random is selected we set classesRandom = true
+                                and selectedClasses = []; otherwise we set selectedClasses = [value]. */}
+                                    <Select
+                                        value={
+                                            classesRandom
+                                                ? "random"
+                                                : selectedClasses[0] ?? "Wizard"
                                         }
-                                        disabled={schoolsRandom}
+                                        onValueChange={(v) => {
+                                            if (v === "random") {
+                                                // switch to random
+                                                toggleClassesRandom(true);
+                                            } else {
+                                                // any manual selection cancels random
+                                                if (classesRandom)
+                                                    toggleClassesRandom(false);
+                                                setSelectedClasses([v]);
+                                            }
+                                        }}
                                     >
-                                        {allSchoolsSelected
-                                            ? "Clear"
-                                            : "Select All"}
-                                    </Button>
+                                        <SelectTrigger className="mt-1 w-full">
+                                            <SelectValue placeholder="Select class" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="random">
+                                                Random
+                                            </SelectItem>
+                                            {CLASSES.map((c) => (
+                                                <SelectItem
+                                                    key={c}
+                                                    value={c}
+                                                >
+                                                    {c}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Hidden input for server: "random" or classes[] */}
+                                    {classesRandom ? (
+                                        <input
+                                            type="hidden"
+                                            name="classes"
+                                            value="random"
+                                        />
+                                    ) : (
+                                        <input
+                                            type="hidden"
+                                            name="classes[]"
+                                            value={
+                                                selectedClasses[0] ?? "Wizard"
+                                            }
+                                        />
+                                    )}
                                 </div>
-                            </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <Label>Schools of Magic</Label>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    id="schools-random"
+                                                    name="schools-random"
+                                                    checked={schoolsRandom}
+                                                    onCheckedChange={(v) =>
+                                                        toggleSchoolsRandom(
+                                                            v === true
+                                                        )
+                                                    }
+                                                />
+                                                <Label htmlFor="schools-random">
+                                                    Random
+                                                </Label>
+                                            </div>
 
-                            {/* If schoolsRandom, submit a hidden value "random" */}
-                            {schoolsRandom && (
-                                <input
-                                    type="hidden"
-                                    name="schools"
-                                    value="random"
-                                />
-                            )}
-
-                            <div className="grid grid-cols-2 gap-2">
-                                {SCHOOLS.map((s) => {
-                                    const id = `school-${s.replace(
-                                        /\s+/g,
-                                        "-"
-                                    )}`;
-                                    const checked = selectedSchools.includes(s);
-                                    return (
-                                        <div
-                                            key={s}
-                                            className="flex items-center gap-2 text-sm"
-                                        >
-                                            <Checkbox
-                                                id={id}
-                                                name="schools[]"
-                                                value={s}
-                                                checked={checked}
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    schoolsRandom
+                                                        ? handleSelectAllSchools()
+                                                        : allSchoolsSelected
+                                                        ? handleClearSchools()
+                                                        : handleSelectAllSchools()
+                                                }
                                                 disabled={schoolsRandom}
-                                                onCheckedChange={(v) =>
-                                                    handleToggleSchool(
-                                                        s,
-                                                        v === true
-                                                    )
-                                                }
-                                            />
-                                            <Label htmlFor={id}>{s}</Label>
+                                            >
+                                                {allSchoolsSelected
+                                                    ? "Clear"
+                                                    : "Select All"}
+                                            </Button>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                                    </div>
 
-                        {/* Source shorts */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <Label>Sources</Label>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                            allSourcesSelected
-                                                ? setSelectedSources([])
-                                                : setSelectedSources([
-                                                      ...SOURCE_SHORTS,
-                                                  ])
-                                        }
-                                    >
-                                        {allSourcesSelected
-                                            ? "Clear"
-                                            : "Select All"}
-                                    </Button>
+                                    {/* If schoolsRandom, submit a hidden value "random" */}
+                                    {schoolsRandom && (
+                                        <input
+                                            type="hidden"
+                                            name="schools"
+                                            value="random"
+                                        />
+                                    )}
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {SCHOOLS.map((s) => {
+                                            const id = `school-${s.replace(
+                                                /\s+/g,
+                                                "-"
+                                            )}`;
+                                            const checked =
+                                                selectedSchools.includes(s);
+                                            return (
+                                                <div
+                                                    key={s}
+                                                    className="flex items-center gap-2 text-sm"
+                                                >
+                                                    <Checkbox
+                                                        id={id}
+                                                        name="schools[]"
+                                                        value={s}
+                                                        checked={checked}
+                                                        disabled={schoolsRandom}
+                                                        onCheckedChange={(v) =>
+                                                            handleToggleSchool(
+                                                                s,
+                                                                v === true
+                                                            )
+                                                        }
+                                                    />
+                                                    <Label htmlFor={id}>
+                                                        {s}
+                                                    </Label>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Hidden inputs for selected sources so server always receives them */}
-                            <div className="grid grid-cols-3 gap-2">
-                                {SOURCE_SHORTS.map((s) => {
-                                    const id = `source-${s}`;
-                                    const checked = selectedSources.includes(s);
-                                    return (
-                                        <div
-                                            key={s}
-                                            className="flex items-center gap-2 text-sm"
-                                        >
-                                            <Checkbox
-                                                id={id}
-                                                name="sourceShorts[]"
-                                                value={s}
-                                                checked={checked}
+                                {/* Source shorts */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <Label>Sources</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() =>
+                                                    allSourcesSelected
+                                                        ? setSelectedSources([])
+                                                        : setSelectedSources([
+                                                              ...SOURCE_SHORTS,
+                                                          ])
+                                                }
+                                            >
+                                                {allSourcesSelected
+                                                    ? "Clear"
+                                                    : "Select All"}
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Hidden inputs for selected sources so server always receives them */}
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {SOURCE_SHORTS.map((s) => {
+                                            const id = `source-${s}`;
+                                            const checked =
+                                                selectedSources.includes(s);
+                                            return (
+                                                <div
+                                                    key={s}
+                                                    className="flex items-center gap-2 text-sm"
+                                                >
+                                                    <Checkbox
+                                                        id={id}
+                                                        name="sourceShorts[]"
+                                                        value={s}
+                                                        checked={checked}
+                                                        onCheckedChange={(v) =>
+                                                            setSelectedSources(
+                                                                (cur) =>
+                                                                    v === true
+                                                                        ? cur.includes(
+                                                                              s
+                                                                          )
+                                                                            ? cur
+                                                                            : [
+                                                                                  ...cur,
+                                                                                  s,
+                                                                              ]
+                                                                        : cur.filter(
+                                                                              (
+                                                                                  x
+                                                                              ) =>
+                                                                                  x !==
+                                                                                  s
+                                                                          )
+                                                            )
+                                                        }
+                                                    />
+                                                    <Label htmlFor={id}>
+                                                        {s.toUpperCase()}
+                                                    </Label>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Exclude Legacy */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <Label htmlFor="exclude-legacy">
+                                            Exclude Legacy
+                                        </Label>
+                                        <div className="flex items-center gap-3">
+                                            <Switch
+                                                id="exclude-legacy-switch"
+                                                checked={excludeLegacy}
                                                 onCheckedChange={(v) =>
-                                                    setSelectedSources((cur) =>
-                                                        v === true
-                                                            ? cur.includes(s)
-                                                                ? cur
-                                                                : [...cur, s]
-                                                            : cur.filter(
-                                                                  (x) => x !== s
-                                                              )
-                                                    )
+                                                    setExcludeLegacy(v === true)
                                                 }
                                             />
-                                            <Label htmlFor={id}>
-                                                {s.toUpperCase()}
-                                            </Label>
+                                            <Toggle
+                                                aria-label="Exclude Legacy"
+                                                pressed={excludeLegacy}
+                                                onPressedChange={(v) =>
+                                                    setExcludeLegacy(v === true)
+                                                }
+                                            >
+                                                Exclude Legacy
+                                            </Toggle>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Exclude Legacy */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <Label htmlFor="exclude-legacy">
-                                    Exclude Legacy
-                                </Label>
-                                <div className="flex items-center gap-3">
-                                    <Switch
-                                        id="exclude-legacy-switch"
-                                        checked={excludeLegacy}
-                                        onCheckedChange={(v) =>
-                                            setExcludeLegacy(v === true)
-                                        }
+                                    </div>
+                                    {/* Submit a hidden normalized value to simplify server parsing */}
+                                    <input
+                                        type="hidden"
+                                        name="excludeLegacyNormalized"
+                                        value={excludeLegacy ? "1" : "0"}
                                     />
-                                    <Toggle
-                                        aria-label="Exclude Legacy"
-                                        pressed={excludeLegacy}
-                                        onPressedChange={(v) =>
-                                            setExcludeLegacy(v === true)
-                                        }
-                                    >
-                                        Exclude Legacy
-                                    </Toggle>
                                 </div>
-                            </div>
-                            {/* Submit a hidden normalized value to simplify server parsing */}
-                            <input
-                                type="hidden"
-                                name="excludeLegacyNormalized"
-                                value={excludeLegacy ? "1" : "0"}
-                            />
-                        </div>
+                            </>
+                        )}
                     </CredenzaBody>
 
                     <CredenzaFooter>
@@ -672,23 +696,19 @@ export default function SpellbookGeneratorDialog({
                         <Button
                             type="submit"
                             className="flex-1"
-                            disabled={isGenerating}
+                            disabled={mode === "create" && isGenerating}
                         >
-                            {isGenerating ? (
+                            {mode === "edit" ? (
+                                <>Save</>
+                            ) : isGenerating ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                     Generate Spellbook
                                 </>
                             ) : (
                                 <>
-                                    {mode === "edit" ? (
-                                        <>Save</>
-                                    ) : (
-                                        <>
-                                            <Dices className="h-4 w-4" />
-                                            Generate Spellbook
-                                        </>
-                                    )}
+                                    <Dices className="h-4 w-4" />
+                                    Generate Spellbook
                                 </>
                             )}
                         </Button>

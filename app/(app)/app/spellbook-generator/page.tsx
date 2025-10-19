@@ -8,8 +8,6 @@ import { BookOpen, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import type { GenerateOpts } from "./_components/GenSpellbookResponsiveDialog";
-import { toast } from "sonner";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
 import SpellbooksGrid from "./_components/SpellbooksGrid";
 import SpellbookGeneratorDialog from "./_components/GenSpellbookResponsiveDialog";
@@ -160,34 +158,6 @@ export default function SpellbookPage() {
         if (!v) setEditingParty(null);
     };
 
-    // Creation now handled by dialog's server action; no-op here
-
-    const handleEditGenerate = async (opts: GenerateOpts) => {
-        const id =
-            editingParty?.id ?? editingParty?._id ?? editingParty?.spellbookId;
-        if (!id) {
-            toast.error("Missing spellbook id for edit");
-            setEditOpen(false);
-            setEditingParty(null);
-            return;
-        }
-
-        addPending(id);
-        try {
-            // TODO: replace with your update logic
-            console.log("Update spellbook", id, opts);
-            // Example: await api.updateSpellbook(id, opts)
-        } catch (err) {
-            console.error("Update failed", err);
-            toast.error("Update failed");
-            setEditOpen(true);
-        } finally {
-            removePending(id);
-            setEditOpen(false);
-            setEditingParty(null);
-        }
-    };
-
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
             <div className="flex items-center justify-between">
@@ -257,7 +227,6 @@ export default function SpellbookPage() {
                         hideTitleOnMobile={true}
                         addPending={addPending}
                         removePending={removePending}
-                        onGenerate={handleEditGenerate}
                     />
                 )}
             </div>

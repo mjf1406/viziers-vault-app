@@ -29,6 +29,12 @@
 
 ## Change Log
 
+### 2025/10/19
+
+-   UI: edit spellbook only allows the changing of the name now
+-   BUG: spellbooks generated are now saved correctly when on basic, plus, or pro plans
+-   UX: user is no longer pushed to the spellbook page after generating it. Instead, a toast notification is shown and the dialog is closed.
+
 ### 2025/10/18
 
 -   removed dynamic imports and instead use loading.tsx with skeletons resembling the UI being loaded

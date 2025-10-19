@@ -10,7 +10,12 @@ import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
 import SpellbookUpsell from "./_components/SpellbookUpsell";
 import SpellbooksGrid from "./_components/SpellbooksGrid";
-import SpellbookGeneratorDialog from "./_components/GenSpellbookResponsiveDialog";
+import dynamic from "next/dynamic";
+
+const SpellbookGeneratorDialog = dynamic(
+    () => import("./_components/GenSpellbookResponsiveDialog"),
+    { ssr: false }
+);
 
 // Separate component for data-dependent content
 function SpellbookContent({

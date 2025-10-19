@@ -11,7 +11,12 @@ import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsive
 import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
-import MagicShopGeneratorDialog from "./_components/GenMagicShopResponsiveDialog";
+import dynamic from "next/dynamic";
+
+const MagicShopGeneratorDialog = dynamic(
+    () => import("./_components/GenMagicShopResponsiveDialog"),
+    { ssr: false }
+);
 
 // Separate component for data-dependent content
 function MagicShopContent({

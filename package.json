@@ -7,7 +7,8 @@
         "build": "next build --turbopack",
         "start": "next start",
         "pushschema": "npx instant-cli@latest push schema",
-        "pushperms": "npx instant-cli@latest push perms"
+        "pushperms": "npx instant-cli@latest push perms",
+        "bs": "npm run build && npm run start"
     },
     "dependencies": {
         "@instantdb/admin": "^0.21.9",

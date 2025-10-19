@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 import { FooterSection } from "../(home)/_components/layout/sections/footer";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import SessionCookieSync from "./_components/SessionCookieSync";
+import { GeneratorDataProvider } from "./_components/GeneratorDataProvider";
 
 export const metadata: Metadata = {
     title: sectionTitleTemplate("App"),
@@ -38,7 +39,9 @@ export default function AppLayout({
                             <main className="w-full">
                                 <NuqsAdapter>
                                     <SessionCookieSync />
-                                    {children}
+                                    <GeneratorDataProvider>
+                                        {children}
+                                    </GeneratorDataProvider>
                                 </NuqsAdapter>
                             </main>
                         </div>

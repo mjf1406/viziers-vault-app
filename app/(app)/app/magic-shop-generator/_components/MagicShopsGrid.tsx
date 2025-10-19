@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
 import Link from "next/link";
+import { useGeneratorData } from "../../../_components/GeneratorDataProvider";
 
 export default function MagicShopsGrid({
     onEdit,
@@ -30,9 +31,9 @@ export default function MagicShopsGrid({
     onEdit: (s: any) => void;
     pendingIds: Set<string>;
 }) {
-    const { isLoading, error, data } = db.useQuery({
-        magicShops: {},
-    });
+    // Use data from context instead of local query
+    const { magicShops: magicShopsQuery } = useGeneratorData();
+    const { isLoading, error, data } = magicShopsQuery;
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading shops…</div>;
@@ -242,4 +243,3 @@ export default function MagicShopsGrid({
         </div>
     );
 }
-

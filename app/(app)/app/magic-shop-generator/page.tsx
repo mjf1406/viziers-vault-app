@@ -81,7 +81,11 @@ export default function MagicShopGeneratorPage() {
         const r = p?._raw ?? p ?? {};
         const id = r.id ?? r._id ?? r.magicShopId ?? "";
         const name = r.name ?? "Untitled Shop";
-        const population = r.options?.population ?? "random";
+        const popRaw = r.options?.population;
+        const population =
+            typeof popRaw === "number" && Number.isFinite(popRaw)
+                ? popRaw
+                : null;
         const wealth = r.options?.wealth ?? "random";
         const magicness = r.options?.magicness ?? "random";
 
@@ -186,7 +190,11 @@ export default function MagicShopGeneratorPage() {
                                 editingShop._id ??
                                 editingShop.magicShopId,
                             name: editingShop.name ?? "",
-                            population: editingShop.population,
+                            population:
+                                typeof editingShop.population === "number" &&
+                                Number.isFinite(editingShop.population)
+                                    ? editingShop.population
+                                    : null,
                             wealth: editingShop.wealth,
                             magicness: editingShop.magicness,
                         }}

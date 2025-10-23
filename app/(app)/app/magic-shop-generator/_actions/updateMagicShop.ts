@@ -24,8 +24,8 @@ export async function updateMagicShop(params: {
             worldId,
             settlementId,
             overrideWealth,
-            stockIntensity,
-        } = rawOptions;
+            stockMultiplier,
+        } = rawOptions as any;
         update.options = {
             population,
             wealth,
@@ -34,7 +34,11 @@ export async function updateMagicShop(params: {
             worldId: worldId || undefined,
             settlementId: settlementId || undefined,
             overrideWealth: overrideWealth || undefined,
-            stockIntensity: stockIntensity || "normal",
+            stockMultiplier:
+                typeof stockMultiplier === "number" &&
+                Number.isFinite(stockMultiplier)
+                    ? stockMultiplier
+                    : undefined,
         } as any;
     }
 

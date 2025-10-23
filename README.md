@@ -31,6 +31,7 @@
 
 ### 2025/10/23
 
+-   user can create worlds and settlements in pre-made worlds now
 -   added add default worlds button to world creation dialog
 -   updated getUserAuthAndSaveEligibility to include worlds and settlements and moved to its own file
 -   added updateMagicShop action as client side, though

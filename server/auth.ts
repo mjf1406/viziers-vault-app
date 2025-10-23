@@ -67,3 +67,4 @@ export async function getAuthAndSaveEligibility(): Promise<{
 
     return { uid, canSave, userIdForSave, tier };
 }
+

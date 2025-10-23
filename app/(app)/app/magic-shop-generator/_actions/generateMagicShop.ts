@@ -1,9 +1,9 @@
 /** @format */
 
-"use server";
+// "use server";
 
 import dbServer from "@/server/db-server";
-import { getAuthAndSaveEligibility } from "@/server/auth";
+// import { getAuthAndSaveEligibility } from "@/server/auth";
 import { randomUUID } from "crypto";
 import type { GenerateMagicShopOpts } from "../_components/GenMagicShopResponsiveDialog";
 
@@ -15,19 +15,18 @@ function buildOptions(opts: GenerateMagicShopOpts) {
         stockTypes,
         worldId,
         settlementId,
-        overrideWealth,
-        stockIntensity,
+        // overrideWealth,
+        stockMultiplier,
     } = opts;
     return {
         population,
         wealth,
-        // Normalize naming expected by grid
         magicLevel: magicness,
         stockTypes: Array.isArray(stockTypes) ? stockTypes : undefined,
         worldId: worldId || undefined,
         settlementId: settlementId || undefined,
-        overrideWealth: overrideWealth || undefined,
-        stockIntensity: stockIntensity || "normal",
+        // overrideWealth: overrideWealth || undefined,
+        stockMultiplier: stockMultiplier ?? 1,
     } as any;
 }
 
@@ -40,11 +39,11 @@ export type GenerateMagicShopInput = {
 export default async function generateMagicShop(
     input: GenerateMagicShopInput
 ): Promise<string[]> {
-    const { uid, canSave } = await getAuthAndSaveEligibility();
+    // const { uid, canSave } = await getAuthAndSaveEligibility();
 
-    if (!uid || !canSave) {
-        throw new Error("You must be a paid user to save magic shops");
-    }
+    // if (!uid || !canSave) {
+    //     throw new Error("You must be a paid user to save magic shops");
+    // }
 
     const createdAt = new Date();
     const qtyRaw = input?.quantity ?? 1;
@@ -52,7 +51,11 @@ export default async function generateMagicShop(
     const name = input?.name?.trim() || undefined;
     const options = buildOptions(input.options);
 
+    console.log("Magic Shop", { name, qty, options });
+
     const ids: string[] = [];
+    return ids;
+
     for (let i = 0; i < qty; i++) {
         const id = randomUUID();
         const record: any = {

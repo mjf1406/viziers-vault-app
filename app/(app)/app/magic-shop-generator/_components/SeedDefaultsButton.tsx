@@ -44,3 +44,4 @@ export default function SeedDefaultsButton({ className, onSeeded }: Props) {
         </Button>
     );
 }
+

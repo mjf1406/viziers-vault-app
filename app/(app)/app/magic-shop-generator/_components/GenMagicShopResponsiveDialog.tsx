@@ -5,13 +5,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+// Removed select-based stock intensity control in favor of numeric multiplier
 import { toast } from "sonner";
 import {
     Credenza,
@@ -43,24 +37,20 @@ import type {
     WealthLevel,
     ShopType,
 } from "@/lib/constants/settlements";
+import { MAGICNESS_LEVELS, WEALTH_LEVELS } from "@/lib/constants/settlements";
 import generateMagicShop from "../_actions/generateMagicShop";
 
 export type GenerateMagicShopOpts = {
-    population:
-        | "hamlet"
-        | "village"
-        | "town"
-        | "city"
-        | "metropolis"
-        | "random";
-    wealth: WealthLevel | "random";
-    magicness: MagicnessLevel | "random";
+    population?: number | null;
+    wealth: WealthLevel | number | "random";
+    magicness: MagicnessLevel | number | "random";
     stockTypes?: ShopType[] | null;
     worldId?: string | null;
     settlementId?: string | null;
     quantity?: number;
     overrideWealth?: GenerateMagicShopOpts["wealth"] | null;
     stockIntensity?: "sparse" | "normal" | "lush";
+    stockMultiplier?: number | null;
 };
 
 type MagicShopInitial = {
@@ -111,13 +101,28 @@ export default function MagicShopGeneratorDialog({
     const [name, setName] = useState<string>(initial?.name ?? "");
     const [population, setPopulation] = useState<
         GenerateMagicShopOpts["population"]
-    >((initial?.population as any) ?? "random");
-    const [wealth, setWealth] = useState<GenerateMagicShopOpts["wealth"]>(
-        (initial?.wealth as any) ?? "random"
+    >(typeof initial?.population === "number" ? initial?.population : null);
+    const [wealth, setWealth] = useState<WealthLevel | "random">(() => {
+        const w = initial?.wealth as any;
+        if (typeof w === "number") {
+            const idx = Math.min(WEALTH_LEVELS.length - 1, Math.max(0, w));
+            return WEALTH_LEVELS[idx] as WealthLevel;
+        }
+        return (w as WealthLevel) ?? "random";
+    });
+    const [magicness, setMagicness] = useState<MagicnessLevel | "random">(
+        () => {
+            const m = initial?.magicness as any;
+            if (typeof m === "number") {
+                const idx = Math.min(
+                    MAGICNESS_LEVELS.length - 1,
+                    Math.max(0, m)
+                );
+                return MAGICNESS_LEVELS[idx] as MagicnessLevel;
+            }
+            return (m as MagicnessLevel) ?? "random";
+        }
     );
-    const [magicness, setMagicness] = useState<
-        GenerateMagicShopOpts["magicness"]
-    >((initial?.magicness as any) ?? "random");
     const [stockTypes, setStockTypes] = useState<ShopType[]>([]);
 
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -127,9 +132,8 @@ export default function MagicShopGeneratorDialog({
     const [overrideWealth, setOverrideWealth] = useState<
         GenerateMagicShopOpts["wealth"] | null
     >(null);
-    const [stockIntensity, setStockIntensity] = useState<
-        "sparse" | "normal" | "lush"
-    >("normal");
+    // Stock intensity replaced by numeric multiplier
+    const [stockMultiplier, setStockMultiplier] = useState<number | null>(1);
     const [worldDialogOpen, setWorldDialogOpen] = useState(false);
     const [settlementDialogOpen, setSettlementDialogOpen] = useState(false);
 
@@ -188,30 +192,63 @@ export default function MagicShopGeneratorDialog({
             toast.error("Please select at least one stock type");
             return;
         }
+        // Require at least one of population (numeric) or settlementId
+        const hasPopulation =
+            typeof population === "number" && Number.isFinite(population);
+        const hasSettlement =
+            typeof settlementId === "string" && !!settlementId;
+        if (!hasPopulation && !hasSettlement) {
+            toast.error("Provide a population or choose a settlement");
+            return;
+        }
 
-        const resolvedPopulation = resolveRandom(population as any, [
-            "hamlet",
-            "village",
-            "town",
-            "city",
-            "metropolis",
-        ]) as GenerateMagicShopOpts["population"];
-        const resolvedWealth = wealth as GenerateMagicShopOpts["wealth"];
-        const resolvedMagicness =
-            magicness as GenerateMagicShopOpts["magicness"];
+        // Normalize wealth to an integer index
+        const resolvedWealthNumeric = (() => {
+            if (typeof wealth === "number") {
+                const n = Math.round(wealth);
+                return Math.min(WEALTH_LEVELS.length - 1, Math.max(0, n));
+            }
+            const str = resolveRandom(
+                wealth as any,
+                WEALTH_LEVELS as any
+            ) as WealthLevel;
+            const idx = WEALTH_LEVELS.indexOf(str);
+            return idx >= 0 ? idx : 0;
+        })();
+        // Normalize magicness to an integer index
+        const resolvedMagicnessNumeric = (() => {
+            if (typeof magicness === "number") {
+                const n = Math.round(magicness);
+                return Math.min(MAGICNESS_LEVELS.length - 1, Math.max(0, n));
+            }
+            const str = resolveRandom(
+                magicness as any,
+                MAGICNESS_LEVELS as any
+            ) as MagicnessLevel;
+            const idx = MAGICNESS_LEVELS.indexOf(str);
+            return idx >= 0 ? idx : 0;
+        })();
 
         setIsGenerating(true);
         try {
             const payload: GenerateMagicShopOpts = {
-                population: resolvedPopulation,
-                wealth: resolvedWealth,
-                magicness: resolvedMagicness,
+                population:
+                    typeof population === "number" &&
+                    Number.isFinite(population)
+                        ? population
+                        : null,
+                wealth: resolvedWealthNumeric,
+                magicness: resolvedMagicnessNumeric,
                 stockTypes: stockTypes ?? undefined,
                 worldId,
                 settlementId,
                 quantity: qty,
                 overrideWealth,
-                stockIntensity,
+                stockMultiplier:
+                    typeof stockMultiplier === "number" &&
+                    Number.isFinite(stockMultiplier)
+                        ? stockMultiplier
+                        : null,
             };
 
             if (mode === "create") {
@@ -330,12 +367,20 @@ export default function MagicShopGeneratorDialog({
                                     <NumberStepperInput
                                         id="population"
                                         placeholder="e.g., 20000"
-                                        onValueChange={() => {
+                                        value={population ?? undefined}
+                                        onValueChange={(v) => {
                                             setWorldId(null);
                                             setSettlementId(null);
-                                            setPopulation("random");
+                                            setPopulation(
+                                                typeof v === "number" ? v : null
+                                            );
                                         }}
-                                        min={0}
+                                        min={0.1}
+                                        step={0.1}
+                                        modifierSteps={{
+                                            ctrlOrMeta: 0.5,
+                                            shift: 1,
+                                        }}
                                     />
                                 </Field>
                             </TabsContent>
@@ -429,6 +474,7 @@ export default function MagicShopGeneratorDialog({
                                     }
                                     min={1}
                                     max={10}
+                                    step={1}
                                 />
                             </Field>
                         </FieldGroup>
@@ -458,26 +504,27 @@ export default function MagicShopGeneratorDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Shop stock for this generation</Label>
-                            <Select
-                                value={stockIntensity}
-                                onValueChange={(v) =>
-                                    setStockIntensity(v as any)
-                                }
-                            >
-                                <SelectTrigger className="mt-1">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="sparse">
-                                        Sparse
-                                    </SelectItem>
-                                    <SelectItem value="normal">
-                                        Normal
-                                    </SelectItem>
-                                    <SelectItem value="lush">Lush</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <Label>Stock multiplier</Label>
+                            <Field>
+                                <NumberStepperInput
+                                    id="stockMultiplier"
+                                    value={stockMultiplier ?? undefined}
+                                    onValueChange={(v) =>
+                                        setStockMultiplier(
+                                            typeof v === "number" && v >= 0.1
+                                                ? v
+                                                : 0.1
+                                        )
+                                    }
+                                    min={0.1}
+                                    max={10}
+                                    step={0.1}
+                                    modifierSteps={{
+                                        ctrlOrMeta: 0.5,
+                                        shift: 1,
+                                    }}
+                                />
+                            </Field>
                         </div>
 
                         <CreateWorldResponsiveDialog

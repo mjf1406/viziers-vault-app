@@ -4,7 +4,6 @@
 
 import React from "react";
 import db from "@/lib/db";
-import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import {
     Select,
     SelectContent,
@@ -28,20 +27,17 @@ export default function WorldSelect({
     placeholder?: string;
 }) {
     const { isLoading, error, data } = db.useQuery({
-        worlds: { settlements: {} },
+        worlds: { $: { where: {} }, settlements: {} },
     });
 
-    const dbWorlds = (data?.worlds ?? []).map((w: any) => ({
+    const dbWorldsAll = (data?.worlds ?? []).map((w: any) => ({
         id: w.id,
         name: w.name || "Untitled",
+        isPremade: Boolean(w.isPremade),
     }));
 
-    const premadeWorlds = PREMADE_WORLDS.map((w) => ({
-        id: w.id,
-        name: w.name,
-    }));
-
-    const worlds = [...premadeWorlds, ...dbWorlds];
+    const myWorlds = dbWorldsAll.filter((w) => !w.isPremade);
+    const premadeWorlds = dbWorldsAll.filter((w) => w.isPremade);
 
     return (
         <Select
@@ -53,12 +49,12 @@ export default function WorldSelect({
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="__none__">None</SelectItem>
-                {dbWorlds.length ? (
+                {myWorlds.length ? (
                     <>
                         {premadeWorlds.length ? <SelectSeparator /> : null}
                         <SelectGroup>
                             <SelectLabel>My worlds</SelectLabel>
-                            {dbWorlds.map((w) => (
+                            {myWorlds.map((w) => (
                                 <SelectItem
                                     key={`db-${w.id}`}
                                     value={w.id}

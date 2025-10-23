@@ -43,6 +43,7 @@ import type {
     WealthLevel,
     ShopType,
 } from "@/lib/constants/settlements";
+import generateMagicShop from "../_actions/generateMagicShop";
 
 export type GenerateMagicShopOpts = {
     population:
@@ -201,7 +202,6 @@ export default function MagicShopGeneratorDialog({
 
         setIsGenerating(true);
         try {
-            // Placeholder: generation not implemented yet
             const payload: GenerateMagicShopOpts = {
                 population: resolvedPopulation,
                 wealth: resolvedWealth,
@@ -214,13 +214,48 @@ export default function MagicShopGeneratorDialog({
                 stockIntensity,
             };
 
-            if (onGenerate) {
-                await onGenerate(payload);
-            } else {
-                // For create flow before persistence exists, just toast and close
-                toast.success("Magic shop generated (preview)");
+            if (mode === "create") {
+                // Persist via server action (paid users only)
+                try {
+                    const ids = await generateMagicShop({
+                        name:
+                            isPaid && user?.id
+                                ? (name || "").trim() || undefined
+                                : undefined,
+                        options: payload,
+                        quantity: qty,
+                    });
+                    if (Array.isArray(ids) && ids.length) {
+                        toast.success("Magic shop saved");
+                    } else {
+                        toast.success("Magic shop generated");
+                    }
+                } catch (err: any) {
+                    const msg =
+                        err?.message ||
+                        (typeof err === "string" ? err : "Generation failed");
+                    toast.error(msg);
+                    setDialogOpen(true);
+                    return;
+                }
+
+                setDialogOpen(false);
+                return;
             }
 
+            // Edit mode: allow parent to update options; update name instantly client-side
+            if (mode === "edit" && initial?.id) {
+                try {
+                    await db.transact(
+                        db.tx.magicShops[initial.id].update({
+                            name: (name || "").trim() || undefined,
+                            updatedAt: new Date(),
+                        })
+                    );
+                } catch {}
+            }
+
+            if (onGenerate) await onGenerate(payload);
             setDialogOpen(false);
         } catch (err) {
             console.error("Magic shop generation failed", err);

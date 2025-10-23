@@ -16,8 +16,7 @@ import {
 import { resolveLevel } from "@/lib/5e-utils";
 import { CLASSES, SCHOOLS, SPELLS_PER_LEVEL } from "@/lib/5e-data";
 import dbServer from "@/server/db-server";
-import { cookies } from "next/headers";
-import { verifyHint } from "@/lib/hint";
+import { getAuthAndSaveEligibility } from "@/server/auth";
 import { randomUUID } from "crypto";
 
 type GenerateOpts = {
@@ -324,87 +323,7 @@ function selectSpellsForSpellbook(
 
 // toNumber, clampNumber, takeRandom, dedupeBy imported from utils
 
-async function getAuthAndSaveEligibility(): Promise<{
-    uid: string;
-    canSave: boolean;
-    userIdForSave: string | null;
-    tier: string | null;
-}> {
-    // Verify via signed vv_hint cookie (non-blocking for generation)
-    const cookieStore = await cookies();
-    const hintRaw = cookieStore.get("vv_hint")?.value ?? "";
-    const secret = process.env.VV_COOKIE_SECRET || "";
-    const hint = secret && hintRaw ? await verifyHint(hintRaw, secret) : null;
-    const uid = hint?.uid ?? "";
-
-    if (process.env.VV_DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log(
-            "generateSpellbook auth check:",
-            "uid=",
-            uid || "(empty)",
-            "tier=",
-            hint?.tier || "(none)",
-            "hasSecret=",
-            !!secret,
-            "hasCookie=",
-            !!hintRaw,
-            "hintValid=",
-            !!hint
-        );
-    }
-
-    // Fetch user + plan; if missing, still allow generation but do not save
-    let canSave = false;
-    let userIdForSave: string | null = null;
-    let tier: AllowedPlan | null = null;
-
-    try {
-        if (uid) {
-            const users = await dbServer.query({
-                $users: { $: { where: { id: uid } }, profile: {} },
-            });
-            const userInfo = users?.$users?.[0];
-            const planRaw = userInfo?.profile?.plan;
-            // Narrow unknown '{}' from the DB shape to our allowed plan values
-            tier =
-                typeof planRaw === "string" &&
-                (["free", "basic", "plus", "pro"] as const).includes(
-                    planRaw as AllowedPlan
-                )
-                    ? (planRaw as AllowedPlan)
-                    : null;
-
-            const isPremium =
-                tier === "basic" || tier === "plus" || tier === "pro";
-            canSave = Boolean(uid) && isPremium;
-            userIdForSave = uid;
-
-            if (process.env.VV_DEBUG) {
-                // eslint-disable-next-line no-console
-                console.log(
-                    "generateSpellbook user lookup success:",
-                    "isPremium=",
-                    isPremium,
-                    "tier=",
-                    tier,
-                    "canSave=",
-                    canSave
-                );
-            }
-        }
-    } catch (e) {
-        // Non-fatal: treat as anonymous/no-save
-        if (process.env.VV_DEBUG) {
-            // eslint-disable-next-line no-console
-            console.error("generateSpellbook user lookup error:", e);
-        }
-        canSave = false;
-        userIdForSave = null;
-    }
-
-    return { uid, canSave, userIdForSave, tier };
-}
+// getAuthAndSaveEligibility imported from shared server/auth
 
 function parseFormDataToOptions(formData: FormData): {
     level: GenerateOpts["level"];

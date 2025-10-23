@@ -29,6 +29,13 @@
 
 ## Change Log
 
+### 2025/10/23
+
+-   added add default worlds button to world creation dialog
+-   updated getUserAuthAndSaveEligibility to include worlds and settlements and moved to its own file
+-   added updateMagicShop action as client side, though
+-   moved updateSpellbook action to its own file, still client side
+
 ### 2025/10/19
 
 -   render roadmap from the R2 bucket file on build time

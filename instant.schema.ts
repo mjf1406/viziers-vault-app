@@ -151,6 +151,7 @@ const _schema = i.schema({
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
             creatorId: i.string().optional().indexed(),
+            isPremade: i.boolean().optional().indexed(),
         }),
         settlements: i.entity({
             name: i.string(),
@@ -161,6 +162,7 @@ const _schema = i.schema({
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
             creatorId: i.string().optional().indexed(),
+            isPremade: i.boolean().optional().indexed(),
         }),
         starSystems: i.entity({}),
         galaxies: i.entity({}),

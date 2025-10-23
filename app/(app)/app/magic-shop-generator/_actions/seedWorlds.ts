@@ -3,151 +3,59 @@
 "use server";
 
 import dbServer from "@/server/db-server";
+import { getAuthAndSaveEligibility } from "@/server/auth";
+import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import { randomUUID } from "crypto";
 
+// Seeds PREMADE_WORLDS into the current user's DB, linking to $user and marking isPremade
 export async function seedPreMadeWorlds() {
-    const preMade = [
-        {
-            name: "Toril (The Forgotten Realms)",
-            settlements: [
-                {
-                    name: "Waterdeep",
-                    population: 120000,
-                    wealth: "opulent",
-                    magicLevel: "high",
-                },
-                {
-                    name: "Baldur's Gate",
-                    population: 42000,
-                    wealth: "prosperous",
-                    magicLevel: "moderate",
-                },
-                {
-                    name: "Neverwinter",
-                    population: 23000,
-                    wealth: "prosperous",
-                    magicLevel: "high",
-                },
-            ],
-        },
-        {
-            name: "Oerth (Greyhawk)",
-            settlements: [
-                {
-                    name: "Greyhawk City",
-                    population: 70000,
-                    wealth: "prosperous",
-                    magicLevel: "moderate",
-                },
-                {
-                    name: "Dyvers",
-                    population: 30000,
-                    wealth: "modest",
-                    magicLevel: "moderate",
-                },
-            ],
-        },
-        {
-            name: "Krynn (Dragonlance)",
-            settlements: [
-                {
-                    name: "Palanthas",
-                    population: 60000,
-                    wealth: "prosperous",
-                    magicLevel: "high",
-                },
-                {
-                    name: "Solace",
-                    population: 4000,
-                    wealth: "modest",
-                    magicLevel: "low",
-                },
-            ],
-        },
-        {
-            name: "Eberron",
-            settlements: [
-                {
-                    name: "Sharn",
-                    population: 212000,
-                    wealth: "opulent",
-                    magicLevel: "legendary",
-                },
-                {
-                    name: "Stormreach",
-                    population: 26000,
-                    wealth: "prosperous",
-                    magicLevel: "high",
-                },
-            ],
-        },
-        {
-            name: "Athas (Dark Sun)",
-            settlements: [
-                {
-                    name: "Tyr",
-                    population: 15000,
-                    wealth: "modest",
-                    magicLevel: "low",
-                },
-                {
-                    name: "Nibenay",
-                    population: 14000,
-                    wealth: "modest",
-                    magicLevel: "low",
-                },
-            ],
-        },
-        {
-            name: "Earth",
-            settlements: [
-                {
-                    name: "Florence",
-                    population: 366000,
-                    wealth: "prosperous",
-                    magicLevel: "low",
-                },
-                {
-                    name: "Kyoto",
-                    population: 1475000,
-                    wealth: "opulent",
-                    magicLevel: "low",
-                },
-            ],
-        },
-    ];
+    const { uid, canSave } = await getAuthAndSaveEligibility();
+    if (!uid || !canSave) {
+        throw new Error("You must be a paid user to save worlds");
+    }
+
+    // If already seeded, do nothing (idempotent-ish by user)
+    const existing = (await dbServer.query({
+        worlds: { $: { where: { creatorId: uid, isPremade: true } } },
+    })) as any;
+    const alreadySeeded = (existing?.worlds ?? []).length > 0;
+    if (alreadySeeded) {
+        return { ok: true, alreadySeeded: true } as const;
+    }
 
     const now = new Date();
 
-    for (const w of preMade) {
+    for (const w of PREMADE_WORLDS) {
         const worldId = randomUUID();
-        await dbServer.transact([
-            {
-                op: "update",
-                table: "worlds",
-                id: worldId,
-                args: { name: w.name, createdAt: now },
-            },
-        ] as any);
+        await dbServer.transact(
+            dbServer.tx.worlds[worldId]
+                .create({
+                    name: w.name,
+                    createdAt: now,
+                    creatorId: uid,
+                    isPremade: true,
+                })
+                .link({ $user: uid })
+        );
 
-        for (const s of w.settlements) {
-            await dbServer.transact([
-                {
-                    op: "update",
-                    table: "settlements",
-                    id: randomUUID(),
-                    args: {
+        for (const s of w.settlements ?? []) {
+            const settlementId = randomUUID();
+            await dbServer.transact(
+                dbServer.tx.settlements[settlementId]
+                    .create({
                         name: s.name,
                         population: s.population,
-                        wealth: s.wealth,
-                        magicLevel: s.magicLevel,
-                        world: worldId,
+                        wealth: s.wealth as any,
+                        magicness: s.magicness as any,
+                        shopTypes: s.shopTypes as any,
                         createdAt: now,
-                    },
-                },
-            ] as any);
+                        creatorId: uid,
+                        isPremade: true,
+                    })
+                    .link({ $user: uid, world: worldId })
+            );
         }
     }
 
-    return { ok: true };
+    return { ok: true, alreadySeeded: false } as const;
 }

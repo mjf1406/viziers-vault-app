@@ -24,6 +24,7 @@ import {
     CredenzaTitle,
 } from "@/components/ui/credenza";
 import generateSpellbook from "../_actions/generateSpellbook";
+import { updateSpellbook } from "../_actions/updateSpellbook";
 import { CLASSES, SCHOOLS, SOURCE_SHORTS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
 import db from "@/lib/db";
@@ -280,16 +281,7 @@ export default function SpellbookGeneratorDialog({
         // Handle edit mode - instant name update using InstantDB
         if (mode === "edit" && initial?.id) {
             const spellbookId = initial.id;
-
-            // Instant update - no server call needed!
-            db.transact(
-                db.tx.spellbooks[spellbookId].update({
-                    name: name.trim() || undefined,
-                    updatedAt: new Date(),
-                })
-            );
-
-            // Close dialog and show success
+            await updateSpellbook({ id: spellbookId, name });
             setDialogOpen(false);
             return;
         }

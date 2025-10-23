@@ -18,6 +18,7 @@ import {
 import db from "@/lib/db";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "sonner";
+import SeedDefaultsButton from "@/app/(app)/app/magic-shop-generator/_components/SeedDefaultsButton";
 
 type Props = {
     open?: boolean;
@@ -102,6 +103,9 @@ export default function CreateWorldResponsiveDialog({
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="e.g., Eberron"
                             />
+                        </div>
+                        <div className="pt-2">
+                            <SeedDefaultsButton />
                         </div>
                     </CredenzaBody>
                     <CredenzaFooter className="flex items-center justify-between gap-3">

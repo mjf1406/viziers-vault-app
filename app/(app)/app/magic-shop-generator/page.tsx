@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsiveDialog";
+import { updateMagicShop } from "./_actions/updateMagicShop";
 import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
@@ -111,8 +112,12 @@ export default function MagicShopGeneratorPage() {
 
         addPending(id);
         try {
-            // TODO: replace with your update logic
-            console.log("Update magic shop", id, opts);
+            await updateMagicShop({
+                id,
+                options: opts,
+                name: editingShop?.name,
+            });
+            toast.success("Shop updated");
         } catch (err) {
             console.error("Update failed", err);
             toast.error("Update failed");

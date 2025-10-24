@@ -59,10 +59,13 @@ export default async function generateMagicShop(
         const id =
             (globalThis as any)?.crypto?.randomUUID?.() ??
             Math.random().toString(36).slice(2);
+
+        const items = await generateMagicShopItems(options);
+
         const record: any = {
             name,
             createdAt,
-            // options,
+            items,
             creatorId: uid,
         };
 
@@ -73,4 +76,30 @@ export default async function generateMagicShop(
     }
 
     return ids;
+}
+
+// {
+//     "name": "Luthien's Dusty Phylactery",
+//     "options": {
+//         "population": null,
+//         "wealth": 1,
+//         "magicLevel": 3,
+//         "stockTypes": [
+//             "scrolls",
+//             "potions"
+//         ],
+//         "worldId": "d5143afb-eb9d-4a09-8bb0-0ef4e9ec0849",
+//         "settlementId": "0a9bb915-1b5b-4780-bbd2-7ef69efd9100",
+//         "stockMultiplier": 1,
+//         "inputMode": "by-settlement"
+//     },
+//     "qty": 1,
+//     "user": {
+//         "id": "0907147e-b057-4130-a12f-bc5b1d851cbd",
+//         "plan": "Pro"
+//     }
+// }
+
+async function generateMagicShopItems(options: any): Promise<any[]> {
+    return [];
 }

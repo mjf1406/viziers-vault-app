@@ -145,7 +145,13 @@ const _schema = i.schema({
             spells: i.json().optional(),
             creatorId: i.string().optional().indexed(),
         }),
-        magicShops: i.entity({}),
+        magicShops: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional(),
+            updatedAt: i.date().optional(),
+            items: i.json().optional(),
+            creatorId: i.string().optional().indexed(),
+        }),
         worlds: i.entity({
             name: i.string(),
             createdAt: i.date().optional().indexed(),

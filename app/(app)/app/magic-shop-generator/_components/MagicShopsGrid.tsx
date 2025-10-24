@@ -7,7 +7,7 @@ import db from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Store, Link2 } from "lucide-react";
+import { Edit, Trash2, Store, Link2, Check } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -33,6 +33,18 @@ export default function MagicShopsGrid({
     const { isLoading, error, data } = db.useQuery({
         magicShops: {},
     });
+
+    const [copiedId, setCopiedId] = React.useState<string | null>(null);
+    const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
+    React.useEffect(() => {
+        return () => {
+            if (copyTimerRef.current) {
+                clearTimeout(copyTimerRef.current);
+            }
+        };
+    }, []);
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading shops…</div>;
@@ -76,7 +88,6 @@ export default function MagicShopsGrid({
     const handleDelete = async (id: string) => {
         try {
             await db.transact(tx.magicShops[id].delete());
-            toast.success("Shop deleted");
         } catch (err) {
             console.error("Delete shop failed:", err);
             toast.error("Delete failed");
@@ -87,7 +98,13 @@ export default function MagicShopsGrid({
         try {
             const url = `${window.location.origin}/app/magic-shop-generator/${id}`;
             await navigator.clipboard.writeText(url);
-            toast.success("Link copied to clipboard");
+            setCopiedId(id);
+            if (copyTimerRef.current) {
+                clearTimeout(copyTimerRef.current);
+            }
+            copyTimerRef.current = setTimeout(() => {
+                setCopiedId(null);
+            }, 1000);
         } catch (err) {
             console.error("Copy link failed:", err);
             toast.error("Failed to copy link");
@@ -139,9 +156,17 @@ export default function MagicShopsGrid({
                                                     void handleCopyLink(s.id)
                                                 }
                                                 className="w-8 h-8 p-0 hover:bg-gray-100"
-                                                title="Copy link"
+                                                title={
+                                                    copiedId === s.id
+                                                        ? "Copied!"
+                                                        : "Copy link"
+                                                }
                                             >
-                                                <Link2 className="w-4 h-4" />
+                                                {copiedId === s.id ? (
+                                                    <Check className="w-4 h-4 text-green-600" />
+                                                ) : (
+                                                    <Link2 className="w-4 h-4" />
+                                                )}
                                             </Button>
 
                                             <Button
@@ -242,4 +267,3 @@ export default function MagicShopsGrid({
         </div>
     );
 }
-

@@ -138,8 +138,6 @@ export default function PartiesGrid({
             }
 
             await db.transact(txOps);
-
-            toast.success("Party and associated files deleted");
         } catch (err) {
             console.error("Delete party failed:", err);
             toast.error("Delete failed");

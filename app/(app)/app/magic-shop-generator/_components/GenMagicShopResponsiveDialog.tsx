@@ -29,7 +29,7 @@ import MagicnessRadio from "@/components/settlements/MagicnessRadio";
 import StockTypesCheckboxes from "@/components/settlements/StockTypesCheckboxes";
 import CreateWorldResponsiveDialog from "@/app/(app)/app/world-generator/_components/CreateWorldResponsiveDialog";
 import CreateSettlementResponsiveDialog from "@/app/(app)/app/world-generator/_components/CreateSettlementResponsiveDialog";
-import { NumberStepperInput } from "@/components/ui/number-stepper";
+import { NumberInputWithStepper } from "@/components/ui/NumberInputWithStepper";
 import db from "@/lib/db";
 import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import type {
@@ -51,6 +51,7 @@ export type GenerateMagicShopOpts = {
     overrideWealth?: GenerateMagicShopOpts["wealth"] | null;
     stockIntensity?: "sparse" | "normal" | "lush";
     stockMultiplier?: number | null;
+    inputMode?: "by-population" | "by-settlement";
 };
 
 type MagicShopInitial = {
@@ -132,10 +133,13 @@ export default function MagicShopGeneratorDialog({
     const [overrideWealth, setOverrideWealth] = useState<
         GenerateMagicShopOpts["wealth"] | null
     >(null);
-    // Stock intensity replaced by numeric multiplier
     const [stockMultiplier, setStockMultiplier] = useState<number | null>(1);
     const [worldDialogOpen, setWorldDialogOpen] = useState(false);
     const [settlementDialogOpen, setSettlementDialogOpen] = useState(false);
+    const defaultTab = isPaid ? "by-settlement" : "by-population";
+    const [activeTab, setActiveTab] = useState<
+        "by-population" | "by-settlement"
+    >(defaultTab);
 
     // Load worlds with settlements so we can map a selected city -> its attributes
     const { data: worldsData } = db.useQuery({ worlds: { settlements: {} } });
@@ -249,24 +253,22 @@ export default function MagicShopGeneratorDialog({
                     Number.isFinite(stockMultiplier)
                         ? stockMultiplier
                         : null,
+                inputMode: activeTab,
             };
 
             if (mode === "create") {
-                // Persist via server action (paid users only)
                 try {
-                    const ids = await generateMagicShop({
-                        name:
-                            isPaid && user?.id
-                                ? (name || "").trim() || undefined
-                                : undefined,
-                        options: payload,
-                        quantity: qty,
-                    });
-                    if (Array.isArray(ids) && ids.length) {
-                        toast.success("Magic shop saved");
-                    } else {
-                        toast.success("Magic shop generated");
-                    }
+                    const ids = await generateMagicShop(
+                        {
+                            name:
+                                isPaid && user?.id
+                                    ? (name || "").trim() || undefined
+                                    : undefined,
+                            options: payload,
+                            quantity: qty,
+                        },
+                        { id: user?.id ?? null, plan: plan ?? null }
+                    );
                 } catch (err: any) {
                     const msg =
                         err?.message ||
@@ -302,8 +304,6 @@ export default function MagicShopGeneratorDialog({
         }
     };
 
-    const defaultTab = isPaid ? "by-settlement" : "by-population";
-
     return (
         <Credenza
             open={dialogOpen}
@@ -338,7 +338,12 @@ export default function MagicShopGeneratorDialog({
                         ) : null}
 
                         <Tabs
-                            defaultValue={defaultTab}
+                            value={activeTab}
+                            onValueChange={(v) =>
+                                setActiveTab(
+                                    v as "by-population" | "by-settlement"
+                                )
+                            }
                             className="w-full"
                         >
                             <TabsList>
@@ -364,22 +369,25 @@ export default function MagicShopGeneratorDialog({
                                     <FieldLabel htmlFor="population">
                                         Population
                                     </FieldLabel>
-                                    <NumberStepperInput
-                                        id="population"
+                                    <NumberInputWithStepper
                                         placeholder="e.g., 20000"
-                                        value={population ?? undefined}
-                                        onValueChange={(v) => {
+                                        value={population ?? null}
+                                        inputClassName="w-64"
+                                        onChange={(v) => {
                                             setWorldId(null);
                                             setSettlementId(null);
                                             setPopulation(
                                                 typeof v === "number" ? v : null
                                             );
                                         }}
-                                        min={0.1}
-                                        step={0.1}
+                                        min={1}
+                                        step={100}
                                         modifierSteps={{
-                                            ctrlOrMeta: 0.5,
-                                            shift: 1,
+                                            ctrlOrMeta: 200,
+                                            shift: 500,
+                                            alt: 1000,
+                                            ctrlAlt: 5000,
+                                            ctrlShift: 10000,
                                         }}
                                     />
                                 </Field>
@@ -456,16 +464,15 @@ export default function MagicShopGeneratorDialog({
                             </TabsContent>
                         </Tabs>
 
-                        {/* Next steps */}
-                        <FieldGroup>
+                        {/* Quantity and Stock Multiplier side-by-side */}
+                        <FieldGroup className="grid grid-cols-2 gap-4">
                             <Field>
                                 <FieldLabel htmlFor="quantity">
                                     Quantity of shops
                                 </FieldLabel>
-                                <NumberStepperInput
-                                    id="quantity"
-                                    value={quantity ?? undefined}
-                                    onValueChange={(v) =>
+                                <NumberInputWithStepper
+                                    value={quantity ?? 1}
+                                    onChange={(v) =>
                                         setQuantity(
                                             typeof v === "number"
                                                 ? Math.min(10, Math.max(1, v))
@@ -475,6 +482,32 @@ export default function MagicShopGeneratorDialog({
                                     min={1}
                                     max={10}
                                     step={1}
+                                    modifierSteps={{
+                                        ctrlOrMeta: 2,
+                                        shift: 5,
+                                        alt: 10,
+                                    }}
+                                />
+                            </Field>
+                            <Field>
+                                <FieldLabel>Stock multiplier</FieldLabel>
+                                <NumberInputWithStepper
+                                    value={stockMultiplier ?? 1}
+                                    onChange={(v) =>
+                                        setStockMultiplier(
+                                            typeof v === "number" && v >= 0.1
+                                                ? v
+                                                : 0.1
+                                        )
+                                    }
+                                    min={0.1}
+                                    max={10}
+                                    step={0.1}
+                                    modifierSteps={{
+                                        ctrlOrMeta: 0.5,
+                                        shift: 1,
+                                        alt: 2,
+                                    }}
                                 />
                             </Field>
                         </FieldGroup>
@@ -503,29 +536,7 @@ export default function MagicShopGeneratorDialog({
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>Stock multiplier</Label>
-                            <Field>
-                                <NumberStepperInput
-                                    id="stockMultiplier"
-                                    value={stockMultiplier ?? undefined}
-                                    onValueChange={(v) =>
-                                        setStockMultiplier(
-                                            typeof v === "number" && v >= 0.1
-                                                ? v
-                                                : 0.1
-                                        )
-                                    }
-                                    min={0.1}
-                                    max={10}
-                                    step={0.1}
-                                    modifierSteps={{
-                                        ctrlOrMeta: 0.5,
-                                        shift: 1,
-                                    }}
-                                />
-                            </Field>
-                        </div>
+                        {/* Stock multiplier moved next to quantity above */}
 
                         <CreateWorldResponsiveDialog
                             open={worldDialogOpen}

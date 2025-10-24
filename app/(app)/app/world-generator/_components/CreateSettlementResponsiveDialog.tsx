@@ -7,7 +7,7 @@ import { id as genId } from "@instantdb/react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { NumberStepperInput } from "@/components/ui/number-stepper";
+import { NumberInputWithStepper } from "@/components/ui/NumberInputWithStepper";
 import {
     Credenza,
     CredenzaBody,
@@ -111,7 +111,6 @@ export default function CreateSettlementResponsiveDialog({
                     })
                     .link({ $user: user.id, world: worldId })
             );
-            toast.success("Settlement created");
             onCreated?.(newId, worldId);
             setDialogOpen(false);
             setName("");
@@ -165,12 +164,24 @@ export default function CreateSettlementResponsiveDialog({
                                 <FieldLabel htmlFor="population">
                                     Population
                                 </FieldLabel>
-                                <NumberStepperInput
-                                    id="population"
-                                    value={population ?? undefined}
-                                    onValueChange={setPopulation}
+                                <NumberInputWithStepper
+                                    value={population ?? null}
+                                    inputClassName="w-64"
+                                    onChange={(v) =>
+                                        setPopulation(
+                                            typeof v === "number" ? v : null
+                                        )
+                                    }
                                     placeholder="e.g., 120000"
-                                    min={0}
+                                    min={1}
+                                    step={100}
+                                    modifierSteps={{
+                                        ctrlOrMeta: 200,
+                                        shift: 500,
+                                        alt: 1000,
+                                        ctrlAlt: 5000,
+                                        ctrlShift: 10000,
+                                    }}
                                 />
                             </Field>
                             <Field>

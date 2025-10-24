@@ -250,8 +250,6 @@ export default function AccountPage() {
             setSelectedFile(null);
             setPreviewSrc(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
-
-            toast.success("Avatar updated");
         } catch (err: any) {
             console.error("Avatar upload/update failed:", err);
             if (
@@ -282,7 +280,6 @@ export default function AccountPage() {
             await db.transact([
                 db.tx.userProfiles[uid].update({ name: nameInput ?? null }),
             ]);
-            toast.success("Profile updated");
         } catch (err: any) {
             console.error("Profile update failed:", err);
             if (

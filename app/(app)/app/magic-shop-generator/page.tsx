@@ -121,7 +121,6 @@ export default function MagicShopGeneratorPage() {
                 options: opts,
                 name: editingShop?.name,
             });
-            toast.success("Shop updated");
         } catch (err) {
             console.error("Update failed", err);
             toast.error("Update failed");
@@ -215,5 +214,3 @@ export default function MagicShopGeneratorPage() {
         </div>
     );
 }
-
-/** @format */

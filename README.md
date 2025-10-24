@@ -29,6 +29,15 @@
 
 ## Change Log
 
+### 2025/10/24
+
+-   copying links success now shows a checkmark instead of a toast
+-   toasts now only show on errors
+-   where toast.success was used, it's now replaced with checkmark UI changes in buttons
+-   new number stepper that is better and auto creates the correct tooltip based on the steps
+-   removed the note in the Reference Link Preferences
+-   dashboard is v0 complete
+
 ### 2025/10/23
 
 -   user can create worlds and settlements in pre-made worlds now

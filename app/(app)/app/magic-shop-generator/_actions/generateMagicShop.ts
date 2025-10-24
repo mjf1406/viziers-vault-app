@@ -1,10 +1,8 @@
 /** @format */
 
-// "use server";
+"use client";
 
-import dbServer from "@/server/db-server";
-// import { getAuthAndSaveEligibility } from "@/server/auth";
-import { randomUUID } from "crypto";
+import db from "@/lib/db";
 import type { GenerateMagicShopOpts } from "../_components/GenMagicShopResponsiveDialog";
 
 function buildOptions(opts: GenerateMagicShopOpts) {
@@ -17,6 +15,7 @@ function buildOptions(opts: GenerateMagicShopOpts) {
         settlementId,
         // overrideWealth,
         stockMultiplier,
+        inputMode,
     } = opts;
     return {
         population,
@@ -27,6 +26,8 @@ function buildOptions(opts: GenerateMagicShopOpts) {
         settlementId: settlementId || undefined,
         // overrideWealth: overrideWealth || undefined,
         stockMultiplier: stockMultiplier ?? 1,
+        inputMode:
+            inputMode || (population ? "by-population" : "by-settlement"),
     } as any;
 }
 
@@ -37,36 +38,36 @@ export type GenerateMagicShopInput = {
 };
 
 export default async function generateMagicShop(
-    input: GenerateMagicShopInput
+    input: GenerateMagicShopInput,
+    user?: { id?: string | null; plan?: string | null }
 ): Promise<string[]> {
-    // const { uid, canSave } = await getAuthAndSaveEligibility();
-
-    // if (!uid || !canSave) {
-    //     throw new Error("You must be a paid user to save magic shops");
-    // }
+    const uid = user?.id ?? null;
+    if (!uid) {
+        throw new Error("You must be logged in to save magic shops");
+    }
 
     const createdAt = new Date();
     const qtyRaw = input?.quantity ?? 1;
     const qty = Math.min(10, Math.max(1, Number(qtyRaw) || 1));
     const name = input?.name?.trim() || undefined;
     const options = buildOptions(input.options);
-
-    console.log("Magic Shop", { name, qty, options });
+    console.log("generateMagicShop options:", { name, options, qty, user });
 
     const ids: string[] = [];
-    return ids;
 
     for (let i = 0; i < qty; i++) {
-        const id = randomUUID();
+        const id =
+            (globalThis as any)?.crypto?.randomUUID?.() ??
+            Math.random().toString(36).slice(2);
         const record: any = {
             name,
             createdAt,
-            options,
+            // options,
             creatorId: uid,
         };
 
-        await dbServer.transact(
-            dbServer.tx.magicShops[id].create(record).link({ $user: uid })
+        await db.transact(
+            db.tx.magicShops[id].create(record).link({ $user: uid })
         );
         ids.push(id);
     }

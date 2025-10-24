@@ -21,7 +21,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Check } from "lucide-react";
 
 type ProviderKey = "dndbeyond" | "open5e" | "5eTools" | "custom";
 
@@ -152,6 +152,19 @@ export default function UrlLinkSettings() {
     const [prefs, setPrefs] = React.useState<UrlPreferences>(initial);
     React.useEffect(() => setPrefs(initial), [initial]);
 
+    const [isSaving, setIsSaving] = React.useState(false);
+    const [wasSaved, setWasSaved] = React.useState(false);
+    const saveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
+    React.useEffect(() => {
+        return () => {
+            if (saveTimerRef.current) {
+                clearTimeout(saveTimerRef.current);
+            }
+        };
+    }, []);
+
     const updateSection = (
         section: SectionKey,
         patch: Partial<UrlPreferences[SectionKey]>
@@ -171,6 +184,7 @@ export default function UrlLinkSettings() {
             toast.error("You must be signed in to save settings");
             return;
         }
+        setIsSaving(true);
         try {
             const ops: any[] = [];
             if (row?.id) {
@@ -185,10 +199,16 @@ export default function UrlLinkSettings() {
                 );
             }
             await db.transact(ops);
-            toast.success("URL preferences saved");
+            setWasSaved(true);
+            if (saveTimerRef.current) {
+                clearTimeout(saveTimerRef.current);
+            }
+            saveTimerRef.current = setTimeout(() => setWasSaved(false), 1000);
         } catch (e) {
             console.error(e);
             toast.error("Failed to save settings");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -208,11 +228,6 @@ export default function UrlLinkSettings() {
                         items, and monsters. Choose a provider or select Custom
                         and set a Base URL, an Argument pattern, and a Space
                         replacement. Per-type examples are provided below.
-                    </div>
-                    <div className="text-xs">
-                        Note: D&amp;D Beyond links require numeric IDs (e.g.,
-                        https://www.dndbeyond.com/magic-items/5370-adamantine-armor).
-                        Exact links generally need scraped IDs.
                     </div>
                 </div>
                 <Section
@@ -235,8 +250,20 @@ export default function UrlLinkSettings() {
                 />
 
                 <div className="pt-2">
-                    <Button onClick={() => void save()}>
-                        Save preferences
+                    <Button
+                        onClick={() => void save()}
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            "Saving..."
+                        ) : wasSaved ? (
+                            <span className="inline-flex items-center gap-2">
+                                <Check className="w-4 h-4 text-green-600" />
+                                Saved
+                            </span>
+                        ) : (
+                            "Save preferences"
+                        )}
                     </Button>
                 </div>
             </CardContent>

@@ -9,7 +9,7 @@ import db from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, BookOpen, Link2 } from "lucide-react";
+import { Edit, Trash2, BookOpen, Link2, Check } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -37,6 +37,18 @@ export default function SpellbooksGrid({
     const { isLoading, error, data } = db.useQuery({
         spellbooks: {},
     });
+
+    const [copiedId, setCopiedId] = React.useState<string | null>(null);
+    const copyTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
+    React.useEffect(() => {
+        return () => {
+            if (copyTimerRef.current) {
+                clearTimeout(copyTimerRef.current);
+            }
+        };
+    }, []);
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading spellbooks…</div>;
@@ -104,7 +116,13 @@ export default function SpellbooksGrid({
         try {
             const url = `${window.location.origin}/app/spellbook-generator/${id}`;
             await navigator.clipboard.writeText(url);
-            toast.success("Link copied to clipboard");
+            setCopiedId(id);
+            if (copyTimerRef.current) {
+                clearTimeout(copyTimerRef.current);
+            }
+            copyTimerRef.current = setTimeout(() => {
+                setCopiedId(null);
+            }, 1000);
         } catch (err) {
             console.error("Copy link failed:", err);
             toast.error("Failed to copy link");
@@ -172,9 +190,17 @@ export default function SpellbooksGrid({
                                                     void handleCopyLink(s.id)
                                                 }
                                                 className="w-8 h-8 p-0 hover:bg-gray-100"
-                                                title="Copy link"
+                                                title={
+                                                    copiedId === s.id
+                                                        ? "Copied!"
+                                                        : "Copy link"
+                                                }
                                             >
-                                                <Link2 className="w-4 h-4" />
+                                                {copiedId === s.id ? (
+                                                    <Check className="w-4 h-4 text-green-600" />
+                                                ) : (
+                                                    <Link2 className="w-4 h-4" />
+                                                )}
                                             </Button>
 
                                             <Button

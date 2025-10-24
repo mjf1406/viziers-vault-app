@@ -68,7 +68,6 @@ export default function CreateWorldResponsiveDialog({
                     })
                     .link({ $user: user.id })
             );
-            toast.success("World created");
             onCreated?.(newId);
             setDialogOpen(false);
             setName("");

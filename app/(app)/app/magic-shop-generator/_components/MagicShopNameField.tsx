@@ -382,7 +382,7 @@ export default function MagicShopNameField({
     id = "shopName",
     nameAttr = "shopName",
     placeholder = "e.g., Neera's Gilded Emporium",
-    label = "Shop name (optional)",
+    label = "Shop name",
     className,
     buttonAriaLabel = "Randomize shop name",
 }: MagicShopNameFieldProps) {

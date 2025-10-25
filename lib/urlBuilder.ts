@@ -11,18 +11,8 @@ export type SpellUrlPrefs = {
 
 export type UrlPreferences = {
     spells?: SpellUrlPrefs | null;
-    items?: {
-        provider?: SpellUrlProvider;
-        baseUrl?: string | null;
-        argPattern?: string | null; // e.g. "${ITEM_NAME}"
-        spaceReplacement?: string | null;
-    } | null;
-    monsters?: {
-        provider?: SpellUrlProvider;
-        baseUrl?: string | null;
-        argPattern?: string | null; // e.g. "${MONSTER_NAME}"
-        spaceReplacement?: string | null;
-    } | null;
+    items?: SpellUrlPrefs | null;
+    monsters?: SpellUrlPrefs | null;
 } | null;
 
 function normalizeSourceShort(raw: unknown): string {
@@ -108,13 +98,12 @@ export function buildSpellUrl(
 
     if (!spellName && !slug) return null;
 
-    const baseUrl = prefs?.baseUrl ?? "https://5e.tools/spells.html#";
-    const argPattern =
-        prefs?.argPattern ?? "${SPELL_NAME_LOWER}_${SOURCE_SHORT}";
+    const baseUrl = prefs?.baseUrl ?? "";
+    const argPattern = prefs?.argPattern ?? "${SPELL_NAME}";
     const spaceReplacement =
         typeof prefs?.spaceReplacement === "string"
             ? prefs.spaceReplacement
-            : "%20";
+            : "-";
 
     const toToken = (s: string) =>
         String(s || "").replace(/\s+/g, spaceReplacement);
@@ -134,5 +123,69 @@ export function buildSpellUrl(
         .replaceAll("${ITEM_NAME}", token)
         .replaceAll("${MONSTER_NAME}", token);
 
+    // Require a base URL for custom providers; otherwise no valid link
+    if (!baseUrl) return null;
+    return `${baseUrl}${filled}`;
+}
+
+export function buildItemUrl(
+    item: any,
+    prefs?: SpellUrlPrefs | null
+): string | null {
+    const provider = (prefs?.provider ?? "dndbeyond").toString();
+
+    // D&D Beyond provider
+    if (provider === "dndbeyond") {
+        if (item?.url && typeof item.url === "string") {
+            return item.url;
+        }
+        const id = item?.dndbeyondId;
+        const slug = item?.slug;
+        if (!id || !slug) return null;
+        return `https://www.dndbeyond.com/magic-items/${id}-${slug}`;
+    }
+
+    // Custom template provider
+    const sourceShortRaw =
+        item?.sourceShort || item?.source_short || item?.source || "";
+
+    if (!sourceShortRaw && item?.url && typeof item.url === "string") {
+        return item.url;
+    }
+
+    const itemName = item?.name || item?.NAME || "";
+    const itemNameLower =
+        item?.nameLower || item?.name_lower || itemName.toLowerCase();
+    const slug = item?.slug || item?.SLUG || "";
+
+    if (!itemName && !slug) return null;
+
+    const baseUrl = prefs?.baseUrl ?? "";
+    const argPattern = prefs?.argPattern ?? "${ITEM_NAME}";
+    const spaceReplacement =
+        typeof prefs?.spaceReplacement === "string"
+            ? prefs.spaceReplacement
+            : "-";
+
+    const toToken = (s: string) =>
+        String(s || "").replace(/\s+/g, spaceReplacement);
+
+    const token = toToken(itemName);
+    const tokenLower = toToken(itemNameLower);
+    const slugToken = slug;
+    const sourceShort = normalizeSourceShort(sourceShortRaw);
+
+    let filled = String(argPattern)
+        .replaceAll("${ITEM_NAME}", token)
+        .replaceAll("${ITEM_NAME_LOWER}", tokenLower)
+        .replaceAll("${ITEM_NAME_SLUG}", slugToken)
+        .replaceAll("${SLUG}", slugToken)
+        .replaceAll("${SOURCE_SHORT}", sourceShort)
+        .replaceAll("${SOURCE}", sourceShortRaw)
+        .replaceAll("${SPELL_NAME}", token)
+        .replaceAll("${MONSTER_NAME}", token);
+
+    // Require a base URL for custom providers; otherwise no valid link
+    if (!baseUrl) return null;
     return `${baseUrl}${filled}`;
 }

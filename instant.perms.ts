@@ -138,7 +138,7 @@ const rules = {
     },
     magicShops: {
         allow: {
-            view: "isCreator",
+            view: "true",
             create: "isAuthenticated && isPremium",
             update: "isCreator && isStillCreator",
             delete: "isCreator",

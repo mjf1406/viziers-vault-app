@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
+import { SPELL_SCROLL_PRICES_GP } from "@/lib/5e-data";
 
 type SettingsRow = {
     id?: string;
@@ -35,6 +36,7 @@ type SettingsRow = {
     rarityPopulationGating?: "strict" | "soft" | "none" | null;
     basePrices?: Record<string, Record<string, number>> | null;
     rarityThresholds?: Record<string, number> | null;
+    spellScrollPrices?: Record<string, number> | null;
 };
 
 const DEFAULTS: Required<Omit<SettingsRow, "id">> = {
@@ -69,6 +71,7 @@ const DEFAULTS: Required<Omit<SettingsRow, "id">> = {
         "Very Rare": 10000,
         Legendary: 100000,
     },
+    spellScrollPrices: SPELL_SCROLL_PRICES_GP,
 };
 
 export default function MagicShopSettings() {
@@ -89,6 +92,7 @@ export default function MagicShopSettings() {
             rarityPopulationGating: (r.rarityPopulationGating as any) ?? null,
             basePrices: (r.basePrices as any) ?? null,
             rarityThresholds: (r.rarityThresholds as any) ?? null,
+            spellScrollPrices: (r.spellScrollPrices as any) ?? null,
         };
     }, [data?.settings]);
 
@@ -105,6 +109,7 @@ export default function MagicShopSettings() {
             row?.rarityPopulationGating ?? DEFAULTS.rarityPopulationGating,
         basePrices: row?.basePrices ?? DEFAULTS.basePrices,
         rarityThresholds: row?.rarityThresholds ?? DEFAULTS.rarityThresholds,
+        spellScrollPrices: row?.spellScrollPrices ?? DEFAULTS.spellScrollPrices,
     }));
     React.useEffect(() => {
         setForm({
@@ -121,6 +126,8 @@ export default function MagicShopSettings() {
             basePrices: row?.basePrices ?? DEFAULTS.basePrices,
             rarityThresholds:
                 row?.rarityThresholds ?? DEFAULTS.rarityThresholds,
+            spellScrollPrices:
+                row?.spellScrollPrices ?? DEFAULTS.spellScrollPrices,
         });
     }, [row?.id]);
 
@@ -186,6 +193,16 @@ export default function MagicShopSettings() {
                     Object.entries(source).forEach(([rarity, v]) => {
                         const n = Number(v);
                         result[rarity] = Number.isFinite(n) ? n : 0;
+                    });
+                    return result;
+                })(),
+                spellScrollPrices: (() => {
+                    const source = (form.spellScrollPrices ??
+                        DEFAULTS.spellScrollPrices) as Record<string, number>;
+                    const result: Record<string, number> = {};
+                    Object.entries(source).forEach(([level, v]) => {
+                        const n = Number(v);
+                        result[level] = Number.isFinite(n) ? n : 0;
                     });
                     return result;
                 })(),
@@ -554,6 +571,87 @@ export default function MagicShopSettings() {
                                                             (
                                                                 next.rarityThresholds as any
                                                             )[rarity] =
+                                                                Number.isFinite(
+                                                                    n
+                                                                )
+                                                                    ? n
+                                                                    : 0;
+                                                            return next;
+                                                        });
+                                                    }}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="text-lg font-medium">
+                            Spell Scroll Prices (gp)
+                        </div>
+                        <FieldDescription>
+                            Set the base gold cost for spell scrolls by level.
+                        </FieldDescription>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="text-left">
+                                        <th className="py-2 pr-3">Level</th>
+                                        <th className="py-2 pr-3">
+                                            Price (gp)
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[
+                                        "cantrip",
+                                        "1",
+                                        "2",
+                                        "3",
+                                        "4",
+                                        "5",
+                                        "6",
+                                        "7",
+                                        "8",
+                                        "9",
+                                    ].map((lvl) => (
+                                        <tr
+                                            key={lvl}
+                                            className="border-t"
+                                        >
+                                            <td className="py-2 pr-3">{lvl}</td>
+                                            <td className="py-2 pr-3">
+                                                <Input
+                                                    type="number"
+                                                    step="1"
+                                                    value={
+                                                        (form.spellScrollPrices ??
+                                                            DEFAULTS.spellScrollPrices)?.[
+                                                            lvl
+                                                        ] ?? ""
+                                                    }
+                                                    onChange={(e) => {
+                                                        const n = parseFloat(
+                                                            e.target.value
+                                                        );
+                                                        setForm((prev) => {
+                                                            const next = {
+                                                                ...prev,
+                                                                spellScrollPrices:
+                                                                    {
+                                                                        ...(prev.spellScrollPrices ??
+                                                                            DEFAULTS.spellScrollPrices),
+                                                                    } as Record<
+                                                                        string,
+                                                                        number
+                                                                    >,
+                                                            } as SettingsRow;
+                                                            (
+                                                                next.spellScrollPrices as any
+                                                            )[lvl] =
                                                                 Number.isFinite(
                                                                     n
                                                                 )

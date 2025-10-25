@@ -269,3 +269,30 @@ export const SPELLS_PER_LEVEL = {
 
 export const MIN_LEVEL = 1;
 export const MAX_LEVEL = 20;
+
+export const SPELL_SCROLL_PRICES_GP = {
+    // TODO: Add to settings
+    cantrip: 8,
+    "1": 13,
+    "2": 125,
+    "3": 250,
+    "4": 1250,
+    "5": 2500,
+    "6": 7500,
+    "7": 12500,
+    "8": 25000,
+    "9": 125000,
+};
+
+export const SPELL_LEVEL_TO_RARITY = {
+    cantrip: "common",
+    "1": "common",
+    "2": "uncommon",
+    "3": "uncommon",
+    "4": "rare",
+    "5": "rare",
+    "6": "very rare",
+    "7": "very rare",
+    "8": "very rare",
+    "9": "legendary",
+} as const;

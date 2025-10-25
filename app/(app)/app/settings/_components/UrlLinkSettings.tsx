@@ -332,7 +332,7 @@ function Section({
                                     ? "https://open5e.com/spells/"
                                     : sectionKey === "items"
                                     ? "https://open5e.com/magic-items/"
-                                    : "https://5e.tools/bestiary.html#"
+                                    : "https://open5e.com/monsters/"
                             }
                         />
                     </div>

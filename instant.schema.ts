@@ -136,6 +136,7 @@ const _schema = i.schema({
             rarityPopulationGating: i.string().optional(), // "strict" | "soft" | "none"
             basePrices: i.json().optional(),
             rarityThresholds: i.json().optional(),
+            spellScrollPrices: i.json().optional(),
         }),
         battleMaps: i.entity({}),
         parties: i.entity({

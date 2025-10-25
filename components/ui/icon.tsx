@@ -14,7 +14,7 @@ export const Icon = ({
     size: number;
     className?: string;
 }) => {
-    const LucideIcon = icons[name as keyof typeof icons];
+    const LucideIcon = icons[name as keyof typeof icons] || icons["Circle"];
 
     return (
         <LucideIcon

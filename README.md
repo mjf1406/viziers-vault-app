@@ -29,6 +29,10 @@
 
 ## Change Log
 
+### 2025/10/25
+
+-   magic shop generation v1 done
+
 ### 2025/10/24
 
 -   copying links success now shows a checkmark instead of a toast

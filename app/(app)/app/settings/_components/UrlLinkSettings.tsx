@@ -219,7 +219,7 @@ export default function UrlLinkSettings() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Reference Link Preferences</CardTitle>
+                <CardTitle>Reference Link Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2 text-sm text-muted-foreground">
@@ -249,7 +249,7 @@ export default function UrlLinkSettings() {
                     onChange={updateSection}
                 />
 
-                <div className="pt-2">
+                <div className="pt-2 flex justify-end">
                     <Button
                         onClick={() => void save()}
                         disabled={isSaving}
@@ -262,7 +262,7 @@ export default function UrlLinkSettings() {
                                 Saved
                             </span>
                         ) : (
-                            "Save preferences"
+                            "Save Reference Link settings"
                         )}
                     </Button>
                 </div>

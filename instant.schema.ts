@@ -126,6 +126,16 @@ const _schema = i.schema({
         }),
         settings: i.entity({
             urlPreferences: i.json().optional(),
+            // Generator settings (Magic Shop, etc.)
+            slotBeta: i.number().optional(),
+            slotScale: i.number().optional(),
+            wealthInfluence: i.number().optional(),
+            maxPriceChange: i.number().optional(),
+            rarityProgressionExponent: i.number().optional(),
+            magicRarityBias: i.number().optional(),
+            rarityPopulationGating: i.string().optional(), // "strict" | "soft" | "none"
+            basePrices: i.json().optional(),
+            rarityThresholds: i.json().optional(),
         }),
         battleMaps: i.entity({}),
         parties: i.entity({

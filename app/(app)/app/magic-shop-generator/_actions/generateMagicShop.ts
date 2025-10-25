@@ -101,5 +101,16 @@ export default async function generateMagicShop(
 // }
 
 async function generateMagicShopItems(options: any): Promise<any[]> {
+    const {
+        population,
+        wealth,
+        magicLevel,
+        stockTypes,
+        stockMultiplier,
+        worldId,
+        settlementId,
+        inputMode,
+    } = options;
+
     return [];
 }

@@ -52,6 +52,9 @@ export type GenerateMagicShopOpts = {
     stockIntensity?: "sparse" | "normal" | "lush";
     stockMultiplier?: number | null;
     inputMode?: "by-population" | "by-settlement";
+    settings?: any | null;
+    // Snapshot of worlds (with nested settlements) to resolve population in actions without querying
+    worlds?: any[] | null;
 };
 
 type MagicShopInitial = {
@@ -87,7 +90,7 @@ export default function MagicShopGeneratorDialog({
     hideTitleOnMobile = false,
     onGenerate,
 }: MagicShopGeneratorDialogProps) {
-    const { plan, user } = useUser();
+    const { plan, user, settings } = useUser();
     const isPaid = Boolean(plan && plan.toLowerCase() !== "free");
     const [openLocal, setOpenLocal] = useState<boolean>(!!defaultOpen);
     const isControlled = typeof open !== "undefined";
@@ -254,6 +257,8 @@ export default function MagicShopGeneratorDialog({
                         ? stockMultiplier
                         : null,
                 inputMode: activeTab,
+                settings,
+                worlds: (worldsData?.worlds as any[]) ?? [],
             };
 
             if (mode === "create") {

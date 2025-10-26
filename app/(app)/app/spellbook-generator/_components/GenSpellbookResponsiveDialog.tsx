@@ -13,7 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+// removed toast-based validation in favor of Zod + inline errors
 import {
     Credenza,
     CredenzaBody,
@@ -27,9 +27,7 @@ import generateSpellbook from "../_actions/generateSpellbook";
 import { updateSpellbook } from "../_actions/updateSpellbook";
 import { CLASSES, SCHOOLS, SOURCE_SHORTS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
-import db from "@/lib/db";
 import { useUser } from "@/hooks/useUser";
-import { useRouter } from "next/navigation";
 import SpellbookNameField from "./SpellbookNameField";
 import {
     buildSpellbookFilename,
@@ -39,6 +37,7 @@ import {
 import { toTitleCase } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Toggle } from "@/components/ui/toggle";
+import { z } from "zod";
 
 export type GenerateOpts = {
     level: number | "random";
@@ -67,6 +66,65 @@ type SpellbookGeneratorDialogProps = {
     onGenerate?: (opts: GenerateOpts) => Promise<void> | void;
 };
 
+const getSpellbookSchema = (requireName: boolean) =>
+    z
+        .object({
+            name: requireName
+                ? z.string().trim().min(1, "Name is required")
+                : z.string().optional(),
+            level: z.union([
+                z.literal("random"),
+                z
+                    .string()
+                    .regex(
+                        /^(?:[1-9]|1\d|20)$/g,
+                        "Pick a level 1-20 or Random"
+                    ),
+            ]),
+            schoolsRandom: z.boolean(),
+            selectedSchools: z
+                .array(z.string())
+                .refine(
+                    (arr) => arr.every((s) => SCHOOLS.includes(s)),
+                    "Invalid school selected"
+                ),
+            classesRandom: z.boolean(),
+            selectedClasses: z
+                .array(z.string())
+                .refine(
+                    (arr) => arr.every((c) => CLASSES.includes(c)),
+                    "Invalid class selected"
+                ),
+            selectedSources: z.array(z.string()).optional(),
+            excludeLegacy: z.boolean(),
+        })
+        .superRefine((val, ctx) => {
+            if (!val.schoolsRandom && val.selectedSchools.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["selectedSchools"],
+                    message: "Select at least one school or choose Random",
+                });
+            }
+            if (!val.classesRandom && val.selectedClasses.length === 0) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["selectedClasses"],
+                    message: "Select at least one class or choose Random",
+                });
+            }
+            if (val.level !== "random") {
+                const n = parseInt(val.level, 10);
+                if (!(n >= 1 && n <= 20)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["level"],
+                        message: "Level must be between 1 and 20",
+                    });
+                }
+            }
+        });
+
 export default function SpellbookGeneratorDialog({
     mode = "create",
     initial = null,
@@ -89,7 +147,12 @@ export default function SpellbookGeneratorDialog({
         onOpenChange?.(v);
         if (!isControlled && !v) onClose?.();
     };
-    const router = useRouter();
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const clearFieldError = (key: string) =>
+        setErrors((prev) => {
+            const { [key]: _discard, ...rest } = prev;
+            return rest;
+        });
 
     const [selectedLevel, setSelectedLevel] = useState<string>(
         initial?.level ? String(initial.level) : "random"
@@ -201,6 +264,7 @@ export default function SpellbookGeneratorDialog({
             setSelectedSchools(restored);
             setSchoolsRandom(false);
         }
+        clearFieldError("selectedSchools");
     };
 
     const toggleClassesRandom = (value: boolean) => {
@@ -217,6 +281,7 @@ export default function SpellbookGeneratorDialog({
             setSelectedClasses(restored);
             setClassesRandom(false);
         }
+        clearFieldError("selectedClasses");
     };
 
     const handleToggleSchool = (s: string, checked: boolean) => {
@@ -229,6 +294,7 @@ export default function SpellbookGeneratorDialog({
                     : [...cur, s]
                 : cur.filter((x) => x !== s)
         );
+        clearFieldError("selectedSchools");
     };
 
     const handleSelectAllSchools = () => setSelectedSchools([...SCHOOLS]);
@@ -236,6 +302,25 @@ export default function SpellbookGeneratorDialog({
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const parsed = getSpellbookSchema(isPaid && !!user?.id).safeParse({
+            name,
+            level: selectedLevel,
+            schoolsRandom,
+            selectedSchools,
+            classesRandom,
+            selectedClasses,
+            selectedSources,
+            excludeLegacy,
+        });
+        if (!parsed.success) {
+            const fieldErrors: Record<string, string> = {};
+            for (const issue of parsed.error.issues) {
+                const key = (issue.path[0] as string) || "form";
+                if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+            }
+            setErrors(fieldErrors);
+            return;
+        }
 
         const formEl = e.currentTarget;
         const formData = new FormData(formEl);
@@ -255,14 +340,7 @@ export default function SpellbookGeneratorDialog({
             ? "random"
             : selectedClasses;
 
-        if (classesResult !== "random" && classesResult.length === 0) {
-            toast.error("Select at least one class or choose Random");
-            return;
-        }
-        if (schoolsResult !== "random" && schoolsResult.length === 0) {
-            toast.error("Select at least one school or choose Random");
-            return;
-        }
+        // validated by Zod
 
         // If level is "random", pick a numeric level client-side (1-20),
         // update both the form data and the visible selectedLevel so the
@@ -312,7 +390,7 @@ export default function SpellbookGeneratorDialog({
             setDialogOpen(false);
         } catch (err: any) {
             console.error("generate error", err);
-            // Check for middleware-set rate limit message cookie
+            // Inline error instead of toast; check middleware-set rate limit message cookie
             if (typeof document !== "undefined") {
                 const cookieStr = document.cookie || "";
                 const m = cookieStr.match(/(?:^|; )vv_rl_msg=([^;]+)/);
@@ -321,7 +399,7 @@ export default function SpellbookGeneratorDialog({
                         const raw = decodeURIComponent(m[1]);
                         // eslint-disable-next-line no-console
                         console.error(raw);
-                        toast.error("429 Too Many Requests");
+                        setErrors({ form: "429 Too Many Requests" });
                     } finally {
                         document.cookie = "vv_rl_msg=; path=/; max-age=0";
                     }
@@ -334,7 +412,7 @@ export default function SpellbookGeneratorDialog({
                 err?.message ||
                 err?.body?.message ||
                 (typeof err === "string" ? err : "Generation failed");
-            toast.error(msg);
+            setErrors({ form: String(msg) });
             setDialogOpen(true);
         } finally {
             setIsGenerating(false);
@@ -364,14 +442,29 @@ export default function SpellbookGeneratorDialog({
                     </CredenzaHeader>
 
                     <CredenzaBody className="space-y-5">
+                        {errors.form ? (
+                            <div className="text-sm text-red-600">
+                                {errors.form}
+                            </div>
+                        ) : null}
+
                         {isPaid && user?.id ? (
                             <SpellbookNameField
                                 value={name}
-                                onChange={setName}
+                                onChange={(v) => {
+                                    setName(v);
+                                    clearFieldError("form");
+                                    clearFieldError("name");
+                                }}
                                 id="name"
                                 nameAttr="name"
                                 placeholder="e.g., Neera's Apprentice Grimoire"
                             />
+                        ) : null}
+                        {errors.name ? (
+                            <p className="text-sm text-red-600 mt-1">
+                                {errors.name}
+                            </p>
                         ) : null}
 
                         {/* Only show generation options in create mode */}
@@ -384,9 +477,10 @@ export default function SpellbookGeneratorDialog({
 
                                     <Select
                                         value={selectedLevel}
-                                        onValueChange={(v) =>
-                                            setSelectedLevel(v)
-                                        }
+                                        onValueChange={(v) => {
+                                            setSelectedLevel(v);
+                                            clearFieldError("level");
+                                        }}
                                     >
                                         <SelectTrigger
                                             id="level"
@@ -418,6 +512,11 @@ export default function SpellbookGeneratorDialog({
                                         name="level"
                                         value={selectedLevel}
                                     />
+                                    {errors.level ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.level}
+                                        </p>
+                                    ) : null}
                                 </div>
 
                                 <div>
@@ -436,14 +535,13 @@ export default function SpellbookGeneratorDialog({
                                         }
                                         onValueChange={(v) => {
                                             if (v === "random") {
-                                                // switch to random
                                                 toggleClassesRandom(true);
                                             } else {
-                                                // any manual selection cancels random
                                                 if (classesRandom)
                                                     toggleClassesRandom(false);
                                                 setSelectedClasses([v]);
                                             }
+                                            clearFieldError("selectedClasses");
                                         }}
                                     >
                                         <SelectTrigger className="mt-1 w-full">
@@ -480,6 +578,11 @@ export default function SpellbookGeneratorDialog({
                                             }
                                         />
                                     )}
+                                    {errors.selectedClasses ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.selectedClasses}
+                                        </p>
+                                    ) : null}
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
@@ -563,6 +666,11 @@ export default function SpellbookGeneratorDialog({
                                             );
                                         })}
                                     </div>
+                                    {errors.selectedSchools ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.selectedSchools}
+                                        </p>
+                                    ) : null}
                                 </div>
 
                                 {/* Source shorts */}

@@ -15,6 +15,7 @@ export function JoinTheDiscord() {
         >
             <Link
                 href={discrodURL}
+                rel="noopener noreferrer"
                 target="_blank"
                 prefetch={false}
             >
@@ -48,6 +49,7 @@ export function Discord() {
     return (
         <Link
             href={discrodURL}
+            rel="noopener noreferrer"
             target="_blank"
             prefetch={false}
         >

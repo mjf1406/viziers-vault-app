@@ -8,7 +8,8 @@
         "start": "next start",
         "pushschema": "npx instant-cli@latest push schema",
         "pushperms": "npx instant-cli@latest push perms",
-        "bs": "npm run build && npm run start"
+        "bs": "npm run build && npm run start",
+        "update:spell-costs": "tsx stuff/scripts/updateSpellComponentCosts.ts"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.913.0",
@@ -59,7 +60,8 @@
         "remark-rehype": "^11.1.2",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.3.1",
-        "vaul": "^1.1.2"
+        "vaul": "^1.1.2",
+        "zod": "^4.1.12"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",

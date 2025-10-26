@@ -22,6 +22,8 @@ import {
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
 import Link from "next/link";
+import DownloadMagicShopCSVButton from "./DownloadMagicShopCSVButton";
+import { WEALTH_LEVELS, MAGICNESS_LEVELS } from "@/lib/constants/settlements";
 
 export default function MagicShopsGrid({
     onEdit,
@@ -69,6 +71,42 @@ export default function MagicShopsGrid({
         }))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
+    // Resolve world/settlement names for display when not embedded in options
+    const worldIds = Array.from(
+        new Set(
+            shops
+                .map((s: any) => (s?.options?.worldId as any) ?? null)
+                .filter(Boolean) as string[]
+        )
+    );
+    const settlementIds = Array.from(
+        new Set(
+            shops
+                .map((s: any) => (s?.options?.settlementId as any) ?? null)
+                .filter(Boolean) as string[]
+        )
+    );
+    const { data: worldSettleData } = db.useQuery({
+        worlds: { $: { where: { id: { $in: worldIds } } } },
+        settlements: { $: { where: { id: { $in: settlementIds } } } },
+    });
+    const worldIdToName = React.useMemo(() => {
+        const m = new Map<string, string>();
+        const arr = (worldSettleData?.worlds ?? []) as any[];
+        for (const w of arr) {
+            if (w?.id) m.set(w.id, w.name ?? w.id);
+        }
+        return m;
+    }, [worldSettleData]);
+    const settlementIdToName = React.useMemo(() => {
+        const m = new Map<string, string>();
+        const arr = (worldSettleData?.settlements ?? []) as any[];
+        for (const s of arr) {
+            if (s?.id) m.set(s.id, s.name ?? s.id);
+        }
+        return m;
+    }, [worldSettleData]);
+
     if (!shops.length) {
         return (
             <div className="py-12 text-center flex flex-col items-center justify-center w-full">
@@ -115,9 +153,104 @@ export default function MagicShopsGrid({
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {shops.map((s) => {
                 const isPending = pendingIds.has(s.id);
-                const population = s?.options?.population;
-                const wealth = s?.options?.wealth;
-                const magicLevel = s?.options?.magicLevel;
+                const opts: any = s?.options ?? {};
+                const population =
+                    typeof opts?.population === "number"
+                        ? opts.population
+                        : null;
+                const wealthIndex: number | null =
+                    typeof opts?.wealthIndex === "number"
+                        ? opts.wealthIndex
+                        : typeof opts?.wealth === "number"
+                        ? Math.round(
+                              Math.max(0, Math.min(1, opts.wealth)) *
+                                  (WEALTH_LEVELS.length - 1)
+                          )
+                        : null;
+                const magicIndex: number | null =
+                    typeof opts?.magicLevelIndex === "number"
+                        ? opts.magicLevelIndex
+                        : typeof opts?.magicLevel === "number"
+                        ? opts.magicLevel
+                        : null;
+                const wealthLabel =
+                    wealthIndex != null
+                        ? WEALTH_LEVELS[
+                              Math.max(
+                                  0,
+                                  Math.min(
+                                      WEALTH_LEVELS.length - 1,
+                                      wealthIndex
+                                  )
+                              )
+                          ]
+                        : "—";
+                const magicLabel =
+                    magicIndex != null
+                        ? MAGICNESS_LEVELS[
+                              Math.max(
+                                  0,
+                                  Math.min(
+                                      MAGICNESS_LEVELS.length - 1,
+                                      magicIndex
+                                  )
+                              )
+                          ]
+                        : "—";
+                const quantity =
+                    typeof opts?.quantity === "number" ? opts.quantity : null;
+                const stockMultiplier =
+                    typeof opts?.stockMultiplier === "number"
+                        ? opts.stockMultiplier
+                        : null;
+                const worldName: string =
+                    opts?.worldName ??
+                    worldIdToName.get(opts?.worldId as any) ??
+                    "—";
+                const settlementName: string =
+                    opts?.settlementName ??
+                    settlementIdToName.get(opts?.settlementId as any) ??
+                    "—";
+                const selectedStockTypes: string[] = Array.isArray(
+                    opts?.selectedStockTypes
+                )
+                    ? (opts.selectedStockTypes as string[])
+                    : [];
+                const expandedStockTypes: string[] = Array.isArray(
+                    opts?.stockTypes
+                )
+                    ? (opts.stockTypes as string[])
+                    : [];
+                const hasAny = (names: string[]) =>
+                    names.some((n) => expandedStockTypes.includes(n));
+                const categoriesFromExpanded: string[] = (() => {
+                    const cats: string[] = [];
+                    if (expandedStockTypes.includes("weapon"))
+                        cats.push("weapons");
+                    if (expandedStockTypes.includes("armor"))
+                        cats.push("armor");
+                    if (expandedStockTypes.includes("potion"))
+                        cats.push("potions");
+                    if (expandedStockTypes.includes("poison"))
+                        cats.push("poisons");
+                    if (
+                        hasAny([
+                            "ring",
+                            "rod",
+                            "staff",
+                            "wand",
+                            "wondrous item",
+                        ])
+                    )
+                        cats.push("items");
+                    if (opts?.includeScrolls) cats.push("scrolls");
+                    if (opts?.includeSpellComponents)
+                        cats.push("spell components");
+                    return Array.from(new Set(cats));
+                })();
+                const stockCategories: string[] = selectedStockTypes.length
+                    ? selectedStockTypes
+                    : categoriesFromExpanded;
                 const createdAtLocal = s?.createdAt
                     ? new Date(s.createdAt as any).toLocaleString()
                     : null;
@@ -149,6 +282,15 @@ export default function MagicShopsGrid({
                                 <div className="flex items-center gap-0.5 shrink-0">
                                     {!isPending && (
                                         <>
+                                            <DownloadMagicShopCSVButton
+                                                shops={s}
+                                                shopName={s.name}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="w-8 h-8 p-0 hover:bg-gray-100"
+                                                aria-label="Download CSV"
+                                                labelSrOnly
+                                            />
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -228,30 +370,63 @@ export default function MagicShopsGrid({
                         <CardContent>
                             <div className="space-y-2">
                                 <div className="flex flex-wrap gap-1">
-                                    {population && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-xs"
-                                        >
-                                            {String(population)}
-                                        </Badge>
-                                    )}
-                                    {wealth && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-xs"
-                                        >
-                                            {String(wealth)}
-                                        </Badge>
-                                    )}
-                                    {magicLevel && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="text-xs"
-                                        >
-                                            {String(magicLevel)}
-                                        </Badge>
-                                    )}
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        World: {worldName}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Settlement: {settlementName}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Population:{" "}
+                                        {population != null
+                                            ? population.toLocaleString()
+                                            : "—"}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Wealth: {wealthLabel}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Magicness: {magicLabel}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Qty: {quantity != null ? quantity : "—"}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Stock x
+                                        {stockMultiplier != null
+                                            ? stockMultiplier
+                                            : "—"}
+                                    </Badge>
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Types:{" "}
+                                        {stockCategories.length
+                                            ? stockCategories.join(", ")
+                                            : "—"}
+                                    </Badge>
                                 </div>
 
                                 {createdAtLocal && (

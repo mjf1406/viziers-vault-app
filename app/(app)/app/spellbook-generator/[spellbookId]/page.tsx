@@ -9,11 +9,20 @@ import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Copy } from "lucide-react";
+import { Download, Copy, BookOpen } from "lucide-react";
 import { toTitleCase } from "@/lib/utils";
 import DownloadSpellbookCSVButton from "../_components/DownloadSpellbookCSVButton";
 import { buildSpellUrl } from "@/lib/urlBuilder";
 import { useUser } from "@/hooks/useUser";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 export default function SpellbookDetailPage() {
     const params = useParams();
@@ -24,47 +33,7 @@ export default function SpellbookDetailPage() {
     });
     const { settings } = useUser();
 
-    const [copied, setCopied] = React.useState(false);
-    const copyTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-        null
-    );
-
-    React.useEffect(() => {
-        return () => {
-            if (copyTimeoutRef.current) {
-                clearTimeout(copyTimeoutRef.current);
-            }
-        };
-    }, []);
-
-    const copyUrlToClipboard = async () => {
-        const url = window.location.href;
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(url);
-            } else {
-                const ta = document.createElement("textarea");
-                ta.value = url;
-                ta.setAttribute("readonly", "");
-                ta.style.position = "absolute";
-                ta.style.left = "-9999px";
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand("copy");
-                document.body.removeChild(ta);
-            }
-            setCopied(true);
-            if (copyTimeoutRef.current) {
-                clearTimeout(copyTimeoutRef.current);
-            }
-            copyTimeoutRef.current = setTimeout(() => {
-                setCopied(false);
-                copyTimeoutRef.current = null;
-            }, 2000);
-        } catch (e) {
-            console.error("Failed to copy URL", e);
-        }
-    };
+    // copy link logic handled by CopyLinkButton
 
     if (isLoading) {
         return <div className="p-4 xl:p-10">Loading…</div>;
@@ -92,30 +61,54 @@ export default function SpellbookDetailPage() {
 
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-3xl font-bold">
-                        {s.name ?? "Spellbook"}
-                    </h1>
-                </div>
+            <div className="space-y-2">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <Link
+                                prefetch={true}
+                                href="/app/spellbook-generator"
+                            >
+                                Spellbooks
+                            </Link>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <span className="text-foreground">
+                                {s.name ?? "Spellbook"}
+                            </span>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
 
-                <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">
+                            <BookOpen />
+                            {s.name ?? "Spellbook"}
+                        </h1>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <div>
+                    Created{" "}
+                    {s.createdAt
+                        ? new Date(s.createdAt as any).toLocaleString()
+                        : "—"}
+                </div>
+                <div className="flex items-center gap-2">
                     <DownloadSpellbookCSVButton
                         spells={spells}
                         spellbookName={s.name ?? "Spellbook"}
                         variant="outline"
                         size="sm"
                     />
-
-                    <Button
+                    <CopyLinkButton
                         variant="outline"
                         size="sm"
-                        onClick={copyUrlToClipboard}
-                        aria-label="Copy URL to clipboard"
-                    >
-                        <Copy className="h-4 w-4" />
-                        {copied ? "Copied!" : "Copy URL"}
-                    </Button>
+                    />
                 </div>
             </div>
             <div className="space-x-2">

@@ -29,6 +29,16 @@
 
 ## Change Log
 
+### 2025/10/26
+
+-   updated magic shop grid to have badges about the magic shop
+-   created a global copy url component for use everywhere because all things will need it for sharing
+-   spell scroll and spell component prices are not modified by price modifiers
+-   removed artifacts from magic shop generation
+-   added zod to all forms that pass data to the server
+-   added breadcrumbs and icon to magic shop detail page
+-   added breadcrumbs and icon to spellbook detail page
+
 ### 2025/10/25
 
 -   magic shop generation v1 done

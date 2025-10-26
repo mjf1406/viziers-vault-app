@@ -72,6 +72,7 @@ const _schema = i.schema({
             areaShape: i.string().optional().indexed(),
             components: i.string().optional().indexed(),
             materialComponents: i.string().optional(),
+            componentCost: i.number().optional(),
             duration: i.string().optional().indexed(),
             school: i.string().optional().indexed(),
             attackSave: i.string().optional(),
@@ -161,6 +162,7 @@ const _schema = i.schema({
             createdAt: i.date().optional(),
             updatedAt: i.date().optional(),
             items: i.json().optional(),
+            options: i.json().optional(),
             creatorId: i.string().optional().indexed(),
         }),
         worlds: i.entity({

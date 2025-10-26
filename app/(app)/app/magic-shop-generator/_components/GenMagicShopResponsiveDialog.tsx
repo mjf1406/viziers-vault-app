@@ -5,8 +5,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-// Removed select-based stock intensity control in favor of numeric multiplier
-import { toast } from "sonner";
 import {
     Credenza,
     CredenzaBody,
@@ -18,7 +16,6 @@ import {
 } from "@/components/ui/credenza";
 import { Dices, Loader2, Plus } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
-import { useRouter } from "next/navigation";
 import MagicShopNameField from "./MagicShopNameField";
 import WorldSelect from "./WorldSelect";
 import SettlementSelect from "./SettlementSelect";
@@ -39,6 +36,13 @@ import type {
 } from "@/lib/constants/settlements";
 import { MAGICNESS_LEVELS, WEALTH_LEVELS } from "@/lib/constants/settlements";
 import generateMagicShop from "../_actions/generateMagicShop";
+import type { GenerateMagicShopResponse } from "../_actions/generateMagicShop";
+import {
+    buildMagicShopFilename,
+    downloadCsv as downloadShopCsv,
+    shopsToCsv,
+} from "./DownloadMagicShopCSVButton";
+import { z } from "zod";
 
 export type GenerateMagicShopOpts = {
     population?: number | null;
@@ -100,7 +104,12 @@ export default function MagicShopGeneratorDialog({
         onOpenChange?.(v);
         if (!isControlled && !v) onClose?.();
     };
-    const router = useRouter();
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const clearFieldError = (key: string) =>
+        setErrors((prev) => {
+            const { [key]: _discard, ...rest } = prev;
+            return rest;
+        });
 
     const [name, setName] = useState<string>(initial?.name ?? "");
     const [population, setPopulation] = useState<
@@ -144,6 +153,65 @@ export default function MagicShopGeneratorDialog({
         "by-population" | "by-settlement"
     >(defaultTab);
 
+    const getMagicShopSchema = (requireName: boolean) =>
+        z
+            .object({
+                name: requireName
+                    ? z.string().trim().min(1, "Name is required")
+                    : z.string().optional(),
+                quantity: z.number().min(1, "Min 1").max(10, "Max 10"),
+                stockMultiplier: z
+                    .number()
+                    .min(0.1, "Min 0.1")
+                    .max(10, "Max 10"),
+                population: z
+                    .number()
+                    .int("Population must be an integer")
+                    .positive("Population must be positive")
+                    .optional()
+                    .nullable(),
+                settlementId: z.string().min(1).optional().nullable(),
+                stockTypes: z
+                    .array(z.string())
+                    .min(1, "Select at least one type"),
+                wealth: z.union([
+                    z.number(),
+                    z
+                        .string()
+                        .refine(
+                            (v) =>
+                                v === "random" ||
+                                WEALTH_LEVELS.includes(v as any),
+                            "Invalid wealth"
+                        ),
+                ]),
+                magicness: z.union([
+                    z.number(),
+                    z
+                        .string()
+                        .refine(
+                            (v) =>
+                                v === "random" ||
+                                MAGICNESS_LEVELS.includes(v as any),
+                            "Invalid magicness"
+                        ),
+                ]),
+            })
+            .superRefine((val, ctx) => {
+                const hasPopulation =
+                    typeof val.population === "number" &&
+                    Number.isFinite(val.population);
+                const hasSettlement =
+                    typeof val.settlementId === "string" && !!val.settlementId;
+                if (!hasPopulation && !hasSettlement) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["populationOrSettlement"],
+                        message: "Provide a population or choose a settlement",
+                    });
+                }
+            });
+
     // Load worlds with settlements so we can map a selected city -> its attributes
     const { data: worldsData } = db.useQuery({ worlds: { settlements: {} } });
     const allSettlements = useMemo(() => {
@@ -178,6 +246,27 @@ export default function MagicShopGeneratorDialog({
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        // Validate with Zod
+        const parsed = getMagicShopSchema(isPaid && !!user?.id).safeParse({
+            name,
+            quantity: typeof quantity === "number" ? quantity : 1,
+            stockMultiplier:
+                typeof stockMultiplier === "number" ? stockMultiplier : 1,
+            population: typeof population === "number" ? population : null,
+            settlementId: settlementId ?? null,
+            stockTypes: stockTypes ?? [],
+            wealth,
+            magicness,
+        });
+        if (!parsed.success) {
+            const fieldErrors: Record<string, string> = {};
+            for (const issue of parsed.error.issues) {
+                const key = (issue.path[0] as string) || "form";
+                if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+            }
+            setErrors(fieldErrors);
+            return;
+        }
 
         // Resolve randoms client-side for now
         const resolveRandom = <T extends string>(
@@ -187,27 +276,6 @@ export default function MagicShopGeneratorDialog({
             if (current !== ("random" as T)) return current;
             return choices[Math.floor(Math.random() * choices.length)];
         };
-
-        // basic validation
-        const qtyRaw = typeof quantity === "number" ? quantity : 1;
-        const qty = Math.min(10, Math.max(1, Number(qtyRaw) || 1));
-        if (!Number.isFinite(qty) || qty < 1 || qty > 10) {
-            toast.error("Please enter a valid quantity");
-            return;
-        }
-        if (!stockTypes || stockTypes.length === 0) {
-            toast.error("Please select at least one stock type");
-            return;
-        }
-        // Require at least one of population (numeric) or settlementId
-        const hasPopulation =
-            typeof population === "number" && Number.isFinite(population);
-        const hasSettlement =
-            typeof settlementId === "string" && !!settlementId;
-        if (!hasPopulation && !hasSettlement) {
-            toast.error("Provide a population or choose a settlement");
-            return;
-        }
 
         // Normalize wealth to an integer index
         const resolvedWealthNumeric = (() => {
@@ -238,6 +306,7 @@ export default function MagicShopGeneratorDialog({
 
         setIsGenerating(true);
         try {
+            const qty = Math.min(10, Math.max(1, Number(quantity) || 1));
             const payload: GenerateMagicShopOpts = {
                 population:
                     typeof population === "number" &&
@@ -263,22 +332,53 @@ export default function MagicShopGeneratorDialog({
 
             if (mode === "create") {
                 try {
-                    const ids = await generateMagicShop(
-                        {
-                            name:
-                                isPaid && user?.id
-                                    ? (name || "").trim() || undefined
-                                    : undefined,
-                            options: payload,
-                            quantity: qty,
-                        },
-                        { id: user?.id ?? null, plan: plan ?? null }
-                    );
+                    const result: GenerateMagicShopResponse =
+                        await generateMagicShop(
+                            {
+                                name:
+                                    isPaid && user?.id
+                                        ? (name || "").trim() || undefined
+                                        : undefined,
+                                options: payload,
+                                quantity: qty,
+                            },
+                            { id: user?.id ?? null, plan: plan ?? null }
+                        );
+                    // If free/guest: server returns payload with shops, download CSV
+                    if (result && typeof result !== "object") {
+                        // array of ids -> paid flow
+                        setDialogOpen(false);
+                        return;
+                    }
+                    if (
+                        result &&
+                        typeof result === "object" &&
+                        Array.isArray((result as any).shops)
+                    ) {
+                        const shopsPayload = (result as any).shops as any[];
+                        // For CSV, combine shops into one file; include shop name in first column
+                        const csv = shopsToCsv(
+                            shopsPayload.map((s) => ({
+                                name: s?.name ?? name ?? "Magic Shop",
+                                items: s?.items ?? {
+                                    gear: [],
+                                    scrolls: [],
+                                    components: [],
+                                },
+                            }))
+                        );
+                        const fileName = buildMagicShopFilename(
+                            name || "Magic Shop"
+                        );
+                        downloadShopCsv(csv, fileName);
+                        setDialogOpen(false);
+                        return;
+                    }
                 } catch (err: any) {
                     const msg =
                         err?.message ||
                         (typeof err === "string" ? err : "Generation failed");
-                    toast.error(msg);
+                    setErrors({ form: String(msg) });
                     setDialogOpen(true);
                     return;
                 }
@@ -301,9 +401,9 @@ export default function MagicShopGeneratorDialog({
 
             if (onGenerate) await onGenerate(payload);
             setDialogOpen(false);
-        } catch (err) {
+        } catch (err: any) {
             console.error("Magic shop generation failed", err);
-            toast.error("Generation failed");
+            setErrors({ form: String(err?.message || "Generation failed") });
         } finally {
             setIsGenerating(false);
         }
@@ -332,14 +432,28 @@ export default function MagicShopGeneratorDialog({
                     </CredenzaHeader>
 
                     <CredenzaBody className="space-y-5">
+                        {errors.form ? (
+                            <div className="text-sm text-red-600">
+                                {errors.form}
+                            </div>
+                        ) : null}
                         {isPaid && user?.id ? (
                             <MagicShopNameField
                                 value={name}
-                                onChange={setName}
+                                onChange={(v) => {
+                                    setName(v);
+                                    clearFieldError("form");
+                                    clearFieldError("name");
+                                }}
                                 id="name"
                                 nameAttr="name"
                                 placeholder="e.g., Neera's Gilded Emporium"
                             />
+                        ) : null}
+                        {errors.name ? (
+                            <p className="text-sm text-red-600 mt-1">
+                                {errors.name}
+                            </p>
                         ) : null}
 
                         <Tabs
@@ -384,6 +498,10 @@ export default function MagicShopGeneratorDialog({
                                             setPopulation(
                                                 typeof v === "number" ? v : null
                                             );
+                                            clearFieldError("population");
+                                            clearFieldError(
+                                                "populationOrSettlement"
+                                            );
                                         }}
                                         min={1}
                                         step={100}
@@ -395,6 +513,16 @@ export default function MagicShopGeneratorDialog({
                                             ctrlShift: 10000,
                                         }}
                                     />
+                                    {errors.population ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.population}
+                                        </p>
+                                    ) : null}
+                                    {errors.populationOrSettlement ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.populationOrSettlement}
+                                        </p>
+                                    ) : null}
                                 </Field>
                             </TabsContent>
 
@@ -441,9 +569,15 @@ export default function MagicShopGeneratorDialog({
                                                         settlementId ??
                                                         undefined
                                                     }
-                                                    onChange={(v) =>
-                                                        setSettlementId(v)
-                                                    }
+                                                    onChange={(v) => {
+                                                        setSettlementId(v);
+                                                        clearFieldError(
+                                                            "settlementId"
+                                                        );
+                                                        clearFieldError(
+                                                            "populationOrSettlement"
+                                                        );
+                                                    }}
                                                     placeholder="Select settlement"
                                                 />
                                             </div>
@@ -466,6 +600,16 @@ export default function MagicShopGeneratorDialog({
                                         </div>
                                     </Field>
                                 </FieldGroup>
+                                {errors.settlementId ? (
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.settlementId}
+                                    </p>
+                                ) : null}
+                                {errors.populationOrSettlement ? (
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.populationOrSettlement}
+                                    </p>
+                                ) : null}
                             </TabsContent>
                         </Tabs>
 
@@ -477,13 +621,14 @@ export default function MagicShopGeneratorDialog({
                                 </FieldLabel>
                                 <NumberInputWithStepper
                                     value={quantity ?? 1}
-                                    onChange={(v) =>
+                                    onChange={(v) => {
                                         setQuantity(
                                             typeof v === "number"
                                                 ? Math.min(10, Math.max(1, v))
                                                 : 1
-                                        )
-                                    }
+                                        );
+                                        clearFieldError("quantity");
+                                    }}
                                     min={1}
                                     max={10}
                                     step={1}
@@ -493,18 +638,24 @@ export default function MagicShopGeneratorDialog({
                                         alt: 10,
                                     }}
                                 />
+                                {errors.quantity ? (
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.quantity}
+                                    </p>
+                                ) : null}
                             </Field>
                             <Field>
                                 <FieldLabel>Stock multiplier</FieldLabel>
                                 <NumberInputWithStepper
                                     value={stockMultiplier ?? 1}
-                                    onChange={(v) =>
+                                    onChange={(v) => {
                                         setStockMultiplier(
                                             typeof v === "number" && v >= 0.1
                                                 ? v
                                                 : 0.1
-                                        )
-                                    }
+                                        );
+                                        clearFieldError("stockMultiplier");
+                                    }}
                                     min={0.1}
                                     max={10}
                                     step={0.1}
@@ -514,6 +665,11 @@ export default function MagicShopGeneratorDialog({
                                         alt: 2,
                                     }}
                                 />
+                                {errors.stockMultiplier ? (
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.stockMultiplier}
+                                    </p>
+                                ) : null}
                             </Field>
                         </FieldGroup>
 
@@ -537,8 +693,16 @@ export default function MagicShopGeneratorDialog({
                             <Label>Stock Types</Label>
                             <StockTypesCheckboxes
                                 values={stockTypes}
-                                onChange={setStockTypes}
+                                onChange={(vals) => {
+                                    setStockTypes(vals);
+                                    clearFieldError("stockTypes");
+                                }}
                             />
+                            {errors.stockTypes ? (
+                                <p className="text-sm text-red-600 mt-1">
+                                    {errors.stockTypes}
+                                </p>
+                            ) : null}
                         </div>
 
                         {/* Stock multiplier moved next to quantity above */}

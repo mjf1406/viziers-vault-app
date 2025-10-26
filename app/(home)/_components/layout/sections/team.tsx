@@ -118,6 +118,7 @@ export const TeamSection = () => {
                                     >
                                         <Link
                                             href={member.links.github}
+                                            rel="noopener noreferrer"
                                             target="_blank"
                                         >
                                             <Github className="w-4 h-4 mr-2" />
@@ -133,6 +134,7 @@ export const TeamSection = () => {
                                     >
                                         <Link
                                             href={member.links.portfolio}
+                                            rel="noopener noreferrer"
                                             target="_blank"
                                         >
                                             <Globe className="w-4 h-4 mr-2" />
@@ -148,6 +150,7 @@ export const TeamSection = () => {
                                     >
                                         <Link
                                             href={member.links.linkedin}
+                                            rel="noopener noreferrer"
                                             target="_blank"
                                         >
                                             <Linkedin className="w-4 h-4 mr-2" />

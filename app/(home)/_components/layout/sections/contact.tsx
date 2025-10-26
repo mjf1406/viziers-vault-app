@@ -95,6 +95,7 @@ export const ContactSection = () => {
                         >
                             <Link
                                 href="https://github.com/mjf1406/viziers-vault-app"
+                                rel="noopener noreferrer"
                                 target="_blank"
                             >
                                 View on GitHub

@@ -9,6 +9,9 @@ import { useUser } from "@/hooks/useUser";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buildItemUrl, buildSpellUrl } from "@/lib/urlBuilder";
+import DownloadMagicShopCSVButton from "../_components/DownloadMagicShopCSVButton";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import { WEALTH_LEVELS, MAGICNESS_LEVELS } from "@/lib/constants/settlements";
 import {
     FaShirt,
     FaBoxOpen,
@@ -18,6 +21,15 @@ import {
     FaScroll,
     FaHammer,
 } from "react-icons/fa6";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
+import { Store } from "lucide-react";
 
 function rarityNameClass(rarity?: string): string {
     const r = String(rarity || "Common").toLowerCase();
@@ -57,6 +69,16 @@ export default function MagicShopDetailPage() {
         );
 
     const shop = Array.isArray(data?.magicShops) ? data?.magicShops[0] : null;
+    const worldIdForQuery = (shop as any)?.options?.worldId ?? null;
+    const settlementIdForQuery = (shop as any)?.options?.settlementId ?? null;
+    const worldIds = worldIdForQuery ? [worldIdForQuery] : [];
+    const settlementIds = settlementIdForQuery ? [settlementIdForQuery] : [];
+    const { data: worldSettleData } = db.useQuery({
+        worlds: { $: { where: { id: { $in: worldIds } }, limit: 1 } },
+        settlements: {
+            $: { where: { id: { $in: settlementIds } }, limit: 1 },
+        },
+    });
     const urlPrefs =
         (settings as any)?.urlPreferences ??
         (Array.isArray(data?.settings)
@@ -101,28 +123,229 @@ export default function MagicShopDetailPage() {
         })),
         ...components.map((c) => ({
             kind: "component" as const,
-            id: c.name,
-            name: c.name,
-            rarity: "Common",
+            id: c.spellId || c.id || c.name,
+            name: `${c.name} components`,
+            rarity: c.rarity || "Common",
             type: "component",
             priceGp: c.priceGp,
-            href: null as string | null,
+            href: buildSpellUrl(c, spellPrefs) ?? c.url ?? null,
         })),
     ];
 
     return (
         <div className="space-y-6 p-4 xl:p-10">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">
-                    {shop.name ?? "Magic Shop"}
-                </h1>
-                <div className="text-sm text-muted-foreground">
+            <div className="space-y-2">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <Link
+                                prefetch={true}
+                                href="/app/magic-shop-generator"
+                            >
+                                Magic Shops
+                            </Link>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <span className="text-foreground">
+                                {shop.name ?? "Magic Shop"}
+                            </span>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold flex gap-3 items-center justify-center">
+                        <Store />
+                        {shop.name ?? "Magic Shop"}
+                    </h1>
+                </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <div>
                     Created{" "}
                     {shop.createdAt
                         ? new Date(shop.createdAt as any).toLocaleString()
                         : "—"}
                 </div>
+                <div className="flex items-center gap-2">
+                    <DownloadMagicShopCSVButton
+                        shops={shop}
+                        shopName={shop.name ?? "Magic Shop"}
+                        variant="outline"
+                        size="sm"
+                        title="Download CSV"
+                        label="Download CSV"
+                    />
+                    <CopyLinkButton
+                        variant="outline"
+                        size="sm"
+                    />
+                </div>
             </div>
+
+            {(() => {
+                const opts: any = (shop as any)?.options ?? {};
+                const worldName: string =
+                    opts?.worldName ??
+                    ((Array.isArray(worldSettleData?.worlds) &&
+                        (worldSettleData as any).worlds[0]?.name) ||
+                        "—");
+                const settlementName: string =
+                    opts?.settlementName ??
+                    ((Array.isArray(worldSettleData?.settlements) &&
+                        (worldSettleData as any).settlements[0]?.name) ||
+                        "—");
+                const populationVal: number | null =
+                    typeof opts?.population === "number"
+                        ? opts.population
+                        : null;
+                const wealthIndex: number | null =
+                    typeof opts?.wealthIndex === "number"
+                        ? opts.wealthIndex
+                        : typeof opts?.wealth === "number"
+                        ? Math.round(
+                              Math.max(0, Math.min(1, opts.wealth)) *
+                                  (WEALTH_LEVELS.length - 1)
+                          )
+                        : null;
+                const magicIndex: number | null =
+                    typeof opts?.magicLevelIndex === "number"
+                        ? opts.magicLevelIndex
+                        : typeof opts?.magicLevel === "number"
+                        ? opts.magicLevel
+                        : null;
+                const wealthLabel =
+                    wealthIndex != null
+                        ? WEALTH_LEVELS[
+                              Math.max(
+                                  0,
+                                  Math.min(
+                                      WEALTH_LEVELS.length - 1,
+                                      wealthIndex
+                                  )
+                              )
+                          ]
+                        : "—";
+                const magicLabel =
+                    magicIndex != null
+                        ? MAGICNESS_LEVELS[
+                              Math.max(
+                                  0,
+                                  Math.min(
+                                      MAGICNESS_LEVELS.length - 1,
+                                      magicIndex
+                                  )
+                              )
+                          ]
+                        : "—";
+                const quantity: number | null =
+                    typeof opts?.quantity === "number" ? opts.quantity : null;
+                const stockMultiplier: number | null =
+                    typeof opts?.stockMultiplier === "number"
+                        ? opts.stockMultiplier
+                        : null;
+                const selectedStockTypes: string[] = Array.isArray(
+                    opts?.selectedStockTypes
+                )
+                    ? (opts.selectedStockTypes as string[])
+                    : [];
+                const expandedStockTypes: string[] = Array.isArray(
+                    opts?.stockTypes
+                )
+                    ? (opts.stockTypes as string[])
+                    : [];
+                const categoriesFromExpanded: string[] = (() => {
+                    const cats: string[] = [];
+                    const hasAny = (names: string[]) =>
+                        names.some((n) => expandedStockTypes.includes(n));
+                    if (expandedStockTypes.includes("weapon"))
+                        cats.push("weapons");
+                    if (expandedStockTypes.includes("armor"))
+                        cats.push("armor");
+                    if (expandedStockTypes.includes("potion"))
+                        cats.push("potions");
+                    if (expandedStockTypes.includes("poison"))
+                        cats.push("poisons");
+                    if (
+                        hasAny([
+                            "ring",
+                            "rod",
+                            "staff",
+                            "wand",
+                            "wondrous item",
+                        ])
+                    )
+                        cats.push("items");
+                    if (opts?.includeScrolls) cats.push("scrolls");
+                    if (opts?.includeSpellComponents)
+                        cats.push("spell components");
+                    return Array.from(new Set(cats));
+                })();
+                const stockCategories: string[] = selectedStockTypes.length
+                    ? selectedStockTypes
+                    : categoriesFromExpanded;
+                return (
+                    <div className="flex flex-wrap gap-2">
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            World: {worldName}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Settlement: {settlementName}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Population:{" "}
+                            {populationVal != null
+                                ? populationVal.toLocaleString()
+                                : "—"}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Wealth: {wealthLabel}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Magicness: {magicLabel}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Qty: {quantity != null ? quantity : "—"}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Stock x
+                            {stockMultiplier != null ? stockMultiplier : "—"}
+                        </Badge>
+                        <Badge
+                            variant="secondary"
+                            className="text-xs"
+                        >
+                            Types:{" "}
+                            {stockCategories.length
+                                ? stockCategories.join(", ")
+                                : "—"}
+                        </Badge>
+                    </div>
+                );
+            })()}
 
             <Card>
                 <CardHeader>

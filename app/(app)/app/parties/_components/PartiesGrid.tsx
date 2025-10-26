@@ -195,9 +195,9 @@ export default function PartiesGrid({
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
                                             <Button
-                                                variant="ghost"
+                                                variant="destructive"
                                                 size="sm"
-                                                className="absolute w-8 h-8 p-0 top-4 right-4 hover:bg-red-100 hover:text-red-600"
+                                                className="absolute w-8 h-8 p-0 top-4 right-4"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

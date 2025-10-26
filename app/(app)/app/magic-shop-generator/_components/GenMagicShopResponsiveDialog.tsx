@@ -246,7 +246,30 @@ export default function MagicShopGeneratorDialog({
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Validate with Zod
+
+        // Edit mode: only update the name and exit early
+        if (mode === "edit" && initial?.id) {
+            setIsGenerating(true);
+            try {
+                try {
+                    await db.transact(
+                        db.tx.magicShops[initial.id].update({
+                            name: (name || "").trim() || undefined,
+                            updatedAt: new Date(),
+                        })
+                    );
+                } catch {}
+                setDialogOpen(false);
+                return;
+            } catch (err: any) {
+                console.error("Magic shop name update failed", err);
+                setErrors({ form: String(err?.message || "Update failed") });
+            } finally {
+                setIsGenerating(false);
+            }
+        }
+
+        // Create mode: validate inputs
         const parsed = getMagicShopSchema(isPaid && !!user?.id).safeParse({
             name,
             quantity: typeof quantity === "number" ? quantity : 1,
@@ -389,18 +412,11 @@ export default function MagicShopGeneratorDialog({
 
             // Edit mode: allow parent to update options; update name instantly client-side
             if (mode === "edit" && initial?.id) {
-                try {
-                    await db.transact(
-                        db.tx.magicShops[initial.id].update({
-                            name: (name || "").trim() || undefined,
-                            updatedAt: new Date(),
-                        })
-                    );
-                } catch {}
+                // Already handled above; this path should not be reached
+            } else {
+                if (onGenerate) await onGenerate(payload);
+                setDialogOpen(false);
             }
-
-            if (onGenerate) await onGenerate(payload);
-            setDialogOpen(false);
         } catch (err: any) {
             console.error("Magic shop generation failed", err);
             setErrors({ form: String(err?.message || "Generation failed") });
@@ -437,7 +453,7 @@ export default function MagicShopGeneratorDialog({
                                 {errors.form}
                             </div>
                         ) : null}
-                        {isPaid && user?.id ? (
+                        {mode === "edit" || (isPaid && user?.id) ? (
                             <MagicShopNameField
                                 value={name}
                                 onChange={(v) => {
@@ -456,66 +472,162 @@ export default function MagicShopGeneratorDialog({
                             </p>
                         ) : null}
 
-                        <Tabs
-                            value={activeTab}
-                            onValueChange={(v) =>
-                                setActiveTab(
-                                    v as "by-population" | "by-settlement"
-                                )
-                            }
-                            className="w-full"
-                        >
-                            <TabsList>
-                                <TabsTrigger
-                                    value="by-population"
-                                    className="w-1/2"
-                                >
-                                    By population
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="by-settlement"
-                                    className="w-1/2"
-                                >
-                                    By world & city
-                                </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent
-                                value="by-population"
-                                className="space-y-3"
+                        {mode === "create" ? (
+                            <Tabs
+                                value={activeTab}
+                                onValueChange={(v) =>
+                                    setActiveTab(
+                                        v as "by-population" | "by-settlement"
+                                    )
+                                }
+                                className="w-full"
                             >
-                                <Field>
-                                    <FieldLabel htmlFor="population">
-                                        Population
-                                    </FieldLabel>
-                                    <NumberInputWithStepper
-                                        placeholder="e.g., 20000"
-                                        value={population ?? null}
-                                        inputClassName="w-64"
-                                        onChange={(v) => {
-                                            setWorldId(null);
-                                            setSettlementId(null);
-                                            setPopulation(
-                                                typeof v === "number" ? v : null
-                                            );
-                                            clearFieldError("population");
-                                            clearFieldError(
-                                                "populationOrSettlement"
-                                            );
-                                        }}
-                                        min={1}
-                                        step={100}
-                                        modifierSteps={{
-                                            ctrlOrMeta: 200,
-                                            shift: 500,
-                                            alt: 1000,
-                                            ctrlAlt: 5000,
-                                            ctrlShift: 10000,
-                                        }}
-                                    />
-                                    {errors.population ? (
+                                <TabsList>
+                                    <TabsTrigger
+                                        value="by-population"
+                                        className="w-1/2"
+                                    >
+                                        By population
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="by-settlement"
+                                        className="w-1/2"
+                                    >
+                                        By world & city
+                                    </TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent
+                                    value="by-population"
+                                    className="space-y-3"
+                                >
+                                    <Field>
+                                        <FieldLabel htmlFor="population">
+                                            Population
+                                        </FieldLabel>
+                                        <NumberInputWithStepper
+                                            placeholder="e.g., 20000"
+                                            value={population ?? null}
+                                            inputClassName="w-64"
+                                            onChange={(v) => {
+                                                setWorldId(null);
+                                                setSettlementId(null);
+                                                setPopulation(
+                                                    typeof v === "number"
+                                                        ? v
+                                                        : null
+                                                );
+                                                clearFieldError("population");
+                                                clearFieldError(
+                                                    "populationOrSettlement"
+                                                );
+                                            }}
+                                            min={1}
+                                            step={100}
+                                            modifierSteps={{
+                                                ctrlOrMeta: 200,
+                                                shift: 500,
+                                                alt: 1000,
+                                                ctrlAlt: 5000,
+                                                ctrlShift: 10000,
+                                            }}
+                                        />
+                                        {errors.population ? (
+                                            <p className="text-sm text-red-600 mt-1">
+                                                {errors.population}
+                                            </p>
+                                        ) : null}
+                                        {errors.populationOrSettlement ? (
+                                            <p className="text-sm text-red-600 mt-1">
+                                                {errors.populationOrSettlement}
+                                            </p>
+                                        ) : null}
+                                    </Field>
+                                </TabsContent>
+
+                                <TabsContent
+                                    value="by-settlement"
+                                    className="space-y-3"
+                                >
+                                    <FieldGroup className="flex !flex-row gap-4">
+                                        <Field className="">
+                                            <FieldLabel>
+                                                Pick a world
+                                            </FieldLabel>
+                                            <div className="flex items-center gap-1">
+                                                <div className="flex-1">
+                                                    <WorldSelect
+                                                        value={
+                                                            worldId ?? undefined
+                                                        }
+                                                        onChange={(v) => {
+                                                            setWorldId(v);
+                                                            setSettlementId(
+                                                                null
+                                                            );
+                                                        }}
+                                                        placeholder="Select world"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    aria-label="Create world"
+                                                    onClick={() =>
+                                                        setWorldDialogOpen(true)
+                                                    }
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </Field>
+                                        <Field className="">
+                                            <FieldLabel>
+                                                Pick a settlement
+                                            </FieldLabel>
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex-1">
+                                                    <SettlementSelect
+                                                        worldId={worldId}
+                                                        value={
+                                                            settlementId ??
+                                                            undefined
+                                                        }
+                                                        onChange={(v) => {
+                                                            setSettlementId(v);
+                                                            clearFieldError(
+                                                                "settlementId"
+                                                            );
+                                                            clearFieldError(
+                                                                "populationOrSettlement"
+                                                            );
+                                                        }}
+                                                        placeholder="Select settlement"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    aria-label="Create settlement"
+                                                    onClick={() =>
+                                                        setSettlementDialogOpen(
+                                                            true
+                                                        )
+                                                    }
+                                                    disabled={!worldId}
+                                                    aria-disabled={!worldId}
+                                                    className="disabled:cursor-not-allowed"
+                                                >
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </Field>
+                                    </FieldGroup>
+                                    {errors.settlementId ? (
                                         <p className="text-sm text-red-600 mt-1">
-                                            {errors.population}
+                                            {errors.settlementId}
                                         </p>
                                     ) : null}
                                     {errors.populationOrSettlement ? (
@@ -523,208 +635,135 @@ export default function MagicShopGeneratorDialog({
                                             {errors.populationOrSettlement}
                                         </p>
                                     ) : null}
+                                </TabsContent>
+                            </Tabs>
+                        ) : null}
+
+                        {mode === "create" ? (
+                            <FieldGroup className="grid grid-cols-2 gap-4">
+                                <Field>
+                                    <FieldLabel htmlFor="quantity">
+                                        Quantity of shops
+                                    </FieldLabel>
+                                    <NumberInputWithStepper
+                                        value={quantity ?? 1}
+                                        onChange={(v) => {
+                                            setQuantity(
+                                                typeof v === "number"
+                                                    ? Math.min(
+                                                          10,
+                                                          Math.max(1, v)
+                                                      )
+                                                    : 1
+                                            );
+                                            clearFieldError("quantity");
+                                        }}
+                                        min={1}
+                                        max={10}
+                                        step={1}
+                                        modifierSteps={{
+                                            ctrlOrMeta: 2,
+                                            shift: 5,
+                                            alt: 10,
+                                        }}
+                                    />
+                                    {errors.quantity ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.quantity}
+                                        </p>
+                                    ) : null}
                                 </Field>
-                            </TabsContent>
+                                <Field>
+                                    <FieldLabel>Stock multiplier</FieldLabel>
+                                    <NumberInputWithStepper
+                                        value={stockMultiplier ?? 1}
+                                        onChange={(v) => {
+                                            setStockMultiplier(
+                                                typeof v === "number" &&
+                                                    v >= 0.1
+                                                    ? v
+                                                    : 0.1
+                                            );
+                                            clearFieldError("stockMultiplier");
+                                        }}
+                                        min={0.1}
+                                        max={10}
+                                        step={0.1}
+                                        modifierSteps={{
+                                            ctrlOrMeta: 0.5,
+                                            shift: 1,
+                                            alt: 2,
+                                        }}
+                                    />
+                                    {errors.stockMultiplier ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.stockMultiplier}
+                                        </p>
+                                    ) : null}
+                                </Field>
+                            </FieldGroup>
+                        ) : null}
 
-                            <TabsContent
-                                value="by-settlement"
-                                className="space-y-3"
-                            >
-                                <FieldGroup className="flex !flex-row gap-4">
-                                    <Field className="">
-                                        <FieldLabel>Pick a world</FieldLabel>
-                                        <div className="flex items-center gap-1">
-                                            <div className="flex-1">
-                                                <WorldSelect
-                                                    value={worldId ?? undefined}
-                                                    onChange={(v) => {
-                                                        setWorldId(v);
-                                                        setSettlementId(null);
-                                                    }}
-                                                    placeholder="Select world"
-                                                />
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                aria-label="Create world"
-                                                onClick={() =>
-                                                    setWorldDialogOpen(true)
-                                                }
-                                            >
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </Field>
-                                    <Field className="">
-                                        <FieldLabel>
-                                            Pick a settlement
-                                        </FieldLabel>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex-1">
-                                                <SettlementSelect
-                                                    worldId={worldId}
-                                                    value={
-                                                        settlementId ??
-                                                        undefined
-                                                    }
-                                                    onChange={(v) => {
-                                                        setSettlementId(v);
-                                                        clearFieldError(
-                                                            "settlementId"
-                                                        );
-                                                        clearFieldError(
-                                                            "populationOrSettlement"
-                                                        );
-                                                    }}
-                                                    placeholder="Select settlement"
-                                                />
-                                            </div>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="icon"
-                                                aria-label="Create settlement"
-                                                onClick={() =>
-                                                    setSettlementDialogOpen(
-                                                        true
-                                                    )
-                                                }
-                                                disabled={!worldId}
-                                                aria-disabled={!worldId}
-                                                className="disabled:cursor-not-allowed"
-                                            >
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </Field>
-                                </FieldGroup>
-                                {errors.settlementId ? (
-                                    <p className="text-sm text-red-600 mt-1">
-                                        {errors.settlementId}
-                                    </p>
-                                ) : null}
-                                {errors.populationOrSettlement ? (
-                                    <p className="text-sm text-red-600 mt-1">
-                                        {errors.populationOrSettlement}
-                                    </p>
-                                ) : null}
-                            </TabsContent>
-                        </Tabs>
-
-                        {/* Quantity and Stock Multiplier side-by-side */}
-                        <FieldGroup className="grid grid-cols-2 gap-4">
-                            <Field>
-                                <FieldLabel htmlFor="quantity">
-                                    Quantity of shops
-                                </FieldLabel>
-                                <NumberInputWithStepper
-                                    value={quantity ?? 1}
-                                    onChange={(v) => {
-                                        setQuantity(
-                                            typeof v === "number"
-                                                ? Math.min(10, Math.max(1, v))
-                                                : 1
-                                        );
-                                        clearFieldError("quantity");
-                                    }}
-                                    min={1}
-                                    max={10}
-                                    step={1}
-                                    modifierSteps={{
-                                        ctrlOrMeta: 2,
-                                        shift: 5,
-                                        alt: 10,
-                                    }}
-                                />
-                                {errors.quantity ? (
-                                    <p className="text-sm text-red-600 mt-1">
-                                        {errors.quantity}
-                                    </p>
-                                ) : null}
-                            </Field>
-                            <Field>
-                                <FieldLabel>Stock multiplier</FieldLabel>
-                                <NumberInputWithStepper
-                                    value={stockMultiplier ?? 1}
-                                    onChange={(v) => {
-                                        setStockMultiplier(
-                                            typeof v === "number" && v >= 0.1
-                                                ? v
-                                                : 0.1
-                                        );
-                                        clearFieldError("stockMultiplier");
-                                    }}
-                                    min={0.1}
-                                    max={10}
-                                    step={0.1}
-                                    modifierSteps={{
-                                        ctrlOrMeta: 0.5,
-                                        shift: 1,
-                                        alt: 2,
-                                    }}
-                                />
-                                {errors.stockMultiplier ? (
-                                    <p className="text-sm text-red-600 mt-1">
-                                        {errors.stockMultiplier}
-                                    </p>
-                                ) : null}
-                            </Field>
-                        </FieldGroup>
-
-                        <div className="space-y-2">
-                            <Label>Wealth</Label>
-                            <WealthRadio
-                                value={wealth}
-                                onChange={(v) => setWealth(v as any)}
-                                includeRandom
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Magicness</Label>
-                            <MagicnessRadio
-                                value={magicness}
-                                onChange={(v) => setMagicness(v as any)}
-                                includeRandom
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Stock Types</Label>
-                            <StockTypesCheckboxes
-                                values={stockTypes}
-                                onChange={(vals) => {
-                                    setStockTypes(vals);
-                                    clearFieldError("stockTypes");
-                                }}
-                            />
-                            {errors.stockTypes ? (
-                                <p className="text-sm text-red-600 mt-1">
-                                    {errors.stockTypes}
-                                </p>
-                            ) : null}
-                        </div>
+                        {mode === "create" ? (
+                            <>
+                                <div className="space-y-2">
+                                    <Label>Wealth</Label>
+                                    <WealthRadio
+                                        value={wealth}
+                                        onChange={(v) => setWealth(v as any)}
+                                        includeRandom
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Magicness</Label>
+                                    <MagicnessRadio
+                                        value={magicness}
+                                        onChange={(v) => setMagicness(v as any)}
+                                        includeRandom
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Stock Types</Label>
+                                    <StockTypesCheckboxes
+                                        values={stockTypes}
+                                        onChange={(vals) => {
+                                            setStockTypes(vals);
+                                            clearFieldError("stockTypes");
+                                        }}
+                                    />
+                                    {errors.stockTypes ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.stockTypes}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            </>
+                        ) : null}
 
                         {/* Stock multiplier moved next to quantity above */}
 
-                        <CreateWorldResponsiveDialog
-                            open={worldDialogOpen}
-                            onOpenChange={setWorldDialogOpen}
-                            onCreated={(id) => {
-                                setWorldId(id);
-                                setWorldDialogOpen(false);
-                            }}
-                        />
-                        <CreateSettlementResponsiveDialog
-                            open={settlementDialogOpen}
-                            onOpenChange={setSettlementDialogOpen}
-                            defaultWorldId={worldId ?? undefined}
-                            onCreated={(sid, wid) => {
-                                setWorldId(wid);
-                                setSettlementId(sid);
-                                setSettlementDialogOpen(false);
-                            }}
-                        />
+                        {mode === "create" ? (
+                            <>
+                                <CreateWorldResponsiveDialog
+                                    open={worldDialogOpen}
+                                    onOpenChange={setWorldDialogOpen}
+                                    onCreated={(id) => {
+                                        setWorldId(id);
+                                        setWorldDialogOpen(false);
+                                    }}
+                                />
+                                <CreateSettlementResponsiveDialog
+                                    open={settlementDialogOpen}
+                                    onOpenChange={setSettlementDialogOpen}
+                                    defaultWorldId={worldId ?? undefined}
+                                    onCreated={(sid, wid) => {
+                                        setWorldId(wid);
+                                        setSettlementId(sid);
+                                        setSettlementDialogOpen(false);
+                                    }}
+                                />
+                            </>
+                        ) : null}
                     </CredenzaBody>
 
                     <CredenzaFooter>
@@ -745,12 +784,16 @@ export default function MagicShopGeneratorDialog({
                             {isGenerating ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                    Generate Magic Shop
+                                    {mode === "edit"
+                                        ? "Save"
+                                        : "Generate Magic Shop"}
                                 </>
                             ) : (
                                 <>
                                     <Dices className="h-4 w-4" />
-                                    Generate Magic Shop
+                                    {mode === "edit"
+                                        ? "Save"
+                                        : "Generate Magic Shop"}
                                 </>
                             )}
                         </Button>

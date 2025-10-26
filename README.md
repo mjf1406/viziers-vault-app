@@ -31,6 +31,7 @@
 
 ### 2025/10/26
 
+-   user can now only edit the magic shop name instead of all fields
 -   updated magic shop grid to have badges about the magic shop
 -   created a global copy url component for use everywhere because all things will need it for sharing
 -   spell scroll and spell component prices are not modified by price modifiers

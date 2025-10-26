@@ -7,9 +7,6 @@ import { Store, Dices } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsInteger, useQueryState } from "nuqs";
-import type { GenerateMagicShopOpts } from "./_components/GenMagicShopResponsiveDialog";
-import { updateMagicShop } from "./_actions/updateMagicShop";
-import { toast } from "sonner";
 import MagicShopUpsell from "./_components/MagicShopUpsell";
 import MagicShopsGrid from "./_components/MagicShopsGrid";
 import MagicShopGeneratorDialog from "./_components/GenMagicShopResponsiveDialog";
@@ -81,21 +78,7 @@ export default function MagicShopGeneratorPage() {
         const r = p?._raw ?? p ?? {};
         const id = r.id ?? r._id ?? r.magicShopId ?? "";
         const name = r.name ?? "Untitled Shop";
-        const popRaw = r.options?.population;
-        const population =
-            typeof popRaw === "number" && Number.isFinite(popRaw)
-                ? popRaw
-                : null;
-        const wealth = r.options?.wealth ?? "random";
-        const magicness = r.options?.magicness ?? "random";
-
-        setEditingShop({
-            id,
-            name,
-            population,
-            wealth,
-            magicness,
-        });
+        setEditingShop({ id, name });
         setEditOpen(true);
     };
 
@@ -104,33 +87,7 @@ export default function MagicShopGeneratorPage() {
         if (!v) setEditingShop(null);
     };
 
-    const handleEditGenerate = async (opts: GenerateMagicShopOpts) => {
-        const id =
-            editingShop?.id ?? editingShop?._id ?? editingShop?.magicShopId;
-        if (!id) {
-            toast.error("Missing shop id for edit");
-            setEditOpen(false);
-            setEditingShop(null);
-            return;
-        }
-
-        addPending(id);
-        try {
-            await updateMagicShop({
-                id,
-                options: opts,
-                name: editingShop?.name,
-            });
-        } catch (err) {
-            console.error("Update failed", err);
-            toast.error("Update failed");
-            setEditOpen(true);
-        } finally {
-            removePending(id);
-            setEditOpen(false);
-            setEditingShop(null);
-        }
-    };
+    // Edit updates are handled inside the dialog; only name is editable
 
     return (
         <div className="space-y-6 p-4 xl:p-10 min-h-dvh">
@@ -189,20 +146,12 @@ export default function MagicShopGeneratorPage() {
                                 editingShop._id ??
                                 editingShop.magicShopId,
                             name: editingShop.name ?? "",
-                            population:
-                                typeof editingShop.population === "number" &&
-                                Number.isFinite(editingShop.population)
-                                    ? editingShop.population
-                                    : null,
-                            wealth: editingShop.wealth,
-                            magicness: editingShop.magicness,
                         }}
                         open={editOpen}
                         onOpenChange={handleEditOpenChange}
                         hideTitleOnMobile={true}
                         addPending={addPending}
                         removePending={removePending}
-                        onGenerate={handleEditGenerate}
                     />
                 )}
             </div>

@@ -7,6 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import UrlLinkSettings from "./_components/UrlLinkSettings";
 import SettingsUpsell from "./_components/SettingsUpsell";
 import MagicShopSettings from "./_components/MagicShopSettings";
+import SpellbookSettings from "./_components/SpellbookSettings";
 
 export default function SettingsPage() {
     const { plan, isLoading } = useUser();
@@ -36,6 +37,7 @@ export default function SettingsPage() {
                 ) : (
                     <>
                         <MagicShopSettings />
+                        <SpellbookSettings />
                         <UrlLinkSettings />
                     </>
                 )}

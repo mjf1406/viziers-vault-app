@@ -1,5 +1,7 @@
 <!-- @format -->
 
+s<!-- @format -->
+
 # Vizier's Vault App
 
 ## Goals
@@ -31,6 +33,7 @@
 
 ### 2025/10/26
 
+-   added extra spells settings for spellbook generation which takes in a single number or a dice string
 -   user can now only edit the magic shop name instead of all fields
 -   updated magic shop grid to have badges about the magic shop
 -   created a global copy url component for use everywhere because all things will need it for sharing

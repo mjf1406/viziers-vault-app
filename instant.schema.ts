@@ -138,6 +138,8 @@ const _schema = i.schema({
             basePrices: i.json().optional(),
             rarityThresholds: i.json().optional(),
             spellScrollPrices: i.json().optional(),
+            // Spellbook generator settings
+            spellbookExtraSpellsDice: i.string().optional(),
         }),
         battleMaps: i.entity({}),
         parties: i.entity({

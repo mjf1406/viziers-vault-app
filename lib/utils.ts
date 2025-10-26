@@ -103,3 +103,81 @@ export function resolveSelections<T extends string>(
     const unique = Array.from(new Set(input));
     return unique.filter((v) => pool.includes(v));
 }
+
+// -----------------------------
+// Dice utilities
+// -----------------------------
+
+/**
+ * Parse and roll a dice expression like:
+ *  - 2d6
+ *  - 2d6 + 3
+ *  - 3d6 + 1d8 + 2
+ * Supports + and - operators between terms. Whitespace is ignored.
+ * Limits: up to 100 dice per term, die faces 2..1000, absolute flat +/- up to 100000.
+ */
+export function rollDiceExpression(expr: string | null | undefined): number {
+    const raw = String(expr ?? "").trim();
+    if (!raw) return 0;
+
+    // Tokenize by + and - while preserving sign per term
+    // Normalize spaces and leading +
+    const normalized = raw.replace(/\s+/g, " ").trim();
+    if (!normalized) return 0;
+
+    // Split into terms with signs
+    const terms: string[] = [];
+    let buffer = "";
+    for (let i = 0; i < normalized.length; i++) {
+        const ch = normalized[i];
+        if ((ch === "+" || ch === "-") && buffer.trim()) {
+            terms.push(buffer.trim());
+            buffer = ch;
+        } else {
+            buffer += ch;
+        }
+    }
+    if (buffer.trim()) terms.push(buffer.trim());
+
+    let total = 0;
+    for (const term of terms) {
+        const t = term.replace(/\s+/g, "");
+        if (!t) continue;
+        let sign = 1;
+        let body = t;
+        if (body[0] === "+") body = body.slice(1);
+        else if (body[0] === "-") {
+            sign = -1;
+            body = body.slice(1);
+        }
+
+        // dice term like XdY
+        const diceMatch = body.match(/^(\d*)d(\d+)$/i);
+        if (diceMatch) {
+            const count = Math.min(
+                Math.max(parseInt(diceMatch[1] || "1", 10), 1),
+                100
+            );
+            const faces = Math.min(
+                Math.max(parseInt(diceMatch[2], 10), 2),
+                1000
+            );
+            let subtotal = 0;
+            for (let i = 0; i < count; i++) {
+                subtotal += 1 + Math.floor(Math.random() * faces);
+            }
+            total += sign * subtotal;
+            continue;
+        }
+
+        // flat number
+        if (/^\d+$/.test(body)) {
+            const val = Math.min(parseInt(body, 10), 100000);
+            total += sign * val;
+            continue;
+        }
+
+        // If unsupported token found, ignore it for safety
+    }
+    return total;
+}

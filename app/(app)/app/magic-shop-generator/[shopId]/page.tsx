@@ -132,6 +132,95 @@ export default function MagicShopDetailPage() {
         })),
     ];
 
+    // Build shelves by item type (aligned with categoryToItemTypes leaf types)
+    const normalizeType = (t?: string): string => {
+        const lower = String(t || "").toLowerCase();
+        if (lower === "scrolls") return "scroll";
+        if (lower === "spell components") return "component";
+        return lower;
+    };
+
+    const shelfTypes: string[] = [
+        "ring",
+        "rod",
+        "staff",
+        "wand",
+        "wondrous item",
+        "weapon",
+        "armor",
+        "potion",
+        "poison",
+        "scroll",
+        "component",
+    ];
+
+    const shelfLabels: Record<string, string> = {
+        ring: "Rings",
+        rod: "Rods",
+        staff: "Staves",
+        wand: "Wands",
+        "wondrous item": "Wondrous Items",
+        weapon: "Weapons",
+        armor: "Armor",
+        potion: "Potions",
+        poison: "Poisons",
+        scroll: "Scrolls",
+        component: "Spell Components",
+    };
+
+    const itemsByType: Record<string, any[]> = {};
+    for (const it of allCards) {
+        const t = normalizeType(it.type);
+        if (!itemsByType[t]) itemsByType[t] = [];
+        itemsByType[t].push(it);
+    }
+
+    const renderItemCard = (it: any) => (
+        <div
+            key={`${it.kind}:${it.id}:${it.name}`}
+            className={`border rounded p-3`}
+        >
+            <div className="flex items-start gap-2">
+                <span className="mt-0.5 text-muted-foreground">
+                    {typeIcon(it.type)}
+                </span>
+                <div className="flex-1 min-w-0">
+                    <div
+                        className={`font-medium truncate ${rarityNameClass(
+                            it.rarity
+                        )}`}
+                        title={it.name}
+                    >
+                        {it.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Badge
+                            variant="outline"
+                            className="text-[10px] py-0 px-1"
+                        >
+                            {it.rarity ?? "Common"}
+                        </Badge>
+                        <span className="whitespace-nowrap">
+                            {typeof it.priceGp === "number"
+                                ? `${it.priceGp.toLocaleString()} gp`
+                                : "—"}
+                        </span>
+                    </div>
+                    {it.href ? (
+                        <a
+                            href={it.href}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="text-xs text-primary hover:underline"
+                        >
+                            Open reference
+                        </a>
+                    ) : null}
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="space-y-6 p-4 xl:p-10">
             <div className="space-y-2">
@@ -347,67 +436,39 @@ export default function MagicShopDetailPage() {
                 );
             })()}
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Inventory ({allCards.length})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {allCards.length === 0 ? (
+            {allCards.length === 0 ? (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Inventory (0)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <div className="text-muted-foreground">
                             No items saved
                         </div>
-                    ) : (
-                        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                            {allCards.map((it) => (
-                                <div
-                                    key={`${it.kind}:${it.id}:${it.name}`}
-                                    className={`border rounded p-3`}
-                                >
-                                    <div className="flex items-start gap-2">
-                                        <span className="mt-0.5 text-muted-foreground">
-                                            {typeIcon(it.type)}
-                                        </span>
-                                        <div className="flex-1 min-w-0">
-                                            <div
-                                                className={`font-medium truncate ${rarityNameClass(
-                                                    it.rarity
-                                                )}`}
-                                                title={it.name}
-                                            >
-                                                {it.name}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground flex items-center gap-2">
-                                                <Badge
-                                                    variant="outline"
-                                                    className="text-[10px] py-0 px-1"
-                                                >
-                                                    {it.rarity ?? "Common"}
-                                                </Badge>
-                                                <span className="whitespace-nowrap">
-                                                    {typeof it.priceGp ===
-                                                    "number"
-                                                        ? `${it.priceGp} gp`
-                                                        : "—"}
-                                                </span>
-                                            </div>
-                                            {it.href ? (
-                                                <a
-                                                    href={it.href}
-                                                    target="_blank"
-                                                    rel="noreferrer noopener"
-                                                    className="text-xs text-primary hover:underline"
-                                                >
-                                                    Open reference
-                                                </a>
-                                            ) : null}
-                                        </div>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="space-y-6">
+                    {shelfTypes.map((t) => {
+                        const items = itemsByType[t] || [];
+                        if (!items.length) return null;
+                        return (
+                            <Card key={t}>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {shelfLabels[t] ?? t} ({items.length})
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                                        {items.map((it) => renderItemCard(it))}
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 }

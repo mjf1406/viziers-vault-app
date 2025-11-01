@@ -65,8 +65,6 @@ type SpellbookGenerateResponse =
           };
       };
 
-type AllowedPlan = "free" | "basic" | "plus" | "pro";
-
 /**
  * Generate spells only without saving to database
  * Used for client-side updates
@@ -82,77 +80,10 @@ export async function generateSpellsOnly(formData: FormData): Promise<{
     };
 }> {
     try {
-        // Parse incoming form
-        const parsed = parseFormDataToOptions(formData);
-
-        // Resolve "random" tokens to concrete values
-        const resolved = resolveOptions(
-            parsed.level,
-            parsed.schools,
-            parsed.classes
-        );
-
-        // Fetch leveled spells and cantrips separately, then filter by class
-        const [leveledRaw, cantripsRaw] = await Promise.all([
-            fetchSpells(resolved.levels, resolved.schools, parsed.sourceShorts),
-            fetchCantrips(resolved.schools, parsed.sourceShorts),
-        ]);
-        let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
-        let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
-
-        // Apply legacy exclusion if requested (default true from client)
-        if (parsed.excludeLegacy) {
-            const isLegacySchool = (s: unknown) =>
-                String(s || "")
-                    .trim()
-                    .toLowerCase() === "legacy";
-            leveled = leveled.filter((s) => !isLegacySchool(s.school));
-            cantrips = cantrips.filter((s) => !isLegacySchool(s.school));
-        }
-
-        // Determine character level (max of levels, clamped 1..20)
-        const characterLevel = clampNumber(
-            Math.max(
-                ...(resolved.levels || [])
-                    .map((n) => toNumber(n))
-                    .filter((n) => n >= 0)
-            ),
-            1,
-            20
-        );
-
-        // Single-class selection (resolveOptions enforces min/max:1)
-        const playerClass = resolved.classes?.[0] ?? "";
-
-        // Determine targets upfront (avoid post-selection removal)
-        let overrides: { cantripsTarget?: number; spellsTarget?: number } = {};
-        try {
-            const { uid } = await getAuthAndSaveEligibility();
-            const extraExpr = await fetchUserExtraDice(uid);
-            overrides = computeAdjustedTargets(
-                playerClass,
-                characterLevel,
-                extraExpr
-            );
-        } catch {}
-
-        const spellbook = selectSpellsForSpellbook(
-            cantrips,
-            leveled,
-            playerClass,
-            characterLevel,
-            overrides
-        );
-
+        const result = await buildSpellbookFromOptions(formData, false);
         return {
-            spells: spellbook,
-            options: {
-                level: parsed.level,
-                schools: resolved.schools,
-                classes: resolved.classes,
-                sourceShorts: parsed.sourceShorts,
-                excludeLegacy: parsed.excludeLegacy,
-            },
+            spells: result.spells,
+            options: result.options,
         };
     } catch (err) {
         if (process.env.VV_DEBUG) {
@@ -167,116 +98,28 @@ export default async function generateSpellbook(
     formData: FormData
 ): Promise<SpellbookGenerateResponse> {
     try {
-        // Auth + eligibility
         const auth = await getAuthAndSaveEligibility();
-
-        // Parse incoming form
-        const parsed = parseFormDataToOptions(formData);
-
-        // Resolve "random" tokens to concrete values
-        const resolved = resolveOptions(
-            parsed.level,
-            parsed.schools,
-            parsed.classes
+        const result = await buildSpellbookFromOptions(
+            formData,
+            true,
+            auth.uid
         );
 
-        // Fetch leveled spells and cantrips separately, then filter by class
-        const [leveledRaw, cantripsRaw] = await Promise.all([
-            fetchSpells(resolved.levels, resolved.schools, parsed.sourceShorts),
-            fetchCantrips(resolved.schools, parsed.sourceShorts),
-        ]);
-        let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
-        let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
+        logGenerationDebug(auth, result);
 
-        // Apply legacy exclusion if requested (default true from client)
-        if (parsed.excludeLegacy) {
-            const isLegacySchool = (s: unknown) =>
-                String(s || "")
-                    .trim()
-                    .toLowerCase() === "legacy";
-            leveled = leveled.filter((s) => !isLegacySchool(s.school));
-            cantrips = cantrips.filter((s) => !isLegacySchool(s.school));
-        }
-
-        // Determine character level (max of levels, clamped 1..20)
-        const characterLevel = clampNumber(
-            Math.max(
-                ...(resolved.levels || [])
-                    .map((n) => toNumber(n))
-                    .filter((n) => n >= 0)
-            ),
-            1,
-            20
-        );
-
-        // Single-class selection (resolveOptions enforces min/max:1)
-        const playerClass = resolved.classes?.[0] ?? "";
-
-        // Determine targets upfront (avoid post-selection removal)
-        let overrides: { cantripsTarget?: number; spellsTarget?: number } = {};
-        try {
-            const extraExpr = await fetchUserExtraDice(auth.uid);
-            overrides = computeAdjustedTargets(
-                playerClass,
-                characterLevel,
-                extraExpr
-            );
-        } catch {}
-
-        const spellbook = selectSpellsForSpellbook(
-            cantrips,
-            leveled,
-            playerClass,
-            characterLevel,
-            overrides
-        );
-
-        // cantrips are level 0 spells in the spells object
-        // artificer prepared spells is equal to int mod + half level rounded down
-
-        if (process.env.VV_DEBUG) {
-            // eslint-disable-next-line no-console
-            console.log("generateSpellbook — resolved options:", {
-                level: parsed.level,
-                charLevel: characterLevel,
-                schools: resolved.schools,
-                classes: resolved.classes,
-                initialLeveled: leveledRaw.length,
-                initialCantrips: cantripsRaw.length,
-                finalLeveled: leveled.length,
-                finalCantrips: cantrips.length,
-                spellbook: spellbook.length,
-                canSave: auth.canSave,
-            });
-        }
-
-        // Persist for premium, logged-in users
         if (auth.canSave && auth.userIdForSave) {
             const id = await saveSpellbookRecord({
                 userId: auth.userIdForSave,
-                spells: spellbook,
-                options: {
-                    level: parsed.level,
-                    schools: resolved.schools,
-                    classes: resolved.classes,
-                    sourceShorts: parsed.sourceShorts,
-                    excludeLegacy: parsed.excludeLegacy,
-                },
+                spells: result.spells,
+                options: result.options,
                 formData,
             });
             return id;
         }
 
-        // Otherwise return spells payload
         return {
-            spells: spellbook,
-            options: {
-                level: parsed.level,
-                schools: resolved.schools,
-                classes: resolved.classes,
-                sourceShorts: parsed.sourceShorts,
-                excludeLegacy: parsed.excludeLegacy,
-            },
+            spells: result.spells,
+            options: result.options,
         };
     } catch (err) {
         if (process.env.VV_DEBUG) {
@@ -288,9 +131,151 @@ export default async function generateSpellbook(
 }
 
 /**
- * Helpers (kept below the main function)
+ * Core spellbook generation logic shared by both entry points
  */
+async function buildSpellbookFromOptions(
+    formData: FormData,
+    requireAuth: boolean,
+    uid?: string | null | undefined
+): Promise<{
+    spells: Dnd5eSpell[];
+    options: {
+        level: GenerateOpts["level"];
+        schools: string[];
+        classes: string[];
+        sourceShorts?: string[];
+        excludeLegacy?: boolean;
+    };
+}> {
+    const parsed = parseFormDataToOptions(formData);
+    const resolved = resolveOptions(
+        parsed.level,
+        parsed.schools,
+        parsed.classes
+    );
 
+    const { leveled, cantrips } = await fetchAndFilterSpells(
+        resolved,
+        parsed.sourceShorts,
+        parsed.excludeLegacy
+    );
+
+    const characterLevel = calculateCharacterLevel(resolved.levels);
+    const playerClass = resolved.classes?.[0] ?? "";
+
+    const overrides = await getUserOverrides(
+        uid,
+        playerClass,
+        characterLevel,
+        requireAuth
+    );
+
+    const spellbook = selectSpellsForSpellbook(
+        cantrips,
+        leveled,
+        playerClass,
+        characterLevel,
+        overrides
+    );
+
+    return {
+        spells: spellbook,
+        options: {
+            level: parsed.level,
+            schools: resolved.schools,
+            classes: resolved.classes,
+            sourceShorts: parsed.sourceShorts,
+            excludeLegacy: parsed.excludeLegacy,
+        },
+    };
+}
+
+async function fetchAndFilterSpells(
+    resolved: {
+        levels: number[];
+        schools: string[];
+        classes: string[];
+    },
+    sourceShorts?: string[],
+    excludeLegacy?: boolean
+): Promise<{
+    leveled: Dnd5eSpell[];
+    cantrips: Dnd5eSpell[];
+}> {
+    const [leveledRaw, cantripsRaw] = await Promise.all([
+        fetchSpells(resolved.levels, resolved.schools, sourceShorts),
+        fetchCantrips(resolved.schools, sourceShorts),
+    ]);
+
+    let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
+    let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
+
+    if (excludeLegacy) {
+        leveled = filterLegacySpells(leveled);
+        cantrips = filterLegacySpells(cantrips);
+    }
+
+    return { leveled, cantrips };
+}
+
+function filterLegacySpells(spells: Dnd5eSpell[]): Dnd5eSpell[] {
+    return spells.filter(
+        (s) =>
+            String(s.school || "")
+                .trim()
+                .toLowerCase() !== "legacy"
+    );
+}
+
+function calculateCharacterLevel(levels: number[]): number {
+    return clampNumber(
+        Math.max(...levels.map((n) => toNumber(n)).filter((n) => n >= 0)),
+        1,
+        20
+    );
+}
+
+async function getUserOverrides(
+    uid: string | null | undefined,
+    playerClass: string,
+    characterLevel: number,
+    requireAuth: boolean
+): Promise<{ cantripsTarget?: number; spellsTarget?: number }> {
+    if (!uid) return {};
+    try {
+        const extraExpr = await fetchUserExtraDice(uid);
+        return computeAdjustedTargets(playerClass, characterLevel, extraExpr);
+    } catch {
+        return {};
+    }
+}
+
+function logGenerationDebug(
+    auth: Awaited<ReturnType<typeof getAuthAndSaveEligibility>>,
+    result: {
+        spells: Dnd5eSpell[];
+        options: {
+            level: GenerateOpts["level"];
+            schools: string[];
+            classes: string[];
+        };
+    }
+): void {
+    if (process.env.VV_DEBUG) {
+        // eslint-disable-next-line no-console
+        console.log("generateSpellbook — resolved options:", {
+            level: result.options.level,
+            schools: result.options.schools,
+            classes: result.options.classes,
+            spellbook: result.spells.length,
+            canSave: auth.canSave,
+        });
+    }
+}
+
+/**
+ * Select spells for spellbook based on class rules and targets
+ */
 function selectSpellsForSpellbook(
     cantrips: Dnd5eSpell[],
     leveledSpells: Dnd5eSpell[],
@@ -298,37 +283,77 @@ function selectSpellsForSpellbook(
     characterLevel: number,
     overrides?: { cantripsTarget?: number; spellsTarget?: number }
 ): Dnd5eSpell[] {
+    const targets = getClassSpellTargets(
+        playerClass,
+        characterLevel,
+        overrides
+    );
+
+    if (!targets) {
+        return [...cantrips, ...leveledSpells];
+    }
+
+    const pools = prepareSpellPools(
+        cantrips,
+        leveledSpells,
+        targets.maxSpellLevel
+    );
+
+    return selectAndSortSpells(pools, targets);
+}
+
+function getClassSpellTargets(
+    playerClass: string,
+    characterLevel: number,
+    overrides?: { cantripsTarget?: number; spellsTarget?: number }
+): {
+    cantripsTarget: number;
+    spellsTarget: number;
+    maxSpellLevel: number;
+} | null {
     const classKey = toTitleCase(playerClass ?? "");
     const classTable = (SPELLS_PER_LEVEL as any)?.[classKey];
-    if (!classTable) return [...cantrips, ...leveledSpells];
+    if (!classTable) return null;
 
     const row = classTable[String(characterLevel)] ?? classTable["20"];
-    if (!row) return [...cantrips, ...leveledSpells];
+    if (!row) return null;
 
-    // Targets from SPELLS_PER_LEVEL
     const cantripsTarget = Math.max(
         overrides?.cantripsTarget ?? row.cantrips ?? 0,
         0
     );
+
     const maxSpellLevel =
         typeof row.maxSpellLevel === "number" && row.maxSpellLevel >= 0
             ? row.maxSpellLevel
             : 9;
 
-    // Artificer prepared spells: INT mod (1..5 random) + floor(level/2)
     const spellsTargetRaw =
         row.spells == null
             ? 1 + Math.floor(Math.random() * 5) + Math.floor(characterLevel / 2)
             : Math.max(Number(row.spells) || 0, 0);
+
     const spellsTarget = Math.max(
         overrides?.spellsTarget ?? spellsTargetRaw,
         0
     );
 
-    // Dedupe pools and enforce max level
+    return { cantripsTarget, spellsTarget, maxSpellLevel };
+}
+
+function prepareSpellPools(
+    cantrips: Dnd5eSpell[],
+    leveledSpells: Dnd5eSpell[],
+    maxSpellLevel: number
+): {
+    cantripsPool: Dnd5eSpell[];
+    leveledPool: Dnd5eSpell[];
+} {
+    const idKey = (s: Dnd5eSpell) => s.dndbeyondId || s.slug || s.name || "";
+
     const cantripsPool = dedupeBy(
         cantrips.filter((s) => toNumber(s.level) === 0),
-        (s) => s.dndbeyondId || s.slug || s.name || ""
+        idKey
     );
 
     const leveledPool = dedupeBy(
@@ -336,16 +361,23 @@ function selectSpellsForSpellbook(
             const lvl = toNumber(s.level);
             return lvl > 0 && lvl <= maxSpellLevel;
         }),
-        (s) => s.dndbeyondId || s.slug || s.name || ""
+        idKey
     );
 
-    // Select (Policy D: do not relax filters; return fewer if short)
-    const chosenCantrips = takeRandom(cantripsPool, cantripsTarget);
-    const chosenLeveled = takeRandom(leveledPool, spellsTarget);
+    return { cantripsPool, leveledPool };
+}
 
+function selectAndSortSpells(
+    pools: { cantripsPool: Dnd5eSpell[]; leveledPool: Dnd5eSpell[] },
+    targets: { cantripsTarget: number; spellsTarget: number }
+): Dnd5eSpell[] {
+    const chosenCantrips = takeRandom(
+        pools.cantripsPool,
+        targets.cantripsTarget
+    );
+    const chosenLeveled = takeRandom(pools.leveledPool, targets.spellsTarget);
     const selected = [...chosenCantrips, ...chosenLeveled];
 
-    // Stable ordering: level asc, then name asc
     selected.sort((a, b) => {
         const la = toNumber(a.level);
         const lb = toNumber(b.level);
@@ -355,98 +387,82 @@ function selectSpellsForSpellbook(
 
     return selected;
 }
-// Pick extra spells from the remaining pool, respecting max spell level for the class
-function pickExtraSpells(
-    cantrips: Dnd5eSpell[],
-    leveledSpells: Dnd5eSpell[],
-    alreadySelected: Dnd5eSpell[],
-    playerClass: string,
-    characterLevel: number,
-    extraCount: number
-): Dnd5eSpell[] {
-    if (!extraCount) return [];
 
-    const classKey = toTitleCase(playerClass ?? "");
-    const classTable = (SPELLS_PER_LEVEL as any)?.[classKey];
-    const row = classTable
-        ? classTable[String(characterLevel)] ?? classTable["20"]
-        : null;
-    const maxSpellLevel =
-        row && typeof row.maxSpellLevel === "number" && row.maxSpellLevel >= 0
-            ? row.maxSpellLevel
-            : 9;
-
-    const idKey = (s: Dnd5eSpell) => s.dndbeyondId || s.slug || s.name || "";
-    const selectedKeys = new Set(alreadySelected.map(idKey).filter(Boolean));
-
-    const cantripsPool = dedupeBy(
-        cantrips.filter((s) => toNumber(s.level) === 0),
-        idKey
-    ).filter((s) => !selectedKeys.has(idKey(s)));
-
-    const leveledPool = dedupeBy(
-        leveledSpells.filter((s) => {
-            const lvl = toNumber(s.level);
-            return lvl > 0 && lvl <= maxSpellLevel;
-        }),
-        idKey
-    ).filter((s) => !selectedKeys.has(idKey(s)));
-
-    const pool = [...cantripsPool, ...leveledPool];
-    return takeRandom(pool, extraCount);
-}
-
-// Compute adjusted targets (cantrips and leveled) given a modifier string
 function computeAdjustedTargets(
     playerClass: string,
     characterLevel: number,
     modifier: string | null | undefined
 ): { cantripsTarget: number; spellsTarget: number } {
+    const base = calculateBaseTargets(playerClass, characterLevel);
+    const raw = String(modifier ?? "").trim();
+
+    if (!raw) {
+        return {
+            cantripsTarget: base.cantrips,
+            spellsTarget: base.spells,
+        };
+    }
+
+    const targetTotal = parseModifier(raw, base.total);
+    return distributeTargets(base, targetTotal);
+}
+
+function calculateBaseTargets(
+    playerClass: string,
+    characterLevel: number
+): {
+    cantrips: number;
+    spells: number;
+    total: number;
+} {
     const classKey = toTitleCase(playerClass ?? "");
     const classTable = (SPELLS_PER_LEVEL as any)?.[classKey];
     const row = classTable
         ? classTable[String(characterLevel)] ?? classTable["20"]
         : null;
-    const baseCantrips = Math.max(row?.cantrips ?? 0, 0);
-    const baseSpells = Math.max(
+
+    const cantrips = Math.max(row?.cantrips ?? 0, 0);
+    const spells = Math.max(
         row?.spells == null
             ? 1 + Math.floor(Math.random() * 5) + Math.floor(characterLevel / 2)
             : Number(row?.spells) || 0,
         0
     );
-    const baseTotal = baseCantrips + baseSpells;
 
-    const raw = String(modifier ?? "").trim();
-    if (!raw) return { cantripsTarget: baseCantrips, spellsTarget: baseSpells };
+    return { cantrips, spells, total: cantrips + spells };
+}
 
-    let targetTotal = baseTotal;
+function parseModifier(raw: string, baseTotal: number): number {
     const mulDiv = raw.match(/^([*\/])\s*(\d+(?:\.\d+)?)$/);
     if (mulDiv) {
         const op = mulDiv[1];
         const k = Math.max(0.0001, Math.min(parseFloat(mulDiv[2]), 10));
-        targetTotal =
-            op === "*" ? Math.floor(baseTotal * k) : Math.floor(baseTotal / k);
-    } else if (/^[+-]?\s*\d+$/.test(raw)) {
-        targetTotal = Math.max(
-            0,
-            baseTotal + parseInt(raw.replace(/\s+/g, ""), 10)
-        );
-    } else {
-        targetTotal = Math.max(0, baseTotal + rollDiceExpression(raw));
+        return op === "*"
+            ? Math.floor(baseTotal * k)
+            : Math.floor(baseTotal / k);
     }
 
-    if (baseTotal <= 0) {
-        return { cantripsTarget: 0, spellsTarget: targetTotal };
+    if (/^[+-]?\s*\d+$/.test(raw)) {
+        return Math.max(0, baseTotal + parseInt(raw.replace(/\s+/g, ""), 10));
     }
-    const ratio = targetTotal / baseTotal;
-    const newCantrips = Math.max(0, Math.floor(baseCantrips * ratio));
-    const newLeveled = Math.max(0, targetTotal - newCantrips);
-    return { cantripsTarget: newCantrips, spellsTarget: newLeveled };
+
+    return Math.max(0, baseTotal + rollDiceExpression(raw));
 }
 
-// toNumber, clampNumber, takeRandom, dedupeBy imported from utils
+function distributeTargets(
+    base: { cantrips: number; spells: number; total: number },
+    targetTotal: number
+): { cantripsTarget: number; spellsTarget: number } {
+    if (base.total <= 0) {
+        return { cantripsTarget: 0, spellsTarget: targetTotal };
+    }
 
-// getAuthAndSaveEligibility imported from shared server/auth
+    const ratio = targetTotal / base.total;
+    const newCantrips = Math.max(0, Math.floor(base.cantrips * ratio));
+    const newLeveled = Math.max(0, targetTotal - newCantrips);
+
+    return { cantripsTarget: newCantrips, spellsTarget: newLeveled };
+}
 
 function parseFormDataToOptions(formData: FormData): {
     level: GenerateOpts["level"];
@@ -534,15 +550,13 @@ async function fetchSpells(
                     ...(Array.isArray(sourceShorts) && sourceShorts.length
                         ? { sourceShort: { $in: sourceShorts } }
                         : {}),
-                    // classes: { $in: classes }, // Not supported by the backend
                 },
             },
         },
     };
 
     const res = await dbQuery<{ dnd5e_spells?: Dnd5eSpell[] }>(query);
-    const spells: Dnd5eSpell[] = res?.dnd5e_spells ?? [];
-    return spells;
+    return res?.dnd5e_spells ?? [];
 }
 
 async function fetchCantrips(
@@ -563,8 +577,7 @@ async function fetchCantrips(
         },
     };
     const res = await dbQuery<{ dnd5e_spells?: Dnd5eSpell[] }>(query);
-    const spells: Dnd5eSpell[] = res?.dnd5e_spells ?? [];
-    return spells;
+    return res?.dnd5e_spells ?? [];
 }
 
 function filterSpellsByClasses(

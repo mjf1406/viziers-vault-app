@@ -31,6 +31,44 @@ import {
 import Link from "next/link";
 import { Store } from "lucide-react";
 
+function WorldSettlementLabels(props: {
+    worldIds: string[];
+    settlementIds: string[];
+    fallbackWorldName?: string | null;
+    fallbackSettlementName?: string | null;
+}) {
+    const { data } = db.useQuery({
+        worlds: { $: { where: { id: { $in: props.worldIds } }, limit: 1 } },
+        settlements: {
+            $: { where: { id: { $in: props.settlementIds } }, limit: 1 },
+        },
+    });
+    const worldName: string =
+        (props.fallbackWorldName as any) ??
+        ((Array.isArray(data?.worlds) && (data as any).worlds[0]?.name) || "—");
+    const settlementName: string =
+        (props.fallbackSettlementName as any) ??
+        ((Array.isArray(data?.settlements) &&
+            (data as any).settlements[0]?.name) ||
+            "—");
+    return (
+        <>
+            <Badge
+                variant="secondary"
+                className="text-xs"
+            >
+                World: {worldName}
+            </Badge>
+            <Badge
+                variant="secondary"
+                className="text-xs"
+            >
+                Settlement: {settlementName}
+            </Badge>
+        </>
+    );
+}
+
 function rarityNameClass(rarity?: string): string {
     const r = String(rarity || "Common").toLowerCase();
     if (r === "legendary") return "text-orange-800";
@@ -73,12 +111,6 @@ export default function MagicShopDetailPage() {
     const settlementIdForQuery = (shop as any)?.options?.settlementId ?? null;
     const worldIds = worldIdForQuery ? [worldIdForQuery] : [];
     const settlementIds = settlementIdForQuery ? [settlementIdForQuery] : [];
-    const { data: worldSettleData } = db.useQuery({
-        worlds: { $: { where: { id: { $in: worldIds } }, limit: 1 } },
-        settlements: {
-            $: { where: { id: { $in: settlementIds } }, limit: 1 },
-        },
-    });
     const urlPrefs =
         (settings as any)?.urlPreferences ??
         (Array.isArray(data?.settings)
@@ -276,16 +308,6 @@ export default function MagicShopDetailPage() {
 
             {(() => {
                 const opts: any = (shop as any)?.options ?? {};
-                const worldName: string =
-                    opts?.worldName ??
-                    ((Array.isArray(worldSettleData?.worlds) &&
-                        (worldSettleData as any).worlds[0]?.name) ||
-                        "—");
-                const settlementName: string =
-                    opts?.settlementName ??
-                    ((Array.isArray(worldSettleData?.settlements) &&
-                        (worldSettleData as any).settlements[0]?.name) ||
-                        "—");
                 const populationVal: number | null =
                     typeof opts?.population === "number"
                         ? opts.population
@@ -377,18 +399,31 @@ export default function MagicShopDetailPage() {
                     : categoriesFromExpanded;
                 return (
                     <div className="flex flex-wrap gap-2">
-                        <Badge
-                            variant="secondary"
-                            className="text-xs"
-                        >
-                            World: {worldName}
-                        </Badge>
-                        <Badge
-                            variant="secondary"
-                            className="text-xs"
-                        >
-                            Settlement: {settlementName}
-                        </Badge>
+                        {worldIds.length === 0 && settlementIds.length === 0 ? (
+                            <>
+                                <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                >
+                                    World: {opts?.worldName ?? "—"}
+                                </Badge>
+                                <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                >
+                                    Settlement: {opts?.settlementName ?? "—"}
+                                </Badge>
+                            </>
+                        ) : (
+                            <WorldSettlementLabels
+                                worldIds={worldIds}
+                                settlementIds={settlementIds}
+                                fallbackWorldName={opts?.worldName ?? null}
+                                fallbackSettlementName={
+                                    opts?.settlementName ?? null
+                                }
+                            />
+                        )}
                         <Badge
                             variant="secondary"
                             className="text-xs"

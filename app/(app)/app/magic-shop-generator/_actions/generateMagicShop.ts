@@ -21,58 +21,37 @@ function normalizeWealth(wealth: number): number {
     return (wealth - 1) / (WEALTH_LEVELS.length - 1);
 }
 
-function buildOptions(opts: GenerateMagicShopOpts) {
-    const {
-        population,
-        wealth,
-        magicness,
-        stockTypes,
-        worldId,
-        settlementId,
-        stockMultiplier,
-        inputMode,
-        settings,
-        worlds,
-    } = opts;
-
-    let resolvedPopulation: number | null = null;
-
-    const hasNumericPopulation =
-        typeof population === "number" && Number.isFinite(population);
-
-    if (inputMode === "by-settlement" && settlementId) {
-        if (settlementId.includes(":")) {
-            // Premade settlement id format: `${worldId}:${settlementName}`
-            const [premadeWorldId, settlementName] = settlementId.split(":", 2);
-            const world = PREMADE_WORLDS.find((w) => w.id === premadeWorldId);
-            const premade = world?.settlements?.find(
-                (s) => s.name === settlementName
-            );
-            resolvedPopulation =
-                typeof premade?.population === "number"
-                    ? premade.population
-                    : null;
-        } else {
-            // DB settlement by id from provided worlds snapshot
-            const fromWorlds = Array.isArray(worlds) ? (worlds as any[]) : [];
-            const match = fromWorlds
-                .flatMap((w: any) => (w?.settlements ?? []) as any[])
-                .find((s: any) => s?.id === settlementId);
-            resolvedPopulation =
-                typeof match?.population === "number" ? match.population : null;
-        }
-    } else if (hasNumericPopulation) {
-        resolvedPopulation = population as number;
-    }
-
-    if (!resolvedPopulation || !Number.isFinite(resolvedPopulation)) {
-        throw new Error(
-            "Could not resolve population from the provided inputs"
+function resolvePopulationFromSettlement(
+    settlementId: string,
+    worldId: string | null | undefined,
+    worlds: any
+): number | null {
+    if (settlementId.includes(":")) {
+        // Premade settlement id format: `${worldId}:${settlementName}`
+        const [premadeWorldId, settlementName] = settlementId.split(":", 2);
+        const world = PREMADE_WORLDS.find((w) => w.id === premadeWorldId);
+        const premade = world?.settlements?.find(
+            (s) => s.name === settlementName
         );
+        return typeof premade?.population === "number"
+            ? premade.population
+            : null;
+    } else {
+        // DB settlement by id from provided worlds snapshot
+        const fromWorlds = Array.isArray(worlds) ? (worlds as any[]) : [];
+        const match = fromWorlds
+            .flatMap((w: any) => (w?.settlements ?? []) as any[])
+            .find((s: any) => s?.id === settlementId);
+        return typeof match?.population === "number" ? match.population : null;
     }
+}
 
-    // Map high-level stock categories to underlying item.type values
-    // Never include "scroll" here; scrolls and spell components are handled separately
+function expandStockTypes(stockTypes: any): {
+    selectedStockTypes: string[];
+    expandedItemTypes: string[];
+    wantsScrolls: boolean;
+    wantsSpellComponents: boolean;
+} {
     const selectedStockTypes = Array.isArray(stockTypes)
         ? (stockTypes as string[]).map((s) => String(s).toLowerCase().trim())
         : [];
@@ -95,9 +74,23 @@ function buildOptions(opts: GenerateMagicShopOpts) {
         new Set(selectedStockTypes.flatMap((k) => categoryToItemTypes[k] ?? []))
     );
 
-    // Resolve world and settlement names (from provided worlds snapshot or premade list)
+    return {
+        selectedStockTypes,
+        expandedItemTypes,
+        wantsScrolls,
+        wantsSpellComponents,
+    };
+}
+
+function resolveWorldNames(
+    inputMode: string | null | undefined,
+    settlementId: string | null | undefined,
+    worldId: string | null | undefined,
+    worlds: any
+): { worldName: string | null; settlementName: string | null } {
     let resolvedWorldName: string | null = null;
     let resolvedSettlementName: string | null = null;
+
     if (inputMode === "by-settlement" && settlementId) {
         if (settlementId.includes(":")) {
             const [premadeWorldId, premadeSettlementName] = settlementId.split(
@@ -123,6 +116,60 @@ function buildOptions(opts: GenerateMagicShopOpts) {
     }
 
     return {
+        worldName: resolvedWorldName,
+        settlementName: resolvedSettlementName,
+    };
+}
+
+function buildOptions(opts: GenerateMagicShopOpts) {
+    const {
+        population,
+        wealth,
+        magicness,
+        stockTypes,
+        worldId,
+        settlementId,
+        stockMultiplier,
+        inputMode,
+        settings,
+        worlds,
+    } = opts;
+
+    const hasNumericPopulation =
+        typeof population === "number" && Number.isFinite(population);
+
+    let resolvedPopulation: number | null = null;
+    if (inputMode === "by-settlement" && settlementId) {
+        resolvedPopulation = resolvePopulationFromSettlement(
+            settlementId,
+            worldId,
+            worlds
+        );
+    } else if (hasNumericPopulation) {
+        resolvedPopulation = population as number;
+    }
+
+    if (!resolvedPopulation || !Number.isFinite(resolvedPopulation)) {
+        throw new Error(
+            "Could not resolve population from the provided inputs"
+        );
+    }
+
+    const {
+        selectedStockTypes,
+        expandedItemTypes,
+        wantsScrolls,
+        wantsSpellComponents,
+    } = expandStockTypes(stockTypes);
+
+    const { worldName, settlementName } = resolveWorldNames(
+        inputMode,
+        settlementId,
+        worldId,
+        worlds
+    );
+
+    return {
         population: resolvedPopulation,
         wealth: normalizeWealth(wealth as number),
         wealthIndex: wealth,
@@ -134,9 +181,9 @@ function buildOptions(opts: GenerateMagicShopOpts) {
         includeSpellComponents: wantsSpellComponents,
         stockMultiplier: stockMultiplier ?? 1,
         worldId: worldId ?? null,
-        worldName: resolvedWorldName,
+        worldName,
         settlementId: settlementId ?? null,
-        settlementName: resolvedSettlementName,
+        settlementName,
         settings: settings ?? null,
     } as any;
 }
@@ -196,7 +243,7 @@ export default async function generateMagicShop(
 
         const rarityDistribution = generateRarityDistribution(
             options.population,
-            options.wealth,
+            options.magicLevel,
             options.settings
         );
 
@@ -246,22 +293,10 @@ export default async function generateMagicShop(
     return { shops: shopsPayload };
 }
 
-type SpellBundle = { scrolls: any[]; components: any[] };
-
-async function generateUnified(
-    options: any,
-    rarityDistribution: Record<string, number>
-): Promise<{ gear: any[]; scrolls: any[]; components: any[] }> {
-    const includeScrolls = !!options?.includeScrolls;
-    const includeComponents = !!options?.includeSpellComponents;
-
-    // Compute item count and pricing context for gear
-    const { population, stockMultiplier, wealth, settings } = options;
-    const itemCount = calculateItemCount(population, stockMultiplier, settings);
-    const priceModifier = calculatePriceModifiers(wealth, settings);
-    const prices = calculatePrices(priceModifier);
-
-    // Fetch items and spells in parallel
+async function fetchGameData(): Promise<{
+    allItems: any[];
+    allSpells: any[];
+}> {
     const [itemsData, spellsData] = await Promise.all([
         dbServer.query({ dnd5e_magicItems: {} }),
         dbServer.query({ dnd5e_spells: {} }),
@@ -270,10 +305,30 @@ async function generateUnified(
     const allItems = (itemsData?.dnd5e_magicItems ?? []) as any[];
     const allSpells = (spellsData?.dnd5e_spells ?? []) as any[];
 
-    // Filter gear by selected stock types and exclude artifacts/scrolls
-    const selectedTypes: string[] = Array.isArray(options.stockTypes)
-        ? options.stockTypes
-        : [];
+    return { allItems, allSpells };
+}
+
+function filterUsableSpells(
+    allSpells: any[],
+    rarityDistribution: Record<string, number>
+): any[] {
+    return allSpells.filter((spell: any) => {
+        const level = typeof spell?.level === "number" ? spell.level : -1;
+        if (level < 0 || level > 9) return false;
+        const levelKey = (
+            level === 0 ? "cantrip" : String(level)
+        ) as keyof typeof SPELL_LEVEL_TO_RARITY;
+        const rarityLower = SPELL_LEVEL_TO_RARITY[levelKey];
+        const rarityKey = LOWER_TO_TITLE_RARITY[rarityLower];
+        return (rarityDistribution?.[rarityKey] ?? 0) > 0;
+    });
+}
+
+function filterAndPrepareGear(
+    allItems: any[],
+    selectedTypes: string[],
+    prices: any
+): any[] {
     const filteredItems = allItems.filter((item: any) => {
         const typeStr =
             typeof item?.type === "string" ? item.type.toLowerCase() : "";
@@ -283,8 +338,7 @@ async function generateUnified(
         return selectedTypes.includes(typeStr);
     });
 
-    // Prepare gear candidates with computed prices
-    const gearCandidates = filteredItems.map((item: any) => {
+    return filteredItems.map((item: any) => {
         const rarity = normalizeRarity(
             item?.rarity
         ) as keyof typeof BASE_PRICES;
@@ -301,115 +355,92 @@ async function generateUnified(
             sourceShort: item.sourceShort,
         };
     });
+}
 
-    // Filter usable spells (level 0-9 and present in rarity distribution)
-    const usableSpells = allSpells.filter((spell: any) => {
-        const level = typeof spell?.level === "number" ? spell.level : -1;
-        if (level < 0 || level > 9) return false;
-        const levelKey = (
-            level === 0 ? "cantrip" : String(level)
-        ) as keyof typeof SPELL_LEVEL_TO_RARITY;
-        const rarityLower = SPELL_LEVEL_TO_RARITY[levelKey];
-        const rarityKey = LOWER_TO_TITLE_RARITY[rarityLower];
-        return (rarityDistribution?.[rarityKey] ?? 0) > 0;
+function buildScrollCandidates(
+    usableSpells: any[],
+    priceModifier: Record<keyof typeof BASE_PRICES, number>
+): any[] {
+    return usableSpells.map((s: any) => {
+        const level = typeof s?.level === "number" ? s.level : 0;
+        const basePrice = priceScroll(level);
+        const rarityLower =
+            SPELL_LEVEL_TO_RARITY[
+                (level === 0
+                    ? "cantrip"
+                    : String(level)) as keyof typeof SPELL_LEVEL_TO_RARITY
+            ];
+        const rarity = LOWER_TO_TITLE_RARITY[rarityLower];
+        const rarityMultiplier =
+            priceModifier?.[rarity as keyof typeof BASE_PRICES] ?? 1;
+        const adjustedPrice =
+            Math.round(basePrice * rarityMultiplier * 100) / 100;
+        return {
+            kind: "scroll" as const,
+            id: s.dndbeyondId ?? s.id ?? s.slug ?? s.name,
+            name: s.name,
+            level,
+            rarity,
+            type: "scroll",
+            priceGp: adjustedPrice,
+            url: s.url,
+        };
     });
+}
 
-    // Build scroll candidates if included (apply wealth/rarity price modifiers)
-    const scrollCandidates: any[] = includeScrolls
-        ? usableSpells.map((s: any) => {
-              const level = typeof s?.level === "number" ? s.level : 0;
-              const basePrice = priceScroll(level);
-              const rarityLower =
-                  SPELL_LEVEL_TO_RARITY[
-                      (level === 0
-                          ? "cantrip"
-                          : String(level)) as keyof typeof SPELL_LEVEL_TO_RARITY
-                  ];
-              const rarity = LOWER_TO_TITLE_RARITY[rarityLower];
-              const rarityMultiplier =
-                  priceModifier?.[rarity as keyof typeof BASE_PRICES] ?? 1;
-              const adjustedPrice =
-                  Math.round(basePrice * rarityMultiplier * 100) / 100;
-              return {
-                  kind: "scroll" as const,
-                  id: s.dndbeyondId ?? s.id ?? s.slug ?? s.name,
-                  name: s.name,
-                  level,
-                  rarity,
-                  type: "scroll",
-                  priceGp: adjustedPrice,
-                  url: s.url,
-              };
-          })
-        : [];
+function buildComponentCandidates(
+    usableSpells: any[],
+    priceModifier: Record<keyof typeof BASE_PRICES, number>
+): any[] {
+    return usableSpells
+        .filter(
+            (s: any) =>
+                typeof s?.componentCost === "number" && s.componentCost > 0
+        )
+        .map((s: any) => {
+            const level = typeof s?.level === "number" ? s.level : 0;
+            const rarityLower =
+                SPELL_LEVEL_TO_RARITY[
+                    (level === 0
+                        ? "cantrip"
+                        : String(level)) as keyof typeof SPELL_LEVEL_TO_RARITY
+                ];
+            const rarity = LOWER_TO_TITLE_RARITY[rarityLower];
+            const rarityMultiplier =
+                priceModifier?.[rarity as keyof typeof BASE_PRICES] ?? 1;
+            const baseCost =
+                Math.round((s.componentCost as number) * 100) / 100;
+            const adjustedPrice =
+                Math.round(baseCost * rarityMultiplier * 100) / 100;
+            return {
+                kind: "component" as const,
+                id: s.dndbeyondId ?? s.id ?? s.slug ?? s.name,
+                name: s.name,
+                level,
+                rarity,
+                type: "component",
+                priceGp: adjustedPrice,
+                url: s.url,
+            };
+        });
+}
 
-    // Build component candidates if included (only spells with componentCost > 0) and apply modifiers
-    const componentCandidates: any[] = includeComponents
-        ? usableSpells
-              .filter(
-                  (s: any) =>
-                      typeof s?.componentCost === "number" &&
-                      s.componentCost > 0
-              )
-              .map((s: any) => {
-                  const level = typeof s?.level === "number" ? s.level : 0;
-                  const rarityLower =
-                      SPELL_LEVEL_TO_RARITY[
-                          (level === 0
-                              ? "cantrip"
-                              : String(
-                                    level
-                                )) as keyof typeof SPELL_LEVEL_TO_RARITY
-                      ];
-                  const rarity = LOWER_TO_TITLE_RARITY[rarityLower];
-                  const rarityMultiplier =
-                      priceModifier?.[rarity as keyof typeof BASE_PRICES] ?? 1;
-                  const baseCost =
-                      Math.round((s.componentCost as number) * 100) / 100;
-                  const adjustedPrice =
-                      Math.round(baseCost * rarityMultiplier * 100) / 100;
-                  return {
-                      kind: "component" as const,
-                      id: s.dndbeyondId ?? s.id ?? s.slug ?? s.name,
-                      name: s.name,
-                      level,
-                      rarity,
-                      type: "component",
-                      priceGp: adjustedPrice,
-                      url: s.url,
-                  };
-              })
-        : [];
-
-    // Build the combined pool respecting selected categories
-    const pool: any[] = [
-        ...gearCandidates,
-        ...scrollCandidates,
-        ...componentCandidates,
-    ];
-
-    // Enforce minimum 1 per selected category when available
-    const forced: any[] = [];
-    if (gearCandidates.length > 0 && selectedTypes.length > 0) {
-        forced.push(pickRandom(gearCandidates, 1)[0]);
-    }
-    if (includeScrolls && scrollCandidates.length > 0) {
-        forced.push(pickRandom(scrollCandidates, 1)[0]);
-    }
-    if (includeComponents && componentCandidates.length > 0) {
-        forced.push(pickRandom(componentCandidates, 1)[0]);
-    }
-
+function selectItemsByRarity(
+    pool: any[],
+    itemCount: number,
+    rarityDistribution: Record<string, number>,
+    forced: any[]
+): any[] {
     const remainingCount = Math.max(
         0,
         itemCount - forced.filter(Boolean).length
     );
 
-    // Rarity-weighted selection for the remainder
     const poolByRarity = groupBy(pool, (it: any) => it.rarity);
     const keys = Object.keys(BASE_PRICES) as Array<keyof typeof BASE_PRICES>;
     const remainder: any[] = [];
     let remaining = remainingCount;
+
     for (const rk of keys) {
         const bucket = poolByRarity.get(rk) ?? [];
         if (!bucket.length) continue;
@@ -423,6 +454,7 @@ async function generateUnified(
         remaining -= take;
         if (remaining <= 0) break;
     }
+
     if (remaining > 0) {
         const seen = new Set<string>();
         for (const f of forced) {
@@ -431,7 +463,6 @@ async function generateUnified(
         for (const r of remainder) {
             seen.add(`${r.kind}:${keyOf(r)}`);
         }
-        // fill from any remaining pool
         const anyPool = pool.filter(Boolean);
         const shuffled = pickRandom(anyPool, anyPool.length);
         for (const cand of shuffled) {
@@ -444,15 +475,18 @@ async function generateUnified(
         }
     }
 
-    const chosen = [...forced.filter(Boolean), ...remainder].slice(
-        0,
-        itemCount
-    );
+    return [...forced.filter(Boolean), ...remainder].slice(0, itemCount);
+}
 
-    // Split back into arrays for persistence/CSV compatibility
+function splitIntoCategories(chosen: any[]): {
+    gear: any[];
+    scrolls: any[];
+    components: any[];
+} {
     const gear: any[] = [];
     const scrolls: any[] = [];
     const components: any[] = [];
+
     for (const it of chosen) {
         if (it?.kind === "gear") {
             gear.push({
@@ -486,6 +520,69 @@ async function generateUnified(
             });
         }
     }
+
+    return { gear, scrolls, components };
+}
+
+async function generateUnified(
+    options: any,
+    rarityDistribution: Record<string, number>
+): Promise<{ gear: any[]; scrolls: any[]; components: any[] }> {
+    const includeScrolls = !!options?.includeScrolls;
+    const includeComponents = !!options?.includeSpellComponents;
+
+    const { population, stockMultiplier, wealth, settings } = options;
+    const itemCount = calculateItemCount(population, stockMultiplier, settings);
+    const priceModifier = calculatePriceModifiers(wealth, settings);
+    const prices = calculatePrices(priceModifier);
+
+    const { allItems, allSpells } = await fetchGameData();
+
+    const selectedTypes: string[] = Array.isArray(options.stockTypes)
+        ? options.stockTypes
+        : [];
+
+    const gearCandidates = filterAndPrepareGear(
+        allItems,
+        selectedTypes,
+        prices
+    );
+
+    const usableSpells = filterUsableSpells(allSpells, rarityDistribution);
+
+    const scrollCandidates: any[] = includeScrolls
+        ? buildScrollCandidates(usableSpells, priceModifier)
+        : [];
+
+    const componentCandidates: any[] = includeComponents
+        ? buildComponentCandidates(usableSpells, priceModifier)
+        : [];
+
+    const pool: any[] = [
+        ...gearCandidates,
+        ...scrollCandidates,
+        ...componentCandidates,
+    ];
+
+    const forced: any[] = [];
+    if (gearCandidates.length > 0 && selectedTypes.length > 0) {
+        forced.push(pickRandom(gearCandidates, 1)[0]);
+    }
+    if (includeScrolls && scrollCandidates.length > 0) {
+        forced.push(pickRandom(scrollCandidates, 1)[0]);
+    }
+    if (includeComponents && componentCandidates.length > 0) {
+        forced.push(pickRandom(componentCandidates, 1)[0]);
+    }
+
+    const chosen = selectItemsByRarity(
+        pool,
+        itemCount,
+        rarityDistribution,
+        forced
+    );
+
+    const { gear, scrolls, components } = splitIntoCategories(chosen);
 
     if (process.env.VV_DEBUG) {
         console.log("Magic Shop Unified Calculated Params", {

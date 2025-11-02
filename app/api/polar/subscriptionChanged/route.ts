@@ -28,39 +28,67 @@ export const POST = Webhooks({
         // ---------------------------------
         if (type === "subscription.updated" || type === "subscription.active") {
             if (userId) {
-                // Helper function to convert date strings to Date objects or null
-                const toDateOrNull = (
+                // Keep ISO strings as-is (InstantDB accepts ISO 8601 strings directly)
+                const toDateStringOrNull = (
                     dateStr: string | null | undefined
-                ): Date | null => {
+                ): string | null => {
                     if (!dateStr || dateStr === "") return null;
+                    // Validate it's a valid date string
                     const date = new Date(dateStr);
-                    return isNaN(date.getTime()) ? null : date;
+                    return isNaN(date.getTime()) ? null : dateStr;
+                };
+
+                // Normalize recurring interval (Polar uses "year", we want "yearly")
+                const normalizeRecurringInterval = (
+                    interval: string | null | undefined
+                ): "monthly" | "yearly" | null => {
+                    if (!interval) return null;
+                    const normalized = interval.toLowerCase();
+                    if (normalized === "year" || normalized === "yearly") {
+                        return "yearly";
+                    }
+                    if (normalized === "month" || normalized === "monthly") {
+                        return "monthly";
+                    }
+                    return normalized as "monthly" | "yearly";
                 };
 
                 try {
+                    // Debug: Log raw payload values
+                    console.log("Raw webhook payload values:", {
+                        current_period_start:
+                            subscriptionPayload.data.current_period_start,
+                        current_period_end:
+                            subscriptionPayload.data.current_period_end,
+                        trial_start: subscriptionPayload.data.trial_start,
+                        trial_end: subscriptionPayload.data.trial_end,
+                        recurring_interval:
+                            subscriptionPayload.data.recurring_interval,
+                        recurring_interval_count:
+                            subscriptionPayload.data.recurring_interval_count,
+                        amount: subscriptionPayload.data.amount,
+                    });
+
                     const updateData = {
                         plan: plan as "free" | "basic" | "plus" | "pro",
-                        subscriptionPeriodStart: toDateOrNull(
+                        subscriptionPeriodStart: toDateStringOrNull(
                             subscriptionPayload.data.current_period_start
                         ),
-                        subscriptionPeriodEnd: toDateOrNull(
+                        subscriptionPeriodEnd: toDateStringOrNull(
                             subscriptionPayload.data.current_period_end
                         ),
                         subscriptionCost:
                             subscriptionPayload.data.amount ?? null,
-                        recurringInterval: subscriptionPayload.data
-                            .recurring_interval
-                            ? (subscriptionPayload.data.recurring_interval as
-                                  | "monthly"
-                                  | "yearly")
-                            : null,
+                        recurringInterval: normalizeRecurringInterval(
+                            subscriptionPayload.data.recurring_interval
+                        ),
                         recurringIntervalCount:
                             subscriptionPayload.data.recurring_interval_count ??
                             null,
-                        trialPeriodStart: toDateOrNull(
+                        trialPeriodStart: toDateStringOrNull(
                             subscriptionPayload.data.trial_start
                         ),
-                        trialPeriodEnd: toDateOrNull(
+                        trialPeriodEnd: toDateStringOrNull(
                             subscriptionPayload.data.trial_end
                         ),
                     };

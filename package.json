@@ -8,6 +8,7 @@
         "start": "next start",
         "ps": "npx instant-cli@latest push schema",
         "pp": "npx instant-cli@latest push perms",
+        "pps": "npx instant-cli@latest push schema && npx instant-cli@latest push perms",
         "bs": "npm run build && npm run start",
         "update:spell-costs": "tsx stuff/scripts/updateSpellComponentCosts.ts"
     },

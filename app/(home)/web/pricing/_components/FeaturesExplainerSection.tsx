@@ -48,12 +48,30 @@ export const PlanFeaturesSection = () => {
                             </div>
 
                             <div className="mt-4">
-                                <div className="text-2xl font-semibold">
-                                    ${plan.priceMonthly}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                    /month
-                                </div>
+                                {plan.id === "basic" && plan.priceYearly ? (
+                                    <div className="space-y-1">
+                                        <div className="flex items-baseline gap-1">
+                                            <div className="text-2xl font-semibold">
+                                                ${plan.priceYearly}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                /year
+                                            </div>
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            ${plan.priceMonthly}/month
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-baseline gap-1">
+                                        <div className="text-2xl font-semibold">
+                                            ${plan.priceMonthly}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            /month
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </CardHeader>
 

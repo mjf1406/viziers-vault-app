@@ -8,6 +8,8 @@ export interface Plan {
     id: TierId;
     title: string;
     priceMonthly: number;
+    priceYearly?: number; // Optional annual price
+    billingPeriod?: "monthly" | "yearly"; // Billing period
     description: string;
     ctaText: string;
     ctaHref: string;
@@ -29,9 +31,10 @@ export const plans: Plan[] = [
         id: "basic",
         title: "Basic",
         priceMonthly: 3,
+        priceYearly: 30,
         description:
             "Full access to all features with data persistence and advanced capabilities.",
-        ctaText: "Start 4-month free Trial",
+        ctaText: "Sign up for Basic",
         ctaHref: "/app/account",
         popular: true,
         footnote: "No credit card required",

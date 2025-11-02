@@ -65,14 +65,30 @@ export const PricingSection = () => {
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                <div className="flex items-baseline gap-1">
-                                    <div className="text-3xl font-semibold">
-                                        ${plan.priceMonthly}
+                                {plan.id === "basic" && plan.priceYearly ? (
+                                    <div className="space-y-1">
+                                        <div className="flex items-baseline gap-1">
+                                            <div className="text-3xl font-semibold">
+                                                ${plan.priceYearly}
+                                            </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                /year
+                                            </div>
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            ${plan.priceMonthly}/month
+                                        </div>
                                     </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        /month
+                                ) : (
+                                    <div className="flex items-baseline gap-1">
+                                        <div className="text-3xl font-semibold">
+                                            ${plan.priceMonthly}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            /month
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 <ul className="space-y-2">
                                     {tierOrder[plan.id] > 0 && (
@@ -110,7 +126,7 @@ export const PricingSection = () => {
                                         className="w-full"
                                         variant={"default"}
                                     >
-                                        {plan.ctaText || "Upgrade"}
+                                        {plan.ctaText}
                                     </Button>
                                 )}
                                 {plan.id === "free" && (

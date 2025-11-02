@@ -36,6 +36,9 @@ s<!-- @format -->
 -   removed weird custom auth solution
 -   updated instant.perms.ts and instant.schema.ts to use the new auth solution
 -   removed magic link option to sign in so we can test easily in a private alpha with google emails only
+-   added yearly billing info to cards
+-   removed plus and pro plan options for now
+-   BUG: seedWorld now properly seeds worlds for users
 
 ### 2025/10/26
 

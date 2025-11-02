@@ -40,7 +40,7 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
         stripSuffix(a.title).localeCompare(stripSuffix(b.title))
     );
     const { plan } = useUser();
-    const partyAllowedPlans = ["basic" /* , "plus", "pro" */];
+    const partyAllowedPlans = ["basic", "plus", "pro"];
 
     return (
         <Collapsible

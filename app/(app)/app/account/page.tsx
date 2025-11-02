@@ -184,7 +184,7 @@ export default function AccountPage() {
                         </p>
                     </div>
 
-                    <div className="grid gap-6 grid-cols-2">
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
                         {plans.map((p) => (
                             <PlanCard
                                 key={p.id}
@@ -244,12 +244,30 @@ function PlanCard({
                 <CardDescription>{plan.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="flex items-baseline gap-1">
-                    <div className="text-3xl font-semibold">
-                        ${plan.priceMonthly}
+                {plan.id === "basic" && plan.priceYearly ? (
+                    <div className="space-y-1">
+                        <div className="flex items-baseline gap-1">
+                            <div className="text-3xl font-semibold">
+                                ${plan.priceYearly}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                                /year
+                            </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            ${plan.priceMonthly}/month
+                        </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">/month</div>
-                </div>
+                ) : (
+                    <div className="flex items-baseline gap-1">
+                        <div className="text-3xl font-semibold">
+                            ${plan.priceMonthly}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            /month
+                        </div>
+                    </div>
+                )}
                 <ul className="space-y-2">
                     {prevTier && (
                         <li className="flex items-start gap-2">
@@ -298,7 +316,7 @@ function PlanCard({
                         className="w-full"
                         onClick={onCheckout}
                     >
-                        {plan.ctaText || "Upgrade"}
+                        {plan.id === "basic" ? "Get Basic" : plan.ctaText || "Upgrade"}
                     </Button>
                 ) : (
                     <Button

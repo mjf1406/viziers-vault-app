@@ -1,5 +1,8 @@
 /** @format */
 
+"use client";
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -125,8 +128,11 @@ export const PricingSection = () => {
                                     <Button
                                         className="w-full"
                                         variant={"default"}
+                                        asChild
                                     >
-                                        {plan.ctaText}
+                                        <Link href="/app/account">
+                                            {plan.ctaText}
+                                        </Link>
                                     </Button>
                                 )}
                                 {plan.id === "free" && (

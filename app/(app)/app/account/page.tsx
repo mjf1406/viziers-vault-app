@@ -4,6 +4,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -62,6 +63,25 @@ export default function AccountPage() {
     );
 
     const plans = allPlans;
+
+    const buildCheckoutUrl = () => {
+        const baseUrl =
+            "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_d4dWHIBH4EKnnQr4l33lrCR5e4B8RDWIyKsOb4QeKB8/redirect";
+        const params = new URLSearchParams();
+
+        if (user?.id) {
+            params.append("user-id", user.id);
+        }
+        if (displayEmail) {
+            params.append("customer_email", displayEmail);
+        }
+        if (displayName) {
+            params.append("customer_name", displayName);
+        }
+
+        const queryString = params.toString();
+        return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    };
 
     const handleOpenBillingPortal = async () => {
         try {
@@ -194,6 +214,7 @@ export default function AccountPage() {
                                 onManage={handleOpenBillingPortal}
                                 allFeatures={features}
                                 tierOrder={tierOrder}
+                                buildCheckoutUrl={buildCheckoutUrl}
                             />
                         ))}
                     </div>
@@ -210,6 +231,7 @@ function PlanCard({
     onManage,
     allFeatures,
     tierOrder,
+    buildCheckoutUrl,
 }: {
     plan: Plan;
     isCurrent: boolean;
@@ -217,6 +239,7 @@ function PlanCard({
     onManage: () => void;
     allFeatures: Feature[];
     tierOrder: Record<TierId, number>;
+    buildCheckoutUrl: () => string;
 }) {
     const isPaid = plan.id !== "free";
     const included = allFeatures.filter((i) => i.minTier == plan.id);
@@ -312,12 +335,27 @@ function PlanCard({
                         </Button>
                     )
                 ) : isPaid ? (
-                    <Button
-                        className="w-full"
-                        onClick={onCheckout}
-                    >
-                        {plan.id === "basic" ? "Get Basic" : plan.ctaText || "Upgrade"}
-                    </Button>
+                    plan.id === "basic" ? (
+                        <Button
+                            className="w-full"
+                            asChild
+                        >
+                            <Link
+                                href={buildCheckoutUrl()}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Get Basic
+                            </Link>
+                        </Button>
+                    ) : (
+                        <Button
+                            className="w-full"
+                            onClick={onCheckout}
+                        >
+                            {plan.ctaText || "Upgrade"}
+                        </Button>
+                    )
                 ) : (
                     <Button
                         className="w-full"

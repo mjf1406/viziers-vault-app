@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,27 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Check, CheckCircle, Crown, ShieldAlert } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+    Check,
+    CheckCircle,
+    Crown,
+    ShieldAlert,
+    X,
+    Calendar,
+    DollarSign,
+    RefreshCw,
+} from "lucide-react";
 import { features, type Feature } from "@/lib/features";
 import { plans as allPlans, type Plan, type TierId } from "@/lib/plans";
 import { useUser } from "@/hooks/useUser";
@@ -37,10 +57,12 @@ export default function AccountPage() {
         error,
         settings,
         signOut,
+        data,
     } = useUser();
 
     // client-side auth state from the client SDK
     const { user } = db.useAuth();
+    const [isCanceling, setIsCanceling] = useState(false);
 
     const normalizeTier = (name?: string): TierId => {
         const v = name?.toLowerCase();
@@ -63,6 +85,21 @@ export default function AccountPage() {
     );
 
     const plans = allPlans;
+
+    // Get subscription info from profile
+    const profile = data?.$users?.[0]?.profile;
+    const subscriptionInfo = useMemo(() => {
+        if (!profile) return null;
+        return {
+            subscriptionPeriodStart: profile.subscriptionPeriodStart,
+            subscriptionPeriodEnd: profile.subscriptionPeriodEnd,
+            subscriptionCost: profile.subscriptionCost,
+            trialPeriodStart: profile.trialPeriodStart,
+            trialPeriodEnd: profile.trialPeriodEnd,
+            recurringInterval: profile.recurringInterval,
+            recurringIntervalCount: profile.recurringIntervalCount,
+        };
+    }, [profile]);
 
     const buildCheckoutUrl = () => {
         const baseUrl =
@@ -116,6 +153,53 @@ export default function AccountPage() {
         }
     };
 
+    const handleCancelSubscription = async () => {
+        if (!displayEmail) {
+            toast.error("Email not found. Please try again.");
+            return;
+        }
+
+        setIsCanceling(true);
+        try {
+            const res = await fetch("/api/polar/cancel-subscription", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: displayEmail }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                const errorMsg =
+                    data.error ||
+                    data.details ||
+                    "Failed to cancel subscription";
+                console.error("Cancel subscription error:", {
+                    status: res.status,
+                    error: errorMsg,
+                    fullResponse: data,
+                });
+                throw new Error(errorMsg);
+            }
+
+            toast.success(
+                "Subscription will cancel at the end of your billing period. You'll keep access until then."
+            );
+            // Refresh the page to update the UI
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (e: any) {
+            console.error(e);
+            toast.error(
+                e.message ||
+                    "Could not cancel subscription. Please try again or contact support."
+            );
+        } finally {
+            setIsCanceling(false);
+        }
+    };
+
     const tierOrder: Record<TierId, number> = {
         free: 0,
         basic: 1,
@@ -161,14 +245,56 @@ export default function AccountPage() {
 
                 <div className="flex items-center gap-2">
                     {currentTier !== "free" ? (
-                        <Button
-                            variant="outline"
-                            onClick={handleOpenBillingPortal}
-                            className="gap-2"
-                        >
-                            <Crown className="h-4 w-4" />
-                            Manage subscription
-                        </Button>
+                        <>
+                            <Button
+                                variant="outline"
+                                onClick={handleOpenBillingPortal}
+                                className="gap-2"
+                            >
+                                <Crown className="h-4 w-4" />
+                                Manage subscription
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="destructive"
+                                        className="gap-2"
+                                        disabled={isCanceling}
+                                    >
+                                        <X className="h-4 w-4" />
+                                        Cancel subscription
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Cancel subscription?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to cancel your
+                                            subscription? You will lose access
+                                            to premium features at the end of
+                                            your current billing period. You can
+                                            resubscribe at any time.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                            Keep subscription
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleCancelSubscription}
+                                            disabled={isCanceling}
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                            {isCanceling
+                                                ? "Canceling..."
+                                                : "Yes, cancel subscription"}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </>
                     ) : null}
                     <Button
                         variant="ghost"
@@ -197,6 +323,174 @@ export default function AccountPage() {
                 </Alert>
             ) : (
                 <>
+                    {/* Subscription Details */}
+                    {subscriptionInfo &&
+                        (subscriptionInfo.subscriptionPeriodStart ||
+                            subscriptionInfo.subscriptionPeriodEnd ||
+                            subscriptionInfo.subscriptionCost ||
+                            subscriptionInfo.trialPeriodStart ||
+                            subscriptionInfo.trialPeriodEnd ||
+                            subscriptionInfo.recurringInterval ||
+                            subscriptionInfo.recurringIntervalCount) && (
+                            <>
+                                <div className="space-y-3">
+                                    <h2 className="text-xl font-semibold">
+                                        Subscription Details
+                                    </h2>
+                                    <Card>
+                                        <CardContent className="pt-6">
+                                            <div className="grid gap-4 md:grid-cols-2">
+                                                {subscriptionInfo.subscriptionPeriodStart && (
+                                                    <div className="flex items-start gap-3">
+                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm font-medium">
+                                                                Period Start
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {new Date(
+                                                                    subscriptionInfo.subscriptionPeriodStart
+                                                                ).toLocaleDateString(
+                                                                    "en-US",
+                                                                    {
+                                                                        year: "numeric",
+                                                                        month: "long",
+                                                                        day: "numeric",
+                                                                    }
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {subscriptionInfo.subscriptionPeriodEnd && (
+                                                    <div className="flex items-start gap-3">
+                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm font-medium">
+                                                                Period End
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {new Date(
+                                                                    subscriptionInfo.subscriptionPeriodEnd
+                                                                ).toLocaleDateString(
+                                                                    "en-US",
+                                                                    {
+                                                                        year: "numeric",
+                                                                        month: "long",
+                                                                        day: "numeric",
+                                                                    }
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {subscriptionInfo.subscriptionCost !==
+                                                    undefined &&
+                                                    subscriptionInfo.subscriptionCost !==
+                                                        null && (
+                                                        <div className="flex items-start gap-3">
+                                                            <DollarSign className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                            <div>
+                                                                <p className="text-sm font-medium">
+                                                                    Cost
+                                                                </p>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    $
+                                                                    {subscriptionInfo.subscriptionCost.toFixed(
+                                                                        2
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                {subscriptionInfo.recurringInterval && (
+                                                    <div className="flex items-start gap-3">
+                                                        <RefreshCw className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm font-medium">
+                                                                Recurring
+                                                                Interval
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {
+                                                                    subscriptionInfo.recurringInterval
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {subscriptionInfo.recurringIntervalCount !==
+                                                    undefined &&
+                                                    subscriptionInfo.recurringIntervalCount !==
+                                                        null && (
+                                                        <div className="flex items-start gap-3">
+                                                            <RefreshCw className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                            <div>
+                                                                <p className="text-sm font-medium">
+                                                                    Recurring
+                                                                    Interval
+                                                                    Count
+                                                                </p>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {
+                                                                        subscriptionInfo.recurringIntervalCount
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                {subscriptionInfo.trialPeriodStart && (
+                                                    <div className="flex items-start gap-3">
+                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm font-medium">
+                                                                Trial Start
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {new Date(
+                                                                    subscriptionInfo.trialPeriodStart
+                                                                ).toLocaleDateString(
+                                                                    "en-US",
+                                                                    {
+                                                                        year: "numeric",
+                                                                        month: "long",
+                                                                        day: "numeric",
+                                                                    }
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {subscriptionInfo.trialPeriodEnd && (
+                                                    <div className="flex items-start gap-3">
+                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm font-medium">
+                                                                Trial End
+                                                            </p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {new Date(
+                                                                    subscriptionInfo.trialPeriodEnd
+                                                                ).toLocaleDateString(
+                                                                    "en-US",
+                                                                    {
+                                                                        year: "numeric",
+                                                                        month: "long",
+                                                                        day: "numeric",
+                                                                    }
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                                <Separator />
+                            </>
+                        )}
+
                     <div className="space-y-3">
                         <h2 className="text-xl font-semibold">Your plan</h2>
                         <p className="text-sm text-muted-foreground">

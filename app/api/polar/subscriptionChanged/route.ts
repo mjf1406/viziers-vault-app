@@ -3,9 +3,7 @@
 import { Webhooks } from "@polar-sh/nextjs";
 import type { PolarSubscriptionUpdatedPayload } from "@/lib/polar-webhook-types";
 import dbServer from "@/server/db-server";
-import { email } from "zod";
 
-// Ensure this route is dynamic and not statically generated
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -16,8 +14,11 @@ export const POST = Webhooks({
             payload as unknown as PolarSubscriptionUpdatedPayload;
 
         const type = subscriptionPayload.type;
-        const metadata = subscriptionPayload.data.metadata;
-        const plan = metadata.plan as "free" | "basic" | "plus" | "pro";
+        const plan = subscriptionPayload.data.product.name.split(" -")[0] as
+            | "free"
+            | "basic"
+            | "plus"
+            | "pro";
         const user = await dbServer.auth.getUser({
             email: subscriptionPayload.data.customer.email,
         });
@@ -25,32 +26,23 @@ export const POST = Webhooks({
         // ---------------------------------
         //      Subscription Updated
         // ---------------------------------
-        if (
-            type === "subscription.updated" ||
-            type === "subscription.created" ||
-            type === "subscription.uncanceled"
-        ) {
+        if (type === "subscription.updated" || type === "subscription.active") {
             if (userId) {
                 dbServer.transact([
                     dbServer.tx.profiles[userId].update({
                         plan: plan as "free" | "basic" | "plus" | "pro",
-                        subscriptionPeriodStart: new Date(
-                            subscriptionPayload.data.current_period_start
-                        ),
-                        subscriptionPeriodEnd: new Date(
-                            subscriptionPayload.data.current_period_end
-                        ),
+                        subscriptionPeriodStart:
+                            subscriptionPayload.data.current_period_start,
+                        subscriptionPeriodEnd:
+                            subscriptionPayload.data.current_period_end,
                         subscriptionCost: subscriptionPayload.data.amount,
                         recurringInterval: subscriptionPayload.data
                             .recurring_interval as "monthly" | "yearly",
                         recurringIntervalCount:
                             subscriptionPayload.data.recurring_interval_count,
-                        trialPeriodStart: new Date(
-                            subscriptionPayload.data.trial_start
-                        ),
-                        trialPeriodEnd: new Date(
-                            subscriptionPayload.data.trial_end
-                        ),
+                        trialPeriodStart: subscriptionPayload.data.trial_start,
+
+                        trialPeriodEnd: subscriptionPayload.data.trial_end,
                     }),
                 ]);
                 console.log("💰 Subscription updated for", user.email);
@@ -59,7 +51,7 @@ export const POST = Webhooks({
         // ---------------------------------
         //      Subscription Canceled
         // ---------------------------------
-        else if (type === "subscription.canceled") {
+        else if (type === "subscription.revoked") {
             if (userId) {
                 dbServer.transact([
                     dbServer.tx.profiles[userId].update({
@@ -73,7 +65,7 @@ export const POST = Webhooks({
                         trialPeriodEnd: null,
                     }),
                 ]);
-                console.log("❌ Subscription CANCELLED for", user.email);
+                console.log("❌ Subscription REVOKED for", user.email);
             }
         }
     },

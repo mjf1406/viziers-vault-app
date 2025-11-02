@@ -29,10 +29,17 @@ s<!-- @format -->
         -   [x] set up basic blog and docs
     -   [ ] make upgrade to basic in partiesUpsell.tsx and spellbookUpsell.tsx actually upgrade the user
 
+### p0
+
+-   added a way to export user data from the app as a CSV file
+-   added a way to delete an account
+-   updated the subscription details on /account to be better
+
 ## Change Log
 
 ### 2025/11/02
 
+-   polar integration is complete and working
 -   removed weird custom auth solution
 -   updated instant.perms.ts and instant.schema.ts to use the new auth solution
 -   removed magic link option to sign in so we can test easily in a private alpha with google emails only

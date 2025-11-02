@@ -2,6 +2,10 @@
 
 import { Webhooks } from "@polar-sh/nextjs";
 
+// Ensure this route is dynamic and not statically generated
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export const POST = Webhooks({
     webhookSecret: process.env.POLAR_SUBSCRIPTION_CHANGED_SECRET!,
     onPayload: async (payload) => {

@@ -72,11 +72,6 @@ const FAQList: FAQProps[] = [
         answer: "I want to support other systems as I play and learn them, but I'll have to look at licensing agreements to ensure they allow the creation of digital tools. I would also like to make it easy for open source contributions of additional systems.",
         value: "item-7",
     },
-    {
-        question: "Why are there rate limits?",
-        answer: "Every site has rate limits and the reason we have rate limits is no different. It's to protect our site from malicious attackers. It's also used to give higher paying users additional resources so they get even more for their money. The rate limits were fine-tuned based on all the feedback from the beta testers so they are approved by at least some of the community.",
-        value: "item-8",
-    },
 ];
 
 export default function PhilosophyPage() {

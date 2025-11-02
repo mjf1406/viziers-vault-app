@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, X } from "lucide-react";
 import { features } from "@/lib/features";
 import { plans, type TierId } from "@/lib/plans";
-import { formatEveryDuration } from "@/lib/utils";
 
 export const PlanFeaturesSection = () => {
     const tierOrder: Record<TierId, number> = {
@@ -97,49 +96,6 @@ export const PlanFeaturesSection = () => {
                                     );
                                 })}
                             </ul>
-
-                            {plan.rateLimits && (
-                                <div className="pt-4 border-t mt-4">
-                                    <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                                        Rate limits
-                                    </div>
-                                    <ul className="text-sm space-y-1">
-                                        <li>
-                                            Generations:{" "}
-                                            {plan.rateLimits.generations.limit}{" "}
-                                            {formatEveryDuration(
-                                                plan.rateLimits.generations
-                                                    .window
-                                            )}
-                                        </li>
-                                        <li>
-                                            Party updates:{" "}
-                                            {plan.rateLimits.partyUpdates.limit}{" "}
-                                            {formatEveryDuration(
-                                                plan.rateLimits.partyUpdates
-                                                    .window
-                                            )}
-                                        </li>
-                                        <li>
-                                            Avatar uploads:{" "}
-                                            {
-                                                plan.rateLimits.avatarUploads
-                                                    .limit
-                                            }{" "}
-                                            {formatEveryDuration(
-                                                plan.rateLimits.avatarUploads
-                                                    .window
-                                            )}
-                                        </li>
-                                        <li>
-                                            API: {plan.rateLimits.api.limit}{" "}
-                                            {formatEveryDuration(
-                                                plan.rateLimits.api.window
-                                            )}
-                                        </li>
-                                    </ul>
-                                </div>
-                            )}
                         </CardContent>
                     </Card>
                 ))}

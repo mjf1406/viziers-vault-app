@@ -4,7 +4,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import db from "@/lib/db";
-import { signOutAndClearSession } from "@/lib/auth-helpers";
 
 export type User = {
     name?: string | null;
@@ -95,7 +94,7 @@ export function useUser(initialUser?: User) {
 
     const signOut = async () => {
         setUser(null);
-        await signOutAndClearSession();
+        await db.auth.signOut();
     };
 
     return {

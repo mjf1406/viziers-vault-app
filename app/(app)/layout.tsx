@@ -10,7 +10,6 @@ import { SidebarHeader } from "@/components/nav/SidebarHeader";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { FooterSection } from "../(home)/_components/layout/sections/footer";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import SessionCookieSync from "./_components/SessionCookieSync";
 
 export const metadata: Metadata = {
     title: sectionTitleTemplate("App"),
@@ -37,7 +36,6 @@ export default function AppLayout({
                         <div>
                             <main className="w-full">
                                 <NuqsAdapter>
-                                    <SessionCookieSync />
                                     {children}
                                 </NuqsAdapter>
                             </main>

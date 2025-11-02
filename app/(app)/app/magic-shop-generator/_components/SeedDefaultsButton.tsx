@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { seedPreMadeWorlds } from "../_actions/seedWorlds";
+import db from "@/lib/db";
 import { Check } from "lucide-react";
 
 type Props = {
@@ -17,6 +18,7 @@ export default function SeedDefaultsButton({ className, onSeeded }: Props) {
     const [loading, setLoading] = useState(false);
     const [wasSuccessful, setWasSuccessful] = useState(false);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { user } = db.useAuth();
 
     useEffect(() => {
         return () => {
@@ -29,7 +31,13 @@ export default function SeedDefaultsButton({ className, onSeeded }: Props) {
     const handleClick = async () => {
         setLoading(true);
         try {
-            const res = await seedPreMadeWorlds();
+            const token = (user as any)?.refresh_token;
+            if (!token) {
+                toast.error("You must be logged in to seed worlds");
+                setLoading(false);
+                return;
+            }
+            const res = await seedPreMadeWorlds(token);
             onSeeded?.();
             setWasSuccessful(true);
             if (timerRef.current) {

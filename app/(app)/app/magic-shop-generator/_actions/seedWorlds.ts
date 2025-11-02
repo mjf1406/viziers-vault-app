@@ -3,14 +3,33 @@
 "use server";
 
 import dbServer from "@/server/db-server";
-import { getAuthAndSaveEligibility } from "@/server/auth";
 import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import { randomUUID } from "crypto";
 
 // Seeds PREMADE_WORLDS into the current user's DB, linking to $user and marking isPremade
-export async function seedPreMadeWorlds() {
-    const { uid, canSave } = await getAuthAndSaveEligibility();
-    if (!uid || !canSave) {
+export async function seedPreMadeWorlds(token: string) {
+    if (!token || typeof token !== "string") {
+        throw new Error("Unauthorized: missing token");
+    }
+
+    // Verify the refresh token using InstantDB
+    const user = await dbServer.auth.verifyToken(token);
+    if (!user?.id) {
+        throw new Error("Unauthorized: invalid token");
+    }
+
+    const uid = user.id as string;
+
+    // Query user profile to check if they have a premium plan
+    const users = await dbServer.query({
+        $users: { $: { where: { id: uid } }, profile: {} },
+    });
+    const userInfo = (users as any)?.$users?.[0];
+    const planRaw = userInfo?.profile?.plan as string | undefined;
+    const normalized = (planRaw || "free").toLowerCase();
+    const isPremium = ["basic", "plus", "pro"].includes(normalized);
+
+    if (!isPremium) {
         throw new Error("You must be a paid user to save worlds");
     }
 

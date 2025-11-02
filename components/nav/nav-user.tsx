@@ -23,7 +23,6 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 import db from "@/lib/db";
-import { signOutAndClearSession } from "@/lib/auth-helpers";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 
@@ -135,7 +134,7 @@ export function NavUser() {
                         <DropdownMenuItem
                             className="cursor-pointer"
                             onSelect={() => {
-                                void signOutAndClearSession();
+                                void db.auth.signOut();
                             }}
                         >
                             <LogOut className="mr-2 h-4 w-4" />

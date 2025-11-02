@@ -32,15 +32,15 @@ export const features: Feature[] = [
         tags: ["cloud", "export"],
         service: false,
     },
-    {
-        id: "voting-power",
-        title: "Voting Power",
-        description:
-            "Influence the direction of the project with your votes on Discord.",
-        minTier: "pro",
-        tags: ["community", "participation"],
-        service: false,
-    },
+    // {
+    //     id: "voting-power",
+    //     title: "Voting Power",
+    //     description:
+    //         "Influence the direction of the project with your votes on Discord.",
+    //     minTier: "pro",
+    //     tags: ["community", "participation"],
+    //     service: false,
+    // },
     {
         id: "permalinks",
         title: "Permalink Generation",
@@ -57,22 +57,22 @@ export const features: Feature[] = [
         tags: ["export"],
         service: false,
     },
-    {
-        id: "alpha-access",
-        title: "Alpha Access",
-        description: "Get access to alpha features.",
-        minTier: "pro",
-        tags: ["access"],
-        service: false,
-    },
-    {
-        id: "beta-access",
-        title: "Beta Access",
-        description: "Get access to beta features.",
-        minTier: "plus",
-        tags: ["access"],
-        service: false,
-    },
+    // {
+    //     id: "alpha-access",
+    //     title: "Alpha Access",
+    //     description: "Get access to alpha features.",
+    //     minTier: "pro",
+    //     tags: ["access"],
+    //     service: false,
+    // },
+    // {
+    //     id: "beta-access",
+    //     title: "Beta Access",
+    //     description: "Get access to beta features.",
+    //     minTier: "plus",
+    //     tags: ["access"],
+    //     service: false,
+    // },
     {
         id: "csv-export",
         title: "CSV Export",

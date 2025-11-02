@@ -27,7 +27,7 @@ export async function seedPreMadeWorlds(token: string) {
     const userInfo = (users as any)?.$users?.[0];
     const planRaw = userInfo?.profile?.plan as string | undefined;
     const normalized = (planRaw || "free").toLowerCase();
-    const isPremium = ["basic", "plus", "pro"].includes(normalized);
+    const isPremium = ["basic" /* , "plus", "pro" */].includes(normalized);
 
     if (!isPremium) {
         throw new Error("You must be a paid user to save worlds");

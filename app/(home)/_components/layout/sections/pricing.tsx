@@ -17,8 +17,8 @@ export const PricingSection = () => {
     const tierOrder: Record<TierId, number> = {
         free: 0,
         basic: 1,
-        plus: 2,
-        pro: 3,
+        // plus: 2,
+        // pro: 3,
     };
 
     return (

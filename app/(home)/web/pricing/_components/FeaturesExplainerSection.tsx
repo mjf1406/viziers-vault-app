@@ -9,8 +9,8 @@ export const PlanFeaturesSection = () => {
     const tierOrder: Record<TierId, number> = {
         free: 0,
         basic: 1,
-        plus: 2,
-        pro: 3,
+        // plus: 2,
+        // pro: 3,
     };
 
     return (
@@ -31,7 +31,8 @@ export const PlanFeaturesSection = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"> */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
                 {plans.map((plan) => (
                     <Card
                         key={plan.id}

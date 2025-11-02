@@ -2,7 +2,7 @@
 
 // lib/plans.ts
 
-export type TierId = "free" | "basic" | "plus" | "pro";
+export type TierId = "free" | "basic"; // | "plus" | "pro";
 
 export interface Plan {
     id: TierId;
@@ -36,22 +36,22 @@ export const plans: Plan[] = [
         popular: true,
         footnote: "No credit card required",
     },
-    {
-        id: "plus",
-        title: "Plus",
-        priceMonthly: 5,
-        description:
-            "Full access to all features with data persistence and advanced capabilities.",
-        ctaText: "Subscribe to Plus",
-        ctaHref: "/app/account",
-    },
-    {
-        id: "pro",
-        title: "Pro",
-        priceMonthly: 10,
-        description:
-            "Full access to all features with data persistence and advanced capabilities.",
-        ctaText: "Subscribe to Pro",
-        ctaHref: "/app/account",
-    },
+    // {
+    //     id: "plus",
+    //     title: "Plus",
+    //     priceMonthly: 5,
+    //     description:
+    //         "Full access to all features with data persistence and advanced capabilities.",
+    //     ctaText: "Subscribe to Plus",
+    //     ctaHref: "/app/account",
+    // },
+    // {
+    //     id: "pro",
+    //     title: "Pro",
+    //     priceMonthly: 10,
+    //     description:
+    //         "Full access to all features with data persistence and advanced capabilities.",
+    //     ctaText: "Subscribe to Pro",
+    //     ctaHref: "/app/account",
+    // },
 ];

@@ -18,7 +18,7 @@ const adminBind = [
     "isStillOwner",
     "auth.id != null && auth.id == newData.id",
     "isPremium",
-    "auth.ref('$user.profile.plan').exists(p, p in ['basic', 'plus', 'pro'])",
+    "auth.ref('$user.profile.plan').exists(p, p in ['basic' /* , 'plus', 'pro' */])",
 ];
 
 const dataBind = [
@@ -29,7 +29,7 @@ const dataBind = [
     "isGuestOwner",
     "data.owner in auth.ref('$user.linkedGuestUsers.id')",
     "isPremium",
-    "auth.ref('$user.profile.plan').exists(p, p in ['basic', 'plus', 'pro'])",
+    "auth.ref('$user.profile.plan').exists(p, p in ['basic' /* , 'plus', 'pro' */])",
 ];
 
 const commonBind = [
@@ -44,7 +44,7 @@ const commonBind = [
     "isStillOwner",
     "auth.id != null && auth.id == newData.id",
     "isPremium",
-    "auth.ref('$user.profile.plan').exists(p, p in ['basic', 'plus', 'pro'])",
+    "auth.ref('$user.profile.plan').exists(p, p in ['basic' /* , 'plus', 'pro' */])",
 ];
 
 const rules = {

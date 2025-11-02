@@ -4,7 +4,7 @@
 
 import dbServer from "@/server/db-server";
 
-type Plan = "free" | "basic" | "plus" | "pro" | null;
+type Plan = "free" | "basic" | null; // | "plus" | "pro"
 
 export type UpdateUserProfileParams = {
     // user.refresh_token from the client
@@ -54,7 +54,7 @@ export async function updateUserProfile(
         [];
 
     if ("plan" in params) {
-        // plan can be "free" | "basic" | "plus" | "pro" | null
+        // plan can be "free" | "basic" | null  // | "plus" | "pro"
         update.plan = params.plan ?? null;
         updatedFields.push("plan");
     }

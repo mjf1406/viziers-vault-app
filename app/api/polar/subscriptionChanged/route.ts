@@ -28,24 +28,65 @@ export const POST = Webhooks({
         // ---------------------------------
         if (type === "subscription.updated" || type === "subscription.active") {
             if (userId) {
-                dbServer.transact([
-                    dbServer.tx.profiles[userId].update({
-                        plan: plan as "free" | "basic" | "plus" | "pro",
-                        subscriptionPeriodStart:
-                            subscriptionPayload.data.current_period_start,
-                        subscriptionPeriodEnd:
-                            subscriptionPayload.data.current_period_end,
-                        subscriptionCost: subscriptionPayload.data.amount,
-                        recurringInterval: subscriptionPayload.data
-                            .recurring_interval as "monthly" | "yearly",
-                        recurringIntervalCount:
-                            subscriptionPayload.data.recurring_interval_count,
-                        trialPeriodStart: subscriptionPayload.data.trial_start,
+                // Helper function to convert date strings to Date objects or null
+                const toDateOrNull = (
+                    dateStr: string | null | undefined
+                ): Date | null => {
+                    if (!dateStr || dateStr === "") return null;
+                    const date = new Date(dateStr);
+                    return isNaN(date.getTime()) ? null : date;
+                };
 
-                        trialPeriodEnd: subscriptionPayload.data.trial_end,
-                    }),
-                ]);
-                console.log("💰 Subscription updated for", user.email);
+                try {
+                    const updateData = {
+                        plan: plan as "free" | "basic" | "plus" | "pro",
+                        subscriptionPeriodStart: toDateOrNull(
+                            subscriptionPayload.data.current_period_start
+                        ),
+                        subscriptionPeriodEnd: toDateOrNull(
+                            subscriptionPayload.data.current_period_end
+                        ),
+                        subscriptionCost:
+                            subscriptionPayload.data.amount ?? null,
+                        recurringInterval: subscriptionPayload.data
+                            .recurring_interval
+                            ? (subscriptionPayload.data.recurring_interval as
+                                  | "monthly"
+                                  | "yearly")
+                            : null,
+                        recurringIntervalCount:
+                            subscriptionPayload.data.recurring_interval_count ??
+                            null,
+                        trialPeriodStart: toDateOrNull(
+                            subscriptionPayload.data.trial_start
+                        ),
+                        trialPeriodEnd: toDateOrNull(
+                            subscriptionPayload.data.trial_end
+                        ),
+                    };
+
+                    console.log("Updating subscription with data:", {
+                        userId,
+                        email: user.email,
+                        updateData,
+                    });
+
+                    await dbServer.transact([
+                        dbServer.tx.profiles[userId].update(updateData),
+                    ]);
+                    console.log("💰 Subscription updated for", user.email);
+                } catch (error) {
+                    console.error("❌ Error updating subscription:", {
+                        userId,
+                        email: user.email,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                        payload: subscriptionPayload.data,
+                    });
+                    throw error;
+                }
             }
         }
         // ---------------------------------
@@ -53,19 +94,31 @@ export const POST = Webhooks({
         // ---------------------------------
         else if (type === "subscription.revoked") {
             if (userId) {
-                dbServer.transact([
-                    dbServer.tx.profiles[userId].update({
-                        plan: "free",
-                        subscriptionPeriodStart: null,
-                        subscriptionPeriodEnd: null,
-                        subscriptionCost: null,
-                        recurringInterval: null,
-                        recurringIntervalCount: null,
-                        trialPeriodStart: null,
-                        trialPeriodEnd: null,
-                    }),
-                ]);
-                console.log("❌ Subscription REVOKED for", user.email);
+                try {
+                    await dbServer.transact([
+                        dbServer.tx.profiles[userId].update({
+                            plan: "free",
+                            subscriptionPeriodStart: null,
+                            subscriptionPeriodEnd: null,
+                            subscriptionCost: null,
+                            recurringInterval: null,
+                            recurringIntervalCount: null,
+                            trialPeriodStart: null,
+                            trialPeriodEnd: null,
+                        }),
+                    ]);
+                    console.log("❌ Subscription REVOKED for", user.email);
+                } catch (error) {
+                    console.error("❌ Error revoking subscription:", {
+                        userId,
+                        email: user.email,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
+                    });
+                    throw error;
+                }
             }
         }
     },

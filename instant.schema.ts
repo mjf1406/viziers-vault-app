@@ -26,6 +26,13 @@ const _schema = i.schema({
             firstName: i.string(),
             lastName: i.string(),
             googlePicture: i.string().optional(),
+            subscriptionPeriodStart: i.date().optional(),
+            subscriptionPeriodEnd: i.date().optional(),
+            subscriptionCost: i.number().optional(),
+            trialPeriodStart: i.date().optional(),
+            trialPeriodEnd: i.date().optional(),
+            recurringInterval: i.string().optional(),
+            recurringIntervalCount: i.number().optional(),
         }),
         // ----------------------
         //      Data Tables

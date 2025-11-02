@@ -3,6 +3,7 @@
 import { Webhooks } from "@polar-sh/nextjs";
 import type { PolarSubscriptionUpdatedPayload } from "@/lib/polar-webhook-types";
 import dbServer from "@/server/db-server";
+import { email } from "zod";
 
 // Ensure this route is dynamic and not statically generated
 export const dynamic = "force-dynamic";
@@ -52,6 +53,7 @@ export const POST = Webhooks({
                         ),
                     }),
                 ]);
+                console.log("💰 Subscription updated for", user.email);
             }
         }
         // ---------------------------------
@@ -71,6 +73,7 @@ export const POST = Webhooks({
                         trialPeriodEnd: null,
                     }),
                 ]);
+                console.log("❌ Subscription CANCELLED for", user.email);
             }
         }
     },

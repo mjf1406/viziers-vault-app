@@ -86,7 +86,7 @@ export default function SpellbookSettings() {
                 ops.push(
                     db.tx.settings[user.id]
                         .create(payload)
-                        .link({ $user: user.id })
+                        .link({ owner: user.id })
                 );
             }
             await db.transact(ops);
@@ -143,7 +143,7 @@ export default function SpellbookSettings() {
                                 "Saving…"
                             ) : wasSaved ? (
                                 <span className="inline-flex items-center gap-2">
-                                    <Check className="w-4 h-4 text-green-600" />
+                                    <Check className="w-4 h-4 text-current" />
                                     Saved
                                 </span>
                             ) : (

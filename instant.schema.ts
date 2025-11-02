@@ -11,25 +11,25 @@ const _schema = i.schema({
         // ----------------------
         //      Admin Tables
         // ----------------------
-
         $files: i.entity({
             path: i.string().unique().indexed(),
             url: i.string(),
         }),
         $users: i.entity({
             email: i.string().unique().indexed().optional(),
+            imageURL: i.string().optional(),
+            type: i.string().optional(),
         }),
-        userProfiles: i.entity({
-            joined: i.date().optional(),
-            premium: i.boolean().optional(),
-            plan: i.string().optional(), // "free", "basic", "plus", "pro" :::: null = free
-            name: i.string().optional(),
+        profiles: i.entity({
+            joined: i.date(),
+            plan: i.string(),
+            firstName: i.string(),
+            lastName: i.string(),
+            googlePicture: i.string().optional(),
         }),
-
         // ----------------------
         //      Data Tables
         // ----------------------
-
         dnd5e_magicItems: i.entity({
             // D&D Beyond primary key
             dndbeyondId: i.string().unique().indexed(),
@@ -88,7 +88,6 @@ const _schema = i.schema({
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
         }),
-
         dnd5e_bestiary: i.entity({
             // D&D Beyond primary key
             dndbeyondId: i.string().unique().indexed(),
@@ -115,16 +114,9 @@ const _schema = i.schema({
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
         }),
-
         // ----------------------
         //      User Tables
         // ----------------------
-
-        todos: i.entity({
-            createdAt: i.number().optional(),
-            done: i.boolean().optional(),
-            text: i.string().optional(),
-        }),
         settings: i.entity({
             urlPreferences: i.json().optional(),
             // Generator settings (Magic Shop, etc.)
@@ -141,38 +133,11 @@ const _schema = i.schema({
             // Spellbook generator settings
             spellbookExtraSpellsDice: i.string().optional(),
         }),
-        battleMaps: i.entity({}),
         parties: i.entity({
             name: i.string(),
             pcs: i.json(), // [{level: 1, quantity: 3}] - this means there are three level-one PCs
             createdAt: i.date(),
             updatedAt: i.date().optional(),
-            creatorId: i.string().indexed(),
-        }),
-        encounters: i.entity({}),
-        spellbooks: i.entity({
-            name: i.string().optional(),
-            createdAt: i.date().optional().indexed(),
-            updatedAt: i.date().optional().indexed(),
-            options: i.json().optional(),
-            spellCount: i.number().optional(),
-            spells: i.json().optional(),
-            creatorId: i.string().optional().indexed(),
-        }),
-        magicShops: i.entity({
-            name: i.string(),
-            createdAt: i.date().optional(),
-            updatedAt: i.date().optional(),
-            items: i.json().optional(),
-            options: i.json().optional(),
-            creatorId: i.string().optional().indexed(),
-        }),
-        worlds: i.entity({
-            name: i.string(),
-            createdAt: i.date().optional().indexed(),
-            updatedAt: i.date().optional().indexed(),
-            creatorId: i.string().optional().indexed(),
-            isPremade: i.boolean().optional().indexed(),
         }),
         settlements: i.entity({
             name: i.string(),
@@ -182,69 +147,253 @@ const _schema = i.schema({
             shopTypes: i.json().optional(), // ["magic", "general", ...]
             createdAt: i.date().optional().indexed(),
             updatedAt: i.date().optional().indexed(),
-            creatorId: i.string().optional().indexed(),
             isPremade: i.boolean().optional().indexed(),
         }),
-        starSystems: i.entity({}),
-        galaxies: i.entity({}),
+        todos: i.entity({
+            text: i.string(),
+            done: i.boolean(),
+            createdAt: i.date().optional(),
+        }),
+        // ----------------------
+        //    Generator Tables
+        // ----------------------
+        battleMaps: i.entity({}),
+        encounters: i.entity({}),
+        spellbooks: i.entity({
+            name: i.string().optional(),
+            createdAt: i.date(),
+            updatedAt: i.date().optional().indexed(),
+            options: i.json().optional(),
+            spellCount: i.number().optional(),
+            spells: i.json().optional(),
+        }),
+        magicShops: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional(),
+            updatedAt: i.date().optional(),
+            items: i.json().optional(),
+            options: i.json().optional(),
+        }),
+        worlds: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
+            isPremade: i.boolean().optional().indexed(),
+        }),
+        starSystems: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
+            isPremade: i.boolean().optional().indexed(),
+        }),
+        galaxies: i.entity({
+            name: i.string(),
+            createdAt: i.date().optional().indexed(),
+            updatedAt: i.date().optional().indexed(),
+            isPremade: i.boolean().optional().indexed(),
+        }),
     },
     links: {
-        // One-to-many from $users -> each new entity
-        battleMapsUser: {
-            forward: { on: "battleMaps", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "battleMaps" },
+        // ----------------------
+        //      Admin Tables
+        // ----------------------
+        $usersLinkedPrimaryUser: {
+            forward: {
+                on: "$users",
+                has: "one",
+                label: "linkedPrimaryUser",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "linkedGuestUsers",
+            },
         },
-        partiesUser: {
-            forward: { on: "parties", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "parties" },
+        userProfiles: {
+            forward: {
+                on: "profiles",
+                has: "one",
+                label: "user",
+            },
+            reverse: {
+                on: "$users",
+                has: "one",
+                label: "profile",
+            },
         },
-        encountersUser: {
-            forward: { on: "encounters", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "encounters" },
+        // ----------------------
+        //      User Tables
+        // ----------------------
+        settingsOwners: {
+            forward: {
+                // This adds a column to the settings table called owner, wherein the userId is stored.
+                on: "settings",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                // This adds a column to the users table called settings, wherein the settingsId is stored.
+                on: "$users",
+                has: "one",
+                label: "settings",
+            },
         },
-        spellbooksUser: {
-            forward: { on: "spellbooks", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "spellbooks" },
+        partiesOwners: {
+            forward: {
+                // This adds a column to the parties table called owner, wherein the userId is stored.
+                on: "parties",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                // This adds a column to the users table called parties, wherein [partiesId] is stored.
+                on: "$users",
+                has: "many",
+                label: "parties",
+            },
         },
-        magicShopsUser: {
-            forward: { on: "magicShops", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "magicShops" },
-        },
-        settingsUser: {
-            forward: { on: "settings", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "settings" },
-        },
-        worldsUser: {
-            forward: { on: "worlds", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "worlds" },
-        },
-        settlementsUser: {
-            forward: { on: "settlements", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "settlements" },
-        },
-        settlementsWorld: {
-            forward: { on: "settlements", has: "one", label: "world" },
-            reverse: { on: "worlds", has: "many", label: "settlements" },
-        },
-        starSystemsUser: {
-            forward: { on: "starSystems", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "starSystems" },
-        },
-        galaxiesUser: {
-            forward: { on: "galaxies", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "many", label: "galaxies" },
-        },
-        userProfilesUser: {
-            forward: { on: "userProfiles", has: "one", label: "$user" },
-            reverse: { on: "$users", has: "one", label: "profile" },
+        settlementsOwners: {
+            forward: {
+                // This adds a column to the settlements table called owner, wherein the userId is stored.
+                on: "settlements",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                // This adds a column to the users table called settlements, wherein [settlementsId] is stored.
+                on: "$users",
+                has: "many",
+                label: "settlements",
+            },
         },
         partiesFiles: {
-            forward: { on: "parties", has: "one", label: "$files" },
-            reverse: { on: "$files", has: "one", label: "party" },
+            forward: {
+                on: "parties",
+                has: "one",
+                label: "icon",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$files",
+                has: "one",
+                label: "party",
+            },
         },
-        userProfilesFiles: {
-            forward: { on: "userProfiles", has: "one", label: "$files" },
-            reverse: { on: "$files", has: "one", label: "avatar" },
+        // ----------------------------
+        //    Generator Table Owners
+        // ----------------------------
+        battleMapsOwners: {
+            forward: {
+                // This adds a column to the battleMaps table called owner, wherein the userId is stored.
+                on: "battleMaps",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                // This adds a column to the users table called battleMaps, wherein [battleMapsId] is stored.
+                on: "$users",
+                has: "many",
+                label: "battleMaps",
+            },
+        },
+        encountersOwners: {
+            forward: {
+                on: "encounters",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "encounters",
+            },
+        },
+        spellbooksOwners: {
+            forward: {
+                on: "spellbooks",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "spellbooks",
+            },
+        },
+        magicShopsOwners: {
+            forward: {
+                on: "magicShops",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "magicShops",
+            },
+        },
+        worldsOwners: {
+            forward: {
+                on: "worlds",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "worlds",
+            },
+        },
+        starSystemsOwners: {
+            forward: {
+                on: "starSystems",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "starSystems",
+            },
+        },
+        galaxiesOwners: {
+            forward: {
+                on: "galaxies",
+                has: "one",
+                label: "owner",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "$users",
+                has: "many",
+                label: "galaxies",
+            },
+        },
+        // -----------------------------------
+        //    Generator Table Relationships
+        // -----------------------------------
+        settlementsWorld: {
+            forward: {
+                on: "settlements",
+                has: "one",
+                label: "world",
+                onDelete: "cascade",
+            },
+            reverse: {
+                on: "worlds",
+                has: "many",
+                label: "settlements",
+            },
         },
     },
     rooms: {

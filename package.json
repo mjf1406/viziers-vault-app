@@ -6,8 +6,8 @@
         "dev": "next dev --turbopack",
         "build": "next build --turbopack",
         "start": "next start",
-        "pushschema": "npx instant-cli@latest push schema",
-        "pushperms": "npx instant-cli@latest push perms",
+        "ps": "npx instant-cli@latest push schema",
+        "pp": "npx instant-cli@latest push perms",
         "bs": "npm run build && npm run start",
         "update:spell-costs": "tsx stuff/scripts/updateSpellComponentCosts.ts"
     },

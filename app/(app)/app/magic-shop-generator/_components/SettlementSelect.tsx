@@ -32,74 +32,78 @@ export default function SettlementSelect({
     });
 
     const settlements = useMemo(() => {
-        const worlds = (data?.worlds ?? []) as any[];
-
-        const dbSettlementsAll = worlds.flatMap(
-            (w: any) => (w?.settlements ?? []) as any[]
-        );
-
-        const premadeSettlementsAll = PREMADE_WORLDS.flatMap((w) =>
-            (w.settlements ?? []).map((s) => ({ ...s, worldId: w.id }))
-        );
-
-        if (worldId) {
-            const dbWorld = worlds.find((w: any) => w.id === worldId);
-            const dbList = ((dbWorld?.settlements ?? []) as any[]).map((s) => ({
-                id: s.id,
-                name: s.name || "Untitled",
-            }));
-
-            const premadeList =
-                PREMADE_WORLDS.find((w) => w.id === worldId)?.settlements?.map(
-                    (s) => ({
-                        id: `${worldId}:${s.name}`,
-                        name: s.name,
-                    })
-                ) ?? [];
-
-            return [...premadeList, ...dbList];
+        // Only show settlements when a world is selected
+        if (!worldId) {
+            return [];
         }
 
-        const mergedAll = [
-            ...premadeSettlementsAll.map((s) => ({
-                id: `${s.worldId}:${s.name}`,
-                name: s.name,
-            })),
-            ...dbSettlementsAll.map((s: any) => ({
-                id: s.id,
-                name: s.name || "Untitled",
-            })),
-        ];
+        const worlds = (data?.worlds ?? []) as any[];
+        const dbWorld = worlds.find((w: any) => w.id === worldId);
+        
+        if (!dbWorld) {
+            return [];
+        }
 
-        return mergedAll;
+        const dbList = ((dbWorld?.settlements ?? []) as any[]).map((s) => ({
+            id: s.id,
+            name: s.name || "Untitled",
+        }));
+
+        // Only show premade settlements if the selected world is a premade world in user's DB
+        const dbWorldIsPremade = dbWorld?.isPremade === true;
+        const premadeList = dbWorldIsPremade
+            ? (() => {
+                  const premadeWorld = PREMADE_WORLDS.find(
+                      (w) => w.name === dbWorld?.name
+                  );
+                  return (
+                      premadeWorld?.settlements?.map((s) => ({
+                          id: `${premadeWorld.id}:${s.name}`,
+                          name: s.name,
+                      })) ?? []
+                  );
+              })()
+            : [];
+
+        return [...premadeList, ...dbList];
     }, [data, worldId]);
 
     // Build grouped lists for pre-made vs user-made
     const premadeListAll = useMemo(() => {
-        if (worldId) {
-            return (
-                PREMADE_WORLDS.find((w) => w.id === worldId)?.settlements ?? []
-            ).map((s) => ({ id: `${worldId}:${s.name}`, name: s.name }));
+        // Only show settlements when a world is selected
+        if (!worldId) {
+            return [];
         }
-        return PREMADE_WORLDS.flatMap((w) =>
-            (w.settlements ?? []).map((s) => ({
-                id: `${w.id}:${s.name}`,
-                name: s.name,
-            }))
+
+        const worlds = (data?.worlds ?? []) as any[];
+        const dbWorld = worlds.find((w: any) => w.id === worldId);
+        const dbWorldIsPremade = dbWorld?.isPremade === true;
+        
+        if (!dbWorldIsPremade) return [];
+        
+        const premadeWorld = PREMADE_WORLDS.find(
+            (w) => w.name === dbWorld?.name
         );
-    }, [worldId]);
+        return (
+            premadeWorld?.settlements?.map((s) => ({
+                id: `${premadeWorld.id}:${s.name}`,
+                name: s.name,
+            })) ?? []
+        );
+    }, [data, worldId]);
 
     const dbListAll = useMemo(() => {
-        const worlds = (data?.worlds ?? []) as any[];
-        if (worldId) {
-            const w = worlds.find((w: any) => w.id === worldId);
-            return ((w?.settlements ?? []) as any[]).map((s) => ({
-                id: s.id,
-                name: s.name || "Untitled",
-            }));
+        // Only show settlements when a world is selected
+        if (!worldId) {
+            return [];
         }
-        const all = worlds.flatMap((w: any) => (w?.settlements ?? []) as any[]);
-        return all.map((s: any) => ({ id: s.id, name: s.name || "Untitled" }));
+
+        const worlds = (data?.worlds ?? []) as any[];
+        const w = worlds.find((w: any) => w.id === worldId);
+        return ((w?.settlements ?? []) as any[]).map((s) => ({
+            id: s.id,
+            name: s.name || "Untitled",
+        }));
     }, [data, worldId]);
 
     return (

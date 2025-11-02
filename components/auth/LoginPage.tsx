@@ -161,7 +161,6 @@ export default function LoginPage() {
                         token,
                         name: info.name ?? null,
                         imageUrl: info.picture ?? null,
-                        fileName: `${user.id}-avatar`,
                     });
 
                     // res.created === true => we created a profile (and possibly uploaded+linked)

@@ -11,9 +11,7 @@ export type UpdateUserProfileParams = {
     token: string;
 
     // Optional fields to update
-    name?: string | null;
     plan?: Plan | undefined;
-    premium?: boolean | null;
     joined?: Date | string | null;
 };
 
@@ -29,7 +27,7 @@ export type UpdateUserProfileResult =
       };
 
 /**
- * Update a userProfiles row for this user.
+ * Update a profiles row for this user.
  * - Auth: verifies refresh_token and scopes queries to that user.
  * - NOTE: this no longer creates a profile if missing; it will fail if the
  *   profile does not exist.
@@ -55,18 +53,10 @@ export async function updateUserProfile(
     const updatedFields: Array<keyof Omit<UpdateUserProfileParams, "token">> =
         [];
 
-    if ("name" in params) {
-        update.name = params.name ?? null;
-        updatedFields.push("name");
-    }
     if ("plan" in params) {
         // plan can be "free" | "basic" | "plus" | "pro" | null
         update.plan = params.plan ?? null;
         updatedFields.push("plan");
-    }
-    if ("premium" in params) {
-        update.premium = params.premium ?? null;
-        updatedFields.push("premium");
     }
     if ("joined" in params) {
         const j = params.joined;
@@ -92,7 +82,7 @@ export async function updateUserProfile(
 
     try {
         const res = await scopedDb.transact([
-            scopedDb.tx.userProfiles[uid].update(update),
+            scopedDb.tx.profiles[uid].update(update),
         ]);
         return {
             success: true,

@@ -48,17 +48,6 @@ export default function MagicShopsGrid({
         };
     }, []);
 
-    if (isLoading) {
-        return <div className="py-12 text-center">Loading shops…</div>;
-    }
-    if (error) {
-        return (
-            <div className="py-12 text-center text-destructive">
-                Error loading shops
-            </div>
-        );
-    }
-
     const shopsRaw: any[] = data?.magicShops ?? [];
 
     const shops = shopsRaw
@@ -86,10 +75,13 @@ export default function MagicShopsGrid({
                 .filter(Boolean) as string[]
         )
     );
+    
+    // This hook must be called before any early returns
     const { data: worldSettleData } = db.useQuery({
         worlds: { $: { where: { id: { $in: worldIds } } } },
         settlements: { $: { where: { id: { $in: settlementIds } } } },
     });
+    
     const worldIdToName = React.useMemo(() => {
         const m = new Map<string, string>();
         const arr = (worldSettleData?.worlds ?? []) as any[];
@@ -106,6 +98,17 @@ export default function MagicShopsGrid({
         }
         return m;
     }, [worldSettleData]);
+
+    if (isLoading) {
+        return <div className="py-12 text-center">Loading shops…</div>;
+    }
+    if (error) {
+        return (
+            <div className="py-12 text-center text-destructive">
+                Error loading shops
+            </div>
+        );
+    }
 
     if (!shops.length) {
         return (

@@ -9,7 +9,7 @@ import db from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Copy, BookOpen } from "lucide-react";
+import { Download, Copy, BookOpen, ExternalLink } from "lucide-react";
 import { toTitleCase } from "@/lib/utils";
 import DownloadSpellbookCSVButton from "../_components/DownloadSpellbookCSVButton";
 import { buildSpellUrl } from "@/lib/urlBuilder";
@@ -197,9 +197,10 @@ export default function SpellbookDetailPage() {
                                                         href={href}
                                                         target="_blank"
                                                         rel="noreferrer noopener"
-                                                        className="text-xs text-primary hover:underline"
+                                                        className="text-xs text-primary hover:underline flex items-center gap-1"
                                                     >
                                                         Open reference
+                                                        <ExternalLink className="w-3 h-3" />
                                                     </a>
                                                 ) : null;
                                             })()}

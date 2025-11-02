@@ -30,9 +30,9 @@ export default function PartiesGrid({
     onEdit: (p: any) => void;
     pendingIds: Set<string>;
 }) {
-    // Query parties; each party contains its own $files object
+    // Query parties; each party contains its own icon object
     const { isLoading, error, data } = db.useQuery({
-        parties: { $files: {} },
+        parties: { icon: {} },
     });
 
     if (isLoading) {
@@ -60,18 +60,12 @@ export default function PartiesGrid({
                       }))
                     : [];
 
-            // Resolve icon URL from per-party $files only (no top-level fallback)
+            // Resolve icon URL from per-party icon link
             let iconUrl: string | null = null;
-            const pFiles = p?.["$files"] ?? p?.$files;
-            if (pFiles) {
-                const fileObj = Array.isArray(pFiles) ? pFiles[0] : pFiles;
+            const iconFile = p?.icon;
+            if (iconFile) {
+                const fileObj = Array.isArray(iconFile) ? iconFile[0] : iconFile;
                 iconUrl = fileObj?.url ?? null;
-            } else if (
-                typeof p.icon === "string" &&
-                p.icon.startsWith("http")
-            ) {
-                // optional: support direct URL in p.icon
-                iconUrl = p.icon;
             }
 
             return {
@@ -102,12 +96,12 @@ export default function PartiesGrid({
     const handleDelete = async (id: string) => {
         try {
             const party = parties.find((x) => x.id === id);
-            const pFiles = party?.["$files"] ?? party?.$files;
+            const iconFile = party?.icon;
             const fileIds: string[] = [];
 
-            if (pFiles) {
-                if (Array.isArray(pFiles)) {
-                    for (const f of pFiles) {
+            if (iconFile) {
+                if (Array.isArray(iconFile)) {
+                    for (const f of iconFile) {
                         if (f?.id) fileIds.push(f.id);
                         else if (f?.key) fileIds.push(f.key);
                         else {
@@ -118,7 +112,7 @@ export default function PartiesGrid({
                         }
                     }
                 } else {
-                    const f = pFiles;
+                    const f = iconFile;
                     if (f?.id) fileIds.push(f.id);
                     else if (f?.key) fileIds.push(f.key);
                     else

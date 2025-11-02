@@ -29,7 +29,7 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { Store } from "lucide-react";
+import { Store, ExternalLink } from "lucide-react";
 
 function WorldSettlementLabels(props: {
     worldIds: string[];
@@ -243,9 +243,10 @@ export default function MagicShopDetailPage() {
                             href={it.href}
                             target="_blank"
                             rel="noreferrer noopener"
-                            className="text-xs text-primary hover:underline"
+                            className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
                             Open reference
+                            <ExternalLink className="w-3 h-3" />
                         </a>
                     ) : null}
                 </div>

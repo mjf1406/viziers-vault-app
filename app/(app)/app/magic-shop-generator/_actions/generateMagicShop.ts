@@ -1,13 +1,13 @@
 /** @format */
 
-"use server";
+"use client";
 
 import type { GenerateMagicShopOpts } from "../_components/GenMagicShopResponsiveDialog";
 import { PREMADE_WORLDS } from "@/lib/pre-made-worlds";
 import { WEALTH_LEVELS } from "@/lib/constants/settlements";
-import dbServer from "@/server/db-server";
+import db from "@/lib/db";
 import { SPELL_LEVEL_TO_RARITY, SPELL_SCROLL_PRICES_GP } from "@/lib/5e-data";
-import { getAuthAndSaveEligibility } from "@/server/auth";
+import { id } from "@instantdb/react";
 
 const LOWER_TO_TITLE_RARITY = {
     common: "Common",
@@ -210,22 +210,22 @@ export type GenerateMagicShopResponse =
 
 export default async function generateMagicShop(
     input: GenerateMagicShopInput,
-    // user param kept for backwards compatibility; save eligibility determined server-side
-    _user?: { id?: string | null; plan?: string | null }
+    gameData: { allItems: any[]; allSpells: any[] },
+    userId?: string | null
 ): Promise<GenerateMagicShopResponse> {
-    const auth = await getAuthAndSaveEligibility();
-
     const createdAt = new Date();
     const qtyRaw = input?.quantity ?? 1;
     const qty = Math.min(10, Math.max(1, Number(qtyRaw) || 1));
     const name = input?.name?.trim() || undefined;
     const options = buildOptions(input.options);
+    const canSave = Boolean(userId);
+    
     console.log("generateMagicShop options:", {
         name,
         options,
         qty,
-        canSave: auth.canSave,
-        uid: auth.uid,
+        canSave,
+        userId,
     });
 
     const ids: string[] = [];
@@ -237,9 +237,7 @@ export default async function generateMagicShop(
     }> = [];
 
     for (let i = 0; i < qty; i++) {
-        const id =
-            (globalThis as any)?.crypto?.randomUUID?.() ??
-            Math.random().toString(36).slice(2);
+        const shopId = id();
 
         const rarityDistribution = generateRarityDistribution(
             options.population,
@@ -247,7 +245,7 @@ export default async function generateMagicShop(
             options.settings
         );
 
-        const unified = await generateUnified(options, rarityDistribution);
+        const unified = await generateUnified(options, rarityDistribution, gameData);
 
         const record: any = {
             name,
@@ -269,16 +267,15 @@ export default async function generateMagicShop(
                 settlementId: options.settlementId ?? null,
                 quantity: qty,
             },
-            ...(auth.userIdForSave ? { creatorId: auth.userIdForSave } : {}),
         };
 
-        if (auth.canSave && auth.userIdForSave) {
-            await dbServer.transact(
-                dbServer.tx.magicShops[id]
+        if (canSave && userId) {
+            await db.transact(
+                db.tx.magicShops[shopId]
                     .create(record)
-                    .link({ $user: auth.userIdForSave })
+                    .link({ owner: userId })
             );
-            ids.push(id);
+            ids.push(shopId);
         } else {
             shopsPayload.push({
                 name: record.name,
@@ -289,24 +286,11 @@ export default async function generateMagicShop(
         }
     }
 
-    if (auth.canSave && ids.length) return ids;
+    if (canSave && ids.length) return ids;
     return { shops: shopsPayload };
 }
 
-async function fetchGameData(): Promise<{
-    allItems: any[];
-    allSpells: any[];
-}> {
-    const [itemsData, spellsData] = await Promise.all([
-        dbServer.query({ dnd5e_magicItems: {} }),
-        dbServer.query({ dnd5e_spells: {} }),
-    ]);
-
-    const allItems = (itemsData?.dnd5e_magicItems ?? []) as any[];
-    const allSpells = (spellsData?.dnd5e_spells ?? []) as any[];
-
-    return { allItems, allSpells };
-}
+// Game data is now passed as a parameter instead of being fetched here
 
 function filterUsableSpells(
     allSpells: any[],
@@ -526,7 +510,8 @@ function splitIntoCategories(chosen: any[]): {
 
 async function generateUnified(
     options: any,
-    rarityDistribution: Record<string, number>
+    rarityDistribution: Record<string, number>,
+    gameData: { allItems: any[]; allSpells: any[] }
 ): Promise<{ gear: any[]; scrolls: any[]; components: any[] }> {
     const includeScrolls = !!options?.includeScrolls;
     const includeComponents = !!options?.includeSpellComponents;
@@ -536,7 +521,7 @@ async function generateUnified(
     const priceModifier = calculatePriceModifiers(wealth, settings);
     const prices = calculatePrices(priceModifier);
 
-    const { allItems, allSpells } = await fetchGameData();
+    const { allItems, allSpells } = gameData;
 
     const selectedTypes: string[] = Array.isArray(options.stockTypes)
         ? options.stockTypes
@@ -605,15 +590,15 @@ async function generateUnified(
 
 async function generateItems(
     options: any,
-    rarityDistribution: any
+    rarityDistribution: any,
+    gameData: { allItems: any[]; allSpells: any[] }
 ): Promise<any[]> {
     const { population, stockMultiplier, wealth, settings } = options;
 
     const itemCount = calculateItemCount(population, stockMultiplier, settings);
     const priceModifier = calculatePriceModifiers(wealth, settings);
     const prices = calculatePrices(priceModifier);
-    const itemsData = await dbServer.query({ dnd5e_magicItems: {} });
-    const allItems = itemsData.dnd5e_magicItems as any[];
+    const allItems = gameData.allItems;
     const selectedTypes: string[] = Array.isArray(options.stockTypes)
         ? options.stockTypes
         : [];
@@ -696,19 +681,14 @@ async function generateItems(
     return normalized;
 }
 
-async function fetchItems(stockTypes: string[]): Promise<any[]> {
-    const data = await dbServer.query({
-        dnd5e_magicItems: {
-            $: {
-                where: {
-                    type: { $in: stockTypes },
-                    // Defensive server-side filter to exclude artifacts
-                    rarity: { $nin: ["Artifact", "artifact", "ARTIFACT"] },
-                },
-            },
-        },
+function fetchItems(stockTypes: string[], allItems: any[]): any[] {
+    return allItems.filter((item: any) => {
+        const typeStr = typeof item?.type === "string" ? item.type.toLowerCase() : "";
+        const rarityStr = String(item?.rarity ?? "").toLowerCase();
+        // Defensive filter to exclude artifacts
+        if (rarityStr.includes("artifact")) return false;
+        return stockTypes.includes(typeStr);
     });
-    return data.dnd5e_magicItems;
 }
 
 function calculateItemCount(

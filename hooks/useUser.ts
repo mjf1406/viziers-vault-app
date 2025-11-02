@@ -28,7 +28,7 @@ export function useUser(initialUser?: User) {
         }
     }
 
-    const query = { $users: { profile: { $files: {} }, settings: {} } };
+    const query = { $users: { profile: {}, settings: {} } };
     const { isLoading, error, data } = db.useQuery(query);
     const userInfo = data?.$users?.[0];
 
@@ -44,16 +44,21 @@ export function useUser(initialUser?: User) {
 
     useEffect(() => {
         if (!userInfo) return;
+        const profile = userInfo.profile;
+        const firstName = profile?.firstName ?? null;
+        const lastName = profile?.lastName ?? null;
+        const name = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
         setUser({
-            name: userInfo.profile?.name ?? null,
+            name,
             id: userInfo.id ?? null,
             email: userInfo.email ?? null,
-            avatar: userInfo.profile?.$files?.url ?? null,
+            avatar: profile?.googlePicture ?? null,
         });
     }, [
-        userInfo?.profile?.name,
+        userInfo?.profile?.firstName,
+        userInfo?.profile?.lastName,
+        userInfo?.profile?.googlePicture,
         userInfo?.email,
-        userInfo?.profile?.$files?.url,
         userInfo?.id,
     ]);
 
@@ -61,8 +66,16 @@ export function useUser(initialUser?: User) {
 
     const displayName = useMemo(() => {
         if (!loggedIn) return null;
-        return user?.name ?? userInfo?.profile?.name ?? "Account";
-    }, [loggedIn, user?.name, userInfo?.profile?.name]);
+        const profile = userInfo?.profile;
+        const firstName = profile?.firstName;
+        const lastName = profile?.lastName;
+        if (firstName && lastName) {
+            return `${firstName} ${lastName}`;
+        }
+        if (firstName) return firstName;
+        if (lastName) return lastName;
+        return userInfo?.email ?? "Account";
+    }, [loggedIn, userInfo?.profile?.firstName, userInfo?.profile?.lastName, userInfo?.email]);
 
     const displayEmail = useMemo(() => {
         if (!loggedIn) return null;
@@ -71,8 +84,8 @@ export function useUser(initialUser?: User) {
 
     const avatarSrc = useMemo(() => {
         if (!loggedIn) return null;
-        return user?.avatar ?? userInfo?.profile?.$files?.url ?? null;
-    }, [loggedIn, user?.avatar, userInfo?.profile?.$files?.url]);
+        return user?.avatar ?? userInfo?.profile?.googlePicture ?? null;
+    }, [loggedIn, user?.avatar, userInfo?.profile?.googlePicture]);
 
     const plan = useMemo(() => {
         if (!loggedIn) return null;
@@ -95,7 +108,7 @@ export function useUser(initialUser?: User) {
         displayEmail,
         avatarSrc,
         plan,
-        settings: userInfo?.settings[0] ?? null,
+        settings: userInfo?.settings ?? null,
         signOut,
     };
 }

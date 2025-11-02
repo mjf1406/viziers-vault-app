@@ -214,13 +214,27 @@ export default function MagicShopGeneratorDialog({
 
     // Load worlds with settlements so we can map a selected city -> its attributes
     const { data: worldsData } = db.useQuery({ worlds: { settlements: {} } });
+    
+    // Load game data for magic shop generation
+    const { data: gameData } = db.useQuery({
+        dnd5e_magicItems: {},
+        dnd5e_spells: {},
+    });
     const allSettlements = useMemo(() => {
         const worlds = (worldsData?.worlds ?? []) as any[];
         const dbSettlements = worlds.flatMap(
             (w: any) => (w?.settlements ?? []) as any[]
         );
 
-        const premadeSettlements = PREMADE_WORLDS.flatMap((w) =>
+        // Get premade world names that exist in user's DB
+        const userPremadeWorldNames = new Set(
+            worlds.filter((w: any) => w.isPremade).map((w: any) => w.name)
+        );
+
+        // Only include premade settlements from worlds that exist in user's DB
+        const premadeSettlements = PREMADE_WORLDS.filter((w) =>
+            userPremadeWorldNames.has(w.name)
+        ).flatMap((w) =>
             (w.settlements ?? []).map((s) => ({
                 // synthesize an id that won't collide with DB ids
                 id: `${w.id}:${s.name}`,
@@ -355,6 +369,14 @@ export default function MagicShopGeneratorDialog({
 
             if (mode === "create") {
                 try {
+                    const allItems = (gameData?.dnd5e_magicItems ?? []) as any[];
+                    const allSpells = (gameData?.dnd5e_spells ?? []) as any[];
+                    
+                    if (!allItems.length || !allSpells.length) {
+                        setErrors({ form: "Game data not loaded yet. Please wait..." });
+                        return;
+                    }
+                    
                     const result: GenerateMagicShopResponse =
                         await generateMagicShop(
                             {
@@ -365,7 +387,8 @@ export default function MagicShopGeneratorDialog({
                                 options: payload,
                                 quantity: qty,
                             },
-                            { id: user?.id ?? null, plan: plan ?? null }
+                            { allItems, allSpells },
+                            user?.id ?? null
                         );
                     // If free/guest: server returns payload with shops, download CSV
                     if (result && typeof result !== "object") {

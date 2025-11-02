@@ -23,11 +23,12 @@ import {
     CredenzaHeader,
     CredenzaTitle,
 } from "@/components/ui/credenza";
-import generateSpellbook from "../_actions/generateSpellbook";
+import { generateSpellbookClient } from "../_actions/generateSpellbookClient";
 import { updateSpellbook } from "../_actions/updateSpellbook";
 import { CLASSES, SCHOOLS, SOURCE_SHORTS } from "@/lib/5e-data";
 import { Dices, Loader2 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
+import db from "@/lib/db";
 import SpellbookNameField from "./SpellbookNameField";
 import {
     buildSpellbookFilename,
@@ -137,8 +138,14 @@ export default function SpellbookGeneratorDialog({
     hideTitleOnMobile = false,
     onGenerate,
 }: SpellbookGeneratorDialogProps) {
-    const { user, plan } = useUser();
+    const { user, plan, settings } = useUser();
     const isPaid = Boolean(plan && plan.toLowerCase() !== "free");
+    
+    // Load all spells for client-side generation
+    const { data: spellsData } = db.useQuery({
+        dnd5e_spells: {},
+    });
+    const allSpells = (spellsData?.dnd5e_spells ?? []) as any[];
     const [openLocal, setOpenLocal] = useState<boolean>(!!defaultOpen);
     const isControlled = typeof open !== "undefined";
     const dialogOpen = isControlled ? open : openLocal;
@@ -322,40 +329,6 @@ export default function SpellbookGeneratorDialog({
             return;
         }
 
-        const formEl = e.currentTarget;
-        const formData = new FormData(formEl);
-
-        if (isPaid && user?.id) {
-            formData.set("name", name.trim());
-        } else {
-            formData.delete("name");
-        }
-
-        // No client credentials; server reads HTTP-only cookies
-
-        const schoolsResult: string[] | "random" = schoolsRandom
-            ? "random"
-            : selectedSchools;
-        const classesResult: string[] | "random" = classesRandom
-            ? "random"
-            : selectedClasses;
-
-        // validated by Zod
-
-        // If level is "random", pick a numeric level client-side (1-20),
-        // update both the form data and the visible selectedLevel so the
-        // server receives a concrete numeric level.
-        let chosenLevel: number;
-        if (selectedLevel === "random") {
-            chosenLevel = Math.floor(Math.random() * 20) + 1; // 1..20
-            formData.set("level", String(chosenLevel));
-            // Update visible selection so the hidden input and UI reflect the chosen value
-            setSelectedLevel(String(chosenLevel));
-        } else {
-            chosenLevel = parseInt(selectedLevel, 10);
-            formData.set("level", String(chosenLevel));
-        }
-
         // Handle edit mode - instant name update using InstantDB
         if (mode === "edit" && initial?.id) {
             const spellbookId = initial.id;
@@ -364,13 +337,38 @@ export default function SpellbookGeneratorDialog({
             return;
         }
 
-        // Handle create mode - needs loading state since we navigate after
+        // Handle create mode - client-side generation
+        const schoolsResult: string[] | "random" = schoolsRandom
+            ? "random"
+            : selectedSchools;
+        const classesResult: string[] | "random" = classesRandom
+            ? "random"
+            : selectedClasses;
+
+        // If level is "random", pick a numeric level client-side (1-20)
+        let chosenLevel: number | "random";
+        if (selectedLevel === "random") {
+            chosenLevel = "random";
+        } else {
+            chosenLevel = parseInt(selectedLevel, 10);
+        }
+
         setIsGenerating(true);
         try {
-            const level: number = chosenLevel;
-            const result = await generateSpellbook(formData);
+            const result = await generateSpellbookClient({
+                level: chosenLevel,
+                schools: schoolsResult,
+                classes: classesResult,
+                sourceShorts: selectedSources.length > 0 ? selectedSources : undefined,
+                excludeLegacy,
+                name: isPaid && user?.id ? name.trim() : undefined,
+                userId: user?.id ?? null,
+                userSettings: settings,
+                allSpells,
+            });
+
             if (mode === "create" && typeof result === "string" && result) {
-                // router.push(`/app/spellbook-generator/${result}`);
+                // Spellbook saved successfully
                 setDialogOpen(false);
                 return;
             }
@@ -390,24 +388,6 @@ export default function SpellbookGeneratorDialog({
             setDialogOpen(false);
         } catch (err: any) {
             console.error("generate error", err);
-            // Inline error instead of toast; check middleware-set rate limit message cookie
-            if (typeof document !== "undefined") {
-                const cookieStr = document.cookie || "";
-                const m = cookieStr.match(/(?:^|; )vv_rl_msg=([^;]+)/);
-                if (m) {
-                    try {
-                        const raw = decodeURIComponent(m[1]);
-                        // eslint-disable-next-line no-console
-                        console.error(raw);
-                        setErrors({ form: "429 Too Many Requests" });
-                    } finally {
-                        document.cookie = "vv_rl_msg=; path=/; max-age=0";
-                    }
-                    setDialogOpen(true);
-                    return;
-                }
-            }
-
             const msg =
                 err?.message ||
                 err?.body?.message ||

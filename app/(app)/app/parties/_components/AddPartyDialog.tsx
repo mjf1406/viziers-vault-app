@@ -146,6 +146,7 @@ export default function AddPartyDialog({
                 }
 
                 const ops = buildUpdatePartyOps(
+                    db,
                     pid,
                     partyName.trim(),
                     filtered,
@@ -203,6 +204,7 @@ export default function AddPartyDialog({
                 }
 
                 const ops = buildCreatePartyOps(
+                    db,
                     newId,
                     user.id,
                     partyName.trim(),

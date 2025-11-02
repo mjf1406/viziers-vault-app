@@ -64,9 +64,8 @@ export default function CreateWorldResponsiveDialog({
                     .create({
                         name: trimmed,
                         createdAt: new Date(),
-                        creatorId: user.id,
                     })
-                    .link({ $user: user.id })
+                    .link({ owner: user.id })
             );
             onCreated?.(newId);
             setDialogOpen(false);

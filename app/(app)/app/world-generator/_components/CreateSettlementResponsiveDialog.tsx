@@ -107,9 +107,8 @@ export default function CreateSettlementResponsiveDialog({
                         magicness,
                         shopTypes,
                         createdAt: new Date(),
-                        creatorId: user.id,
                     })
-                    .link({ $user: user.id, world: worldId })
+                    .link({ owner: user.id, world: worldId })
             );
             onCreated?.(newId, worldId);
             setDialogOpen(false);

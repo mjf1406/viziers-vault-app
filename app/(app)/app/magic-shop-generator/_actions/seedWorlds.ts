@@ -15,8 +15,9 @@ export async function seedPreMadeWorlds() {
     }
 
     // If already seeded, do nothing (idempotent-ish by user)
+    // Query via owner link to check for existing premade worlds
     const existing = (await dbServer.query({
-        worlds: { $: { where: { creatorId: uid, isPremade: true } } },
+        worlds: { $: { where: { "owner.id": uid, isPremade: true } } },
     })) as any;
     const alreadySeeded = (existing?.worlds ?? []).length > 0;
     if (alreadySeeded) {
@@ -32,10 +33,9 @@ export async function seedPreMadeWorlds() {
                 .create({
                     name: w.name,
                     createdAt: now,
-                    creatorId: uid,
                     isPremade: true,
                 })
-                .link({ $user: uid })
+                .link({ owner: uid })
         );
 
         for (const s of w.settlements ?? []) {
@@ -49,10 +49,9 @@ export async function seedPreMadeWorlds() {
                         magicness: s.magicness as any,
                         shopTypes: s.shopTypes as any,
                         createdAt: now,
-                        creatorId: uid,
                         isPremade: true,
                     })
-                    .link({ $user: uid, world: worldId })
+                    .link({ owner: uid, world: worldId })
             );
         }
     }

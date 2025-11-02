@@ -1,8 +1,6 @@
 /** @format */
 
-// app/spellbook-generator/_actions/generateSpellbook.ts
-
-"use server";
+"use client";
 
 import {
     FisherYatesShuffle,
@@ -16,9 +14,8 @@ import {
 } from "@/lib/utils";
 import { resolveLevel } from "@/lib/5e-utils";
 import { CLASSES, SCHOOLS, SPELLS_PER_LEVEL } from "@/lib/5e-data";
-import dbServer from "@/server/db-server";
-import { getAuthAndSaveEligibility } from "@/server/auth";
-import { randomUUID } from "crypto";
+import db from "@/lib/db";
+import { id } from "@instantdb/react";
 
 type GenerateOpts = {
     level: number | "random";
@@ -28,7 +25,7 @@ type GenerateOpts = {
     excludeLegacy?: boolean;
 };
 
-type Dnd5eSpell = {
+export type Dnd5eSpell = {
     dndbeyondId: string;
     name?: string;
     slug?: string;
@@ -65,132 +62,89 @@ type SpellbookGenerateResponse =
           };
       };
 
-/**
- * Generate spells only without saving to database
- * Used for client-side updates
- */
-export async function generateSpellsOnly(formData: FormData): Promise<{
-    spells: Dnd5eSpell[];
-    options: {
-        level: GenerateOpts["level"];
-        schools: string[];
-        classes: string[];
-        sourceShorts?: string[];
-        excludeLegacy?: boolean;
-    };
-}> {
-    try {
-        const result = await buildSpellbookFromOptions(formData, false);
-        return {
-            spells: result.spells,
-            options: result.options,
-        };
-    } catch (err) {
-        if (process.env.VV_DEBUG) {
-            // eslint-disable-next-line no-console
-            console.error("generateSpellsOnly error:", err);
-        }
-        throw err;
-    }
-}
+type GenerateSpellbookClientInput = {
+    level: number | "random";
+    schools: string[] | "random";
+    classes: string[] | "random";
+    sourceShorts?: string[];
+    excludeLegacy?: boolean;
+    name?: string;
+    userId?: string | null;
+    userSettings?: { spellbookExtraSpellsDice?: string } | null;
+    allSpells: Dnd5eSpell[]; // Pre-loaded spells from db.useQuery
+};
 
-export default async function generateSpellbook(
-    formData: FormData
+/**
+ * Client-side spellbook generation
+ */
+export async function generateSpellbookClient(
+    input: GenerateSpellbookClientInput
 ): Promise<SpellbookGenerateResponse> {
     try {
-        const auth = await getAuthAndSaveEligibility();
-        const result = await buildSpellbookFromOptions(
-            formData,
-            true,
-            auth.uid
+        const resolved = resolveOptions(
+            input.level,
+            input.schools,
+            input.classes
         );
 
-        logGenerationDebug(auth, result);
+        const { leveled, cantrips } = filterSpells(
+            input.allSpells,
+            resolved,
+            input.sourceShorts,
+            input.excludeLegacy
+        );
 
-        if (auth.canSave && auth.userIdForSave) {
-            const id = await saveSpellbookRecord({
-                userId: auth.userIdForSave,
+        const characterLevel = calculateCharacterLevel(resolved.levels);
+        const playerClass = resolved.classes?.[0] ?? "";
+
+        const overrides = getUserOverrides(
+            input.userSettings,
+            playerClass,
+            characterLevel
+        );
+
+        const spellbook = selectSpellsForSpellbook(
+            cantrips,
+            leveled,
+            playerClass,
+            characterLevel,
+            overrides
+        );
+
+        const result = {
+            spells: spellbook,
+            options: {
+                level: input.level,
+                schools: resolved.schools,
+                classes: resolved.classes,
+                sourceShorts: input.sourceShorts,
+                excludeLegacy: input.excludeLegacy,
+            },
+        };
+
+        // Save if user is authenticated
+        if (input.userId) {
+            const spellbookId = await saveSpellbookRecord({
+                userId: input.userId,
                 spells: result.spells,
                 options: result.options,
-                formData,
+                name: input.name,
             });
-            return id;
+            return spellbookId;
         }
 
-        return {
-            spells: result.spells,
-            options: result.options,
-        };
+        return result;
     } catch (err) {
-        if (process.env.VV_DEBUG) {
+        if (process.env.NEXT_PUBLIC_VV_DEBUG) {
             // eslint-disable-next-line no-console
-            console.error("generateSpellbook error:", err);
+            console.error("generateSpellbookClient error:", err);
         }
         throw err;
     }
 }
 
-/**
- * Core spellbook generation logic shared by both entry points
- */
-async function buildSpellbookFromOptions(
-    formData: FormData,
-    requireAuth: boolean,
-    uid?: string | null | undefined
-): Promise<{
-    spells: Dnd5eSpell[];
-    options: {
-        level: GenerateOpts["level"];
-        schools: string[];
-        classes: string[];
-        sourceShorts?: string[];
-        excludeLegacy?: boolean;
-    };
-}> {
-    const parsed = parseFormDataToOptions(formData);
-    const resolved = resolveOptions(
-        parsed.level,
-        parsed.schools,
-        parsed.classes
-    );
-
-    const { leveled, cantrips } = await fetchAndFilterSpells(
-        resolved,
-        parsed.sourceShorts,
-        parsed.excludeLegacy
-    );
-
-    const characterLevel = calculateCharacterLevel(resolved.levels);
-    const playerClass = resolved.classes?.[0] ?? "";
-
-    const overrides = await getUserOverrides(
-        uid,
-        playerClass,
-        characterLevel,
-        requireAuth
-    );
-
-    const spellbook = selectSpellsForSpellbook(
-        cantrips,
-        leveled,
-        playerClass,
-        characterLevel,
-        overrides
-    );
-
-    return {
-        spells: spellbook,
-        options: {
-            level: parsed.level,
-            schools: resolved.schools,
-            classes: resolved.classes,
-            sourceShorts: parsed.sourceShorts,
-            excludeLegacy: parsed.excludeLegacy,
-        },
-    };
-}
-
-async function fetchAndFilterSpells(
+function filterSpells(
+    allSpells: Dnd5eSpell[],
     resolved: {
         levels: number[];
         schools: string[];
@@ -198,14 +152,40 @@ async function fetchAndFilterSpells(
     },
     sourceShorts?: string[],
     excludeLegacy?: boolean
-): Promise<{
+): {
     leveled: Dnd5eSpell[];
     cantrips: Dnd5eSpell[];
-}> {
-    const [leveledRaw, cantripsRaw] = await Promise.all([
-        fetchSpells(resolved.levels, resolved.schools, sourceShorts),
-        fetchCantrips(resolved.schools, sourceShorts),
-    ]);
+} {
+    // Filter leveled spells
+    let leveledRaw = allSpells.filter((spell) => {
+        const level = toNumber(spell.level);
+        return (
+            level > 0 &&
+            resolved.levels.includes(level) &&
+            resolved.schools.includes(String(spell.school || "").trim()) &&
+            (!sourceShorts ||
+                sourceShorts.length === 0 ||
+                (spell.sourceShort &&
+                    sourceShorts.includes(
+                        String(spell.sourceShort).toLowerCase()
+                    )))
+        );
+    });
+
+    // Filter cantrips
+    let cantripsRaw = allSpells.filter((spell) => {
+        const level = toNumber(spell.level);
+        return (
+            level === 0 &&
+            resolved.schools.includes(String(spell.school || "").trim()) &&
+            (!sourceShorts ||
+                sourceShorts.length === 0 ||
+                (spell.sourceShort &&
+                    sourceShorts.includes(
+                        String(spell.sourceShort).toLowerCase()
+                    )))
+        );
+    });
 
     let leveled = filterSpellsByClasses(leveledRaw, resolved.classes);
     let cantrips = filterSpellsByClasses(cantripsRaw, resolved.classes);
@@ -235,41 +215,17 @@ function calculateCharacterLevel(levels: number[]): number {
     );
 }
 
-async function getUserOverrides(
-    uid: string | null | undefined,
+function getUserOverrides(
+    userSettings: { spellbookExtraSpellsDice?: string } | null | undefined,
     playerClass: string,
-    characterLevel: number,
-    requireAuth: boolean
-): Promise<{ cantripsTarget?: number; spellsTarget?: number }> {
-    if (!uid) return {};
+    characterLevel: number
+): { cantripsTarget?: number; spellsTarget?: number } {
+    if (!userSettings) return {};
     try {
-        const extraExpr = await fetchUserExtraDice(uid);
+        const extraExpr = userSettings.spellbookExtraSpellsDice;
         return computeAdjustedTargets(playerClass, characterLevel, extraExpr);
     } catch {
         return {};
-    }
-}
-
-function logGenerationDebug(
-    auth: Awaited<ReturnType<typeof getAuthAndSaveEligibility>>,
-    result: {
-        spells: Dnd5eSpell[];
-        options: {
-            level: GenerateOpts["level"];
-            schools: string[];
-            classes: string[];
-        };
-    }
-): void {
-    if (process.env.VV_DEBUG) {
-        // eslint-disable-next-line no-console
-        console.log("generateSpellbook — resolved options:", {
-            level: result.options.level,
-            schools: result.options.schools,
-            classes: result.options.classes,
-            spellbook: result.spells.length,
-            canSave: auth.canSave,
-        });
     }
 }
 
@@ -464,42 +420,6 @@ function distributeTargets(
     return { cantripsTarget: newCantrips, spellsTarget: newLeveled };
 }
 
-function parseFormDataToOptions(formData: FormData): {
-    level: GenerateOpts["level"];
-    schools: GenerateOpts["schools"];
-    classes: GenerateOpts["classes"];
-    sourceShorts: string[];
-    excludeLegacy: boolean;
-    name?: string;
-} {
-    const rawLevel = formData.get("level")?.toString() ?? "random";
-    const level: GenerateOpts["level"] =
-        rawLevel === "random" ? "random" : parseInt(rawLevel, 10);
-
-    const schoolsIsRandom = formData.get("schools") === "random";
-    const schools: GenerateOpts["schools"] = schoolsIsRandom
-        ? "random"
-        : formData.getAll("schools[]").map(String);
-
-    const classesIsRandom = formData.get("classes") === "random";
-    const classes: GenerateOpts["classes"] = classesIsRandom
-        ? "random"
-        : formData.getAll("classes[]").map(String);
-
-    const sourceShorts = formData
-        .getAll("sourceShorts[]")
-        .map((s) => String(s).toLowerCase()) as string[];
-
-    const excludeLegacy =
-        formData.get("excludeLegacyNormalized")?.toString() === "1" ||
-        formData.get("excludeLegacy")?.toString() === "on";
-
-    const nameRaw = formData.get("name");
-    const name = typeof nameRaw === "string" ? nameRaw.trim() : undefined;
-
-    return { level, schools, classes, sourceShorts, excludeLegacy, name };
-}
-
 function resolveOptions(
     level: GenerateOpts["level"],
     schools: GenerateOpts["schools"],
@@ -516,68 +436,6 @@ function resolveOptions(
         max: 1,
     }).map((c) => c.toUpperCase());
     return { levels, schools: resolvedSchools, classes: resolvedClasses };
-}
-
-async function dbQuery<T>(q: unknown): Promise<T | null> {
-    const res = await (dbServer as any).query(q);
-    return (res as T) ?? null;
-}
-
-async function fetchUserExtraDice(
-    uid: string | null | undefined
-): Promise<string> {
-    if (!uid) return "";
-    const res = await dbQuery<{
-        $users?: { settings?: { spellbookExtraSpellsDice?: string }[] }[];
-    }>({
-        $users: { $: { where: { id: uid } }, settings: {} },
-    });
-    const first = res?.$users?.[0]?.settings?.[0];
-    return (first?.spellbookExtraSpellsDice || "").toString();
-}
-
-async function fetchSpells(
-    levels: number[],
-    schools: string[],
-    sourceShorts?: string[]
-): Promise<Dnd5eSpell[]> {
-    const query = {
-        dnd5e_spells: {
-            $: {
-                where: {
-                    level: { $in: levels },
-                    school: { $in: schools },
-                    ...(Array.isArray(sourceShorts) && sourceShorts.length
-                        ? { sourceShort: { $in: sourceShorts } }
-                        : {}),
-                },
-            },
-        },
-    };
-
-    const res = await dbQuery<{ dnd5e_spells?: Dnd5eSpell[] }>(query);
-    return res?.dnd5e_spells ?? [];
-}
-
-async function fetchCantrips(
-    schools: string[],
-    sourceShorts?: string[]
-): Promise<Dnd5eSpell[]> {
-    const query = {
-        dnd5e_spells: {
-            $: {
-                where: {
-                    level: { $in: [0] },
-                    school: { $in: schools },
-                    ...(Array.isArray(sourceShorts) && sourceShorts.length
-                        ? { sourceShort: { $in: sourceShorts } }
-                        : {}),
-                },
-            },
-        },
-    };
-    const res = await dbQuery<{ dnd5e_spells?: Dnd5eSpell[] }>(query);
-    return res?.dnd5e_spells ?? [];
 }
 
 function filterSpellsByClasses(
@@ -605,27 +463,24 @@ async function saveSpellbookRecord(args: {
         sourceShorts?: string[];
         excludeLegacy?: boolean;
     };
-    formData: FormData;
+    name?: string;
 }): Promise<string> {
-    const { userId, spells, options, formData } = args;
+    const { userId, spells, options, name } = args;
 
-    const id = randomUUID();
+    const spellbookId = id();
     const createdAt = new Date();
-    const nameRaw = formData.get("name");
-    const name = typeof nameRaw === "string" ? nameRaw.trim() : undefined;
 
     const record = {
-        name: name || undefined,
+        name: name?.trim() || undefined,
         createdAt,
         options,
         spellCount: spells.length,
         spells,
-        creatorId: userId,
-    } as any;
+    };
 
-    await dbServer.transact(
-        dbServer.tx.spellbooks[id].create(record).link({ $user: userId })
+    await db.transact(
+        db.tx.spellbooks[spellbookId].create(record).link({ owner: userId })
     );
 
-    return id;
+    return spellbookId;
 }

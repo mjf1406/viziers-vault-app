@@ -101,6 +101,37 @@ export default function AccountPage() {
         };
     }, [profile]);
 
+    // Determine which end date to display (trial end if trial is active, otherwise period end)
+    const displayEndDate = useMemo(() => {
+        if (!subscriptionInfo) return null;
+
+        const now = new Date();
+        const trialEnd = subscriptionInfo.trialPeriodEnd
+            ? new Date(subscriptionInfo.trialPeriodEnd)
+            : null;
+        const periodEnd = subscriptionInfo.subscriptionPeriodEnd
+            ? new Date(subscriptionInfo.subscriptionPeriodEnd)
+            : null;
+
+        // If trial exists and hasn't ended yet, show trial end
+        if (trialEnd && trialEnd > now) {
+            return {
+                label: "Trial End",
+                date: trialEnd,
+            };
+        }
+
+        // Otherwise show period end
+        if (periodEnd) {
+            return {
+                label: "Period End",
+                date: periodEnd,
+            };
+        }
+
+        return null;
+    }, [subscriptionInfo]);
+
     const buildCheckoutUrl = () => {
         const baseUrl =
             "https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_d4dWHIBH4EKnnQr4l33lrCR5e4B8RDWIyKsOb4QeKB8/redirect";
@@ -340,39 +371,17 @@ export default function AccountPage() {
                                     <Card>
                                         <CardContent className="pt-6">
                                             <div className="grid gap-4 md:grid-cols-2">
-                                                {subscriptionInfo.subscriptionPeriodStart && (
+                                                {displayEndDate && (
                                                     <div className="flex items-start gap-3">
                                                         <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
                                                         <div>
                                                             <p className="text-sm font-medium">
-                                                                Period Start
+                                                                {
+                                                                    displayEndDate.label
+                                                                }
                                                             </p>
                                                             <p className="text-sm text-muted-foreground">
-                                                                {new Date(
-                                                                    subscriptionInfo.subscriptionPeriodStart
-                                                                ).toLocaleDateString(
-                                                                    "en-US",
-                                                                    {
-                                                                        year: "numeric",
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                    }
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {subscriptionInfo.subscriptionPeriodEnd && (
-                                                    <div className="flex items-start gap-3">
-                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                                                        <div>
-                                                            <p className="text-sm font-medium">
-                                                                Period End
-                                                            </p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {new Date(
-                                                                    subscriptionInfo.subscriptionPeriodEnd
-                                                                ).toLocaleDateString(
+                                                                {displayEndDate.date.toLocaleDateString(
                                                                     "en-US",
                                                                     {
                                                                         year: "numeric",
@@ -396,7 +405,10 @@ export default function AccountPage() {
                                                                 </p>
                                                                 <p className="text-sm text-muted-foreground">
                                                                     $
-                                                                    {subscriptionInfo.subscriptionCost.toFixed(
+                                                                    {(
+                                                                        subscriptionInfo.subscriptionCost /
+                                                                        100
+                                                                    ).toFixed(
                                                                         2
                                                                     )}
                                                                 </p>
@@ -439,50 +451,6 @@ export default function AccountPage() {
                                                             </div>
                                                         </div>
                                                     )}
-                                                {subscriptionInfo.trialPeriodStart && (
-                                                    <div className="flex items-start gap-3">
-                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                                                        <div>
-                                                            <p className="text-sm font-medium">
-                                                                Trial Start
-                                                            </p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {new Date(
-                                                                    subscriptionInfo.trialPeriodStart
-                                                                ).toLocaleDateString(
-                                                                    "en-US",
-                                                                    {
-                                                                        year: "numeric",
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                    }
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {subscriptionInfo.trialPeriodEnd && (
-                                                    <div className="flex items-start gap-3">
-                                                        <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                                                        <div>
-                                                            <p className="text-sm font-medium">
-                                                                Trial End
-                                                            </p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {new Date(
-                                                                    subscriptionInfo.trialPeriodEnd
-                                                                ).toLocaleDateString(
-                                                                    "en-US",
-                                                                    {
-                                                                        year: "numeric",
-                                                                        month: "long",
-                                                                        day: "numeric",
-                                                                    }
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>

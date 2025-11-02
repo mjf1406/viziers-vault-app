@@ -388,7 +388,7 @@ export default function MagicShopGeneratorDialog({
                                 quantity: qty,
                             },
                             { allItems, allSpells },
-                            user?.id ?? null
+                            isPaid && user?.id ? user.id : null
                         );
                     // If free/guest: server returns payload with shops, download CSV
                     if (result && typeof result !== "object") {

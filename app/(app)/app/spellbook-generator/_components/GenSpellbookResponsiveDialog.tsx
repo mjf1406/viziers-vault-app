@@ -362,7 +362,7 @@ export default function SpellbookGeneratorDialog({
                 sourceShorts: selectedSources.length > 0 ? selectedSources : undefined,
                 excludeLegacy,
                 name: isPaid && user?.id ? name.trim() : undefined,
-                userId: user?.id ?? null,
+                userId: isPaid && user?.id ? user.id : null,
                 userSettings: settings,
                 allSpells,
             });

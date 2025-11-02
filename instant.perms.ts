@@ -111,7 +111,7 @@ const rules = {
     settings: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.settings.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.settings.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -120,7 +120,7 @@ const rules = {
     parties: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.parties.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.parties.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -129,7 +129,7 @@ const rules = {
     settlements: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.settlements.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.settlements.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -141,7 +141,7 @@ const rules = {
     battleMaps: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.battleMaps.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.battleMaps.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -150,7 +150,7 @@ const rules = {
     encounters: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.encounters.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.encounters.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -159,7 +159,7 @@ const rules = {
     spellbooks: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.spellbooks.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.spellbooks.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -168,7 +168,7 @@ const rules = {
     magicShops: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.magicShops.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.magicShops.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -177,7 +177,7 @@ const rules = {
     worlds: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.worlds.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.worlds.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -186,7 +186,7 @@ const rules = {
     starSystems: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.starSystems.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.starSystems.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -195,7 +195,7 @@ const rules = {
     galaxies: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (size(data.ref('owner.galaxies.id')) < 2 || isPremium)",
+            create: "isAuthenticated && (size(data.ref('owner.galaxies.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },

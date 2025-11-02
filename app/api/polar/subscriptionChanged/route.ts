@@ -11,11 +11,6 @@ export const runtime = "nodejs";
 export const POST = Webhooks({
     webhookSecret: process.env.POLAR_SUBSCRIPTION_CHANGED_SECRET!,
     onPayload: async (payload) => {
-        // Type guard to ensure we're handling the correct webhook type
-        if (payload.type !== "subscription.updated") {
-            console.warn(`Unexpected webhook type: ${payload.type}`);
-            return;
-        }
         const subscriptionPayload =
             payload as unknown as PolarSubscriptionUpdatedPayload;
 

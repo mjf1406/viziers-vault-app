@@ -10,20 +10,17 @@ export const runtime = "nodejs";
 export const POST = Webhooks({
     webhookSecret: process.env.POLAR_SUBSCRIPTION_CHANGED_SECRET!,
     onPayload: async (payload) => {
-        // Debug: Log the entire raw payload to see its structure
-        console.log("Full webhook payload:", JSON.stringify(payload, null, 2));
-
         const subscriptionPayload =
             payload as unknown as PolarSubscriptionUpdatedPayload;
 
         const type = subscriptionPayload.type;
-        const plan = subscriptionPayload.data.product.name.split(" -")[0] as
+        const plan = subscriptionPayload.data.product?.name?.split(" -")[0] as
             | "free"
             | "basic"
             | "plus"
             | "pro";
         const user = await dbServer.auth.getUser({
-            email: subscriptionPayload.data.customer.email,
+            email: subscriptionPayload.data.customer?.email,
         });
         const userId = user?.id;
         // ---------------------------------
@@ -57,74 +54,30 @@ export const POST = Webhooks({
                 };
 
                 try {
-                    // Access the data directly - it might be nested differently
-                    const subscriptionData = subscriptionPayload.data;
+                    // Access the data directly - the webhook wrapper converts snake_case to camelCase
+                    // Use 'as any' to access camelCase properties since types define snake_case
+                    const subscriptionData = subscriptionPayload.data as any;
 
-                    // Debug: Log the data object structure
-                    console.log(
-                        "subscriptionPayload.data keys:",
-                        Object.keys(subscriptionData || {})
-                    );
-                    console.log(
-                        "Has current_period_start?",
-                        "current_period_start" in (subscriptionData || {})
-                    );
-                    console.log(
-                        "subscriptionData.current_period_start type:",
-                        typeof subscriptionData?.current_period_start
-                    );
-                    console.log(
-                        "subscriptionData.current_period_start value:",
-                        subscriptionData?.current_period_start
-                    );
-
-                    // Try accessing directly from the payload (maybe it's not nested under data?)
-                    console.log("Direct payload check:", {
-                        payloadType: typeof payload,
-                        payloadKeys: payload ? Object.keys(payload as any) : [],
-                    });
-
-                    // Debug: Log raw payload values - try both direct access and via data
-                    const rawValues = {
-                        viaData: {
-                            current_period_start:
-                                subscriptionData?.current_period_start,
-                            current_period_end:
-                                subscriptionData?.current_period_end,
-                            trial_start: subscriptionData?.trial_start,
-                            trial_end: subscriptionData?.trial_end,
-                            recurring_interval:
-                                subscriptionData?.recurring_interval,
-                            recurring_interval_count:
-                                subscriptionData?.recurring_interval_count,
-                            amount: subscriptionData?.amount,
-                        },
-                        directPayload:
-                            (payload as any)?.current_period_start ||
-                            "not found",
-                    };
-                    console.log("Raw webhook payload values:", rawValues);
-
-                    // Use the subscriptionData variable we already extracted
+                    // Use camelCase property names (webhook wrapper transforms snake_case to camelCase)
                     const updateData = {
                         plan: plan as "free" | "basic" | "plus" | "pro",
                         subscriptionPeriodStart: toDateStringOrNull(
-                            subscriptionData?.current_period_start
+                            subscriptionData?.currentPeriodStart
                         ),
                         subscriptionPeriodEnd: toDateStringOrNull(
-                            subscriptionData?.current_period_end
+                            subscriptionData?.currentPeriodEnd
                         ),
                         subscriptionCost: subscriptionData?.amount ?? null,
                         recurringInterval: normalizeRecurringInterval(
-                            subscriptionData?.recurring_interval
+                            subscriptionData?.recurringInterval
                         ),
                         recurringIntervalCount:
-                            subscriptionData?.recurring_interval_count ?? null,
+                            subscriptionData?.recurringIntervalCount ?? null,
                         trialPeriodStart: toDateStringOrNull(
-                            subscriptionData?.trial_start
+                            subscriptionData?.trialStart
                         ),
                         trialPeriodEnd: toDateStringOrNull(
-                            subscriptionData?.trial_end
+                            subscriptionData?.trialEnd
                         ),
                     };
 

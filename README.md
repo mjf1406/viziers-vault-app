@@ -31,6 +31,12 @@ s<!-- @format -->
 
 ## Change Log
 
+### 2025/11/02
+
+-   removed weird custom auth solution
+-   updated instant.perms.ts and instant.schema.ts to use the new auth solution
+-   removed magic link option to sign in so we can test easily in a private alpha with google emails only
+
 ### 2025/10/26
 
 -   added extra spells settings for spellbook generation which takes in a single number or a dice string

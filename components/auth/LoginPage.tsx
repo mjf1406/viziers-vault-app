@@ -11,12 +11,10 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import GoogleCustomButton from "./GoogleCustomButton";
 import { v4 as uuidv4 } from "uuid";
-import MagicLinkAuth from "./MagicLinkAuth";
 import { createUserProfileIfMissing } from "@/app/(app)/app/login/_actions/createUserProfile";
 
 const GOOGLE_CLIENT_NAME = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_NAME!;
@@ -257,23 +255,6 @@ export default function LoginPage() {
                                     }}
                                 />
                             </div>
-
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <Separator className="w-full" />
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-background px-2 text-muted-foreground">
-                                        Or continue with
-                                    </span>
-                                </div>
-                            </div>
-
-                            <MagicLinkAuth
-                                onError={(msg) => setError(msg)}
-                                onStartGlobalLoading={() => setIsLoading(true)}
-                                onStopGlobalLoading={() => setIsLoading(false)}
-                            />
                         </CardContent>
                     </Card>
                 </div>

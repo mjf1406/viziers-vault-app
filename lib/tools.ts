@@ -155,6 +155,7 @@ export const tools: Tool[] = [
             "Generate balanced encounters based on party composition, biome, and travel conditions.",
         status: "Alpha 2",
         icon: "Swords",
+        released: "new",
         philosophy:
             "A roguelite D&D campaign is not complete without random encounters of the combat, non-combat, and hazard variety! I love doing hexcrawls and random encounters in each hex or every hour of travel time because it's a wonderfully fun challenge for me to use the randomly rolled encounter, then improvise a way to connect it to the party's story or a PC's story in a coherent way. I LOVE improv GMing!",
         features: [

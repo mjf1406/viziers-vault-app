@@ -37,6 +37,10 @@ s<!-- @format -->
 
 ## Change Log
 
+### 2025/11/04
+
+-   UI: added encounter generator UI
+
 ### 2025/11/02
 
 -   polar integration is complete and working

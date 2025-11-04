@@ -165,7 +165,14 @@ const _schema = i.schema({
         //    Generator Tables
         // ----------------------
         battleMaps: i.entity({}),
-        encounters: i.entity({}),
+        encounters: i.entity({
+            name: i.string().optional(),
+            createdAt: i.date(),
+            updatedAt: i.date().optional().indexed(),
+            options: i.json().optional(),
+            encounterCount: i.number().optional(),
+            encounters: i.json().optional(),
+        }),
         spellbooks: i.entity({
             name: i.string().optional(),
             createdAt: i.date(),

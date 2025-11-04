@@ -33,6 +33,11 @@ const dataBind = [
 ];
 
 const rules = {
+    attrs: {
+        allow: {
+            $default: "false",
+        },
+    },
     // -----------------------------
     //      Admin Tables
     // -----------------------------
@@ -96,7 +101,7 @@ const rules = {
     settings: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.settings.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.settings.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -105,7 +110,7 @@ const rules = {
     parties: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.parties.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.parties.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -114,7 +119,7 @@ const rules = {
     settlements: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.settlements.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.settlements.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -126,7 +131,7 @@ const rules = {
     battleMaps: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.battleMaps.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.battleMaps.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -135,7 +140,7 @@ const rules = {
     encounters: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.encounters.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.encounters.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -144,7 +149,7 @@ const rules = {
     spellbooks: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.spellbooks.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.spellbooks.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -153,7 +158,7 @@ const rules = {
     magicShops: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.magicShops.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.magicShops.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -162,7 +167,7 @@ const rules = {
     worlds: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.worlds.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.worlds.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -171,7 +176,7 @@ const rules = {
     starSystems: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.starSystems.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.starSystems.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },
@@ -180,7 +185,7 @@ const rules = {
     galaxies: {
         allow: {
             view: "isOwner || isGuestOwner",
-            create: "isAuthenticated && (isPremium || size(auth.ref('$user.galaxies.id')) < 1)",
+            create: "isAuthenticated && (size(data.ref('owner.galaxies.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
         },

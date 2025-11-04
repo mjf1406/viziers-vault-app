@@ -60,7 +60,11 @@ export const POST = Webhooks({
 
                     // Use camelCase property names (webhook wrapper transforms snake_case to camelCase)
                     const updateData = {
-                        plan: plan as "free" | "basic" | "plus" | "pro",
+                        plan: plan.toLowerCase() as
+                            | "free"
+                            | "basic"
+                            | "plus"
+                            | "pro",
                         subscriptionPeriodStart: toDateStringOrNull(
                             subscriptionData?.currentPeriodStart
                         ),

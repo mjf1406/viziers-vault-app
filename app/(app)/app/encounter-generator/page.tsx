@@ -11,13 +11,7 @@ import EncountersGrid from "./_components/EncountersGrid";
 import EncounterGeneratorDialog from "./_components/GenEncounterResponsiveDialog";
 
 // Separate component for data-dependent content
-function EncounterContent({
-    pendingIds,
-    onEdit,
-}: {
-    pendingIds: Set<string>;
-    onEdit: (e: any) => void;
-}) {
+function EncounterContent({ onEdit }: { onEdit: (e: any) => void }) {
     const { plan, user } = useUser();
 
     // For now, show grid for all users (no upsell yet)
@@ -35,19 +29,13 @@ function EncounterContent({
         );
     }
 
-    return (
-        <EncountersGrid
-            onEdit={onEdit}
-            pendingIds={pendingIds}
-        />
-    );
+    return <EncountersGrid onEdit={onEdit} />;
 }
 
 export default function EncounterGeneratorPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingEncounter, setEditingEncounter] = useState<any | null>(null);
-    const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
     const [modalOpen, setModalOpen] = useQueryState(
         "modalOpen",
         parseAsInteger.withDefault(0)
@@ -62,22 +50,6 @@ export default function EncounterGeneratorPage() {
             setCreateOpen(false);
         }
     }, [modalOpen, createOpen]);
-
-    const addPending = (id: string) => {
-        setPendingIds((prev) => {
-            const next = new Set(prev);
-            next.add(id);
-            return next;
-        });
-    };
-
-    const removePending = (id: string) => {
-        setPendingIds((prev) => {
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-        });
-    };
 
     const handleCreateOpenChange = (v: boolean) => {
         setCreateOpen(v);
@@ -134,8 +106,6 @@ export default function EncounterGeneratorPage() {
                         open={createOpen}
                         onOpenChange={handleCreateOpenChange}
                         hideTitleOnMobile={true}
-                        addPending={addPending}
-                        removePending={removePending}
                     />
                 )}
 
@@ -158,16 +128,11 @@ export default function EncounterGeneratorPage() {
                         open={editOpen}
                         onOpenChange={handleEditOpenChange}
                         hideTitleOnMobile={true}
-                        addPending={addPending}
-                        removePending={removePending}
                     />
                 )}
             </div>
 
-            <EncounterContent
-                onEdit={(e) => openForEdit(e)}
-                pendingIds={pendingIds}
-            />
+            <EncounterContent onEdit={(e) => openForEdit(e)} />
         </div>
     );
 }

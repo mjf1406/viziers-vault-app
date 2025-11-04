@@ -28,10 +28,8 @@ import {
 
 export default function EncountersGrid({
     onEdit,
-    pendingIds,
 }: {
     onEdit: (e: any) => any;
-    pendingIds: any;
 }) {
     const { isLoading, error, data } = db.useQuery({
         encounters: {},
@@ -115,20 +113,24 @@ export default function EncountersGrid({
     return (
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {encounters.map((e) => {
-                const isPending = pendingIds.has(e.id);
                 const opts = e?.options ?? {};
+                // Handle both old format (options directly) and new format (options.instances array)
+                const instances = Array.isArray(opts?.instances) ? opts.instances : [opts];
+                const firstInstance = instances[0] ?? {};
                 const biome =
-                    opts?.biome && BIOMES.includes(opts.biome)
-                        ? opts.biome
+                    (firstInstance?.biome && BIOMES.includes(firstInstance.biome))
+                        ? firstInstance.biome
                         : null;
-                const travelPace = opts?.travelPace ?? null;
-                const road = opts?.road ?? null;
-                const travelMedium = opts?.travelMedium ?? null;
-                const time = opts?.time ?? null;
-                const season = opts?.season ?? null;
+                const travelPace = firstInstance?.travelPace ?? null;
+                const road = firstInstance?.road ?? null;
+                const travelMedium = firstInstance?.travelMedium ?? null;
+                const time = firstInstance?.time ?? null;
+                const season = firstInstance?.season ?? null;
                 const encounterCount =
-                    typeof opts?.encounterCount === "number"
-                        ? opts.encounterCount
+                    typeof e?.encounterCount === "number"
+                        ? e.encounterCount
+                        : Array.isArray(e?.encounters)
+                        ? e.encounters.length
                         : null;
                 const createdAtLocal = e?.createdAt
                     ? new Date(e.createdAt).toLocaleString()
@@ -137,9 +139,7 @@ export default function EncountersGrid({
                 return (
                     <Card
                         key={e.id}
-                        className={`hover:shadow-md transition-shadow ${
-                            isPending ? "opacity-70 animate-pulse" : ""
-                        }`}
+                        className="hover:shadow-md transition-shadow"
                     >
                         <CardHeader className="relative w-full mx-auto">
                             <div className="flex items-start gap-4">
@@ -151,89 +151,79 @@ export default function EncountersGrid({
                                     >
                                         <span className="block">{e.name}</span>
                                     </Link>
-
-                                    {isPending && (
-                                        <span className="px-2 py-1 text-xs rounded text-muted-foreground bg-muted whitespace-nowrap">
-                                            Saving...
-                                        </span>
-                                    )}
                                 </CardTitle>
 
                                 <div className="flex items-center gap-0.5 shrink-0">
-                                    {!isPending && (
-                                        <>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    void handleCopyLink(e.id)
-                                                }
-                                                className="w-8 h-8 p-0 hover:bg-gray-100"
-                                                title={
-                                                    copiedId === e.id
-                                                        ? "Copied!"
-                                                        : "Copy link"
-                                                }
-                                            >
-                                                {copiedId === e.id ? (
-                                                    <Check className="w-4 h-4 text-green-600" />
-                                                ) : (
-                                                    <Link2 className="w-4 h-4" />
-                                                )}
-                                            </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            void handleCopyLink(e.id)
+                                        }
+                                        className="w-8 h-8 p-0 hover:bg-gray-100"
+                                        title={
+                                            copiedId === e.id
+                                                ? "Copied!"
+                                                : "Copy link"
+                                        }
+                                    >
+                                        {copiedId === e.id ? (
+                                            <Check className="w-4 h-4 text-green-600" />
+                                        ) : (
+                                            <Link2 className="w-4 h-4" />
+                                        )}
+                                    </Button>
 
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() =>
-                                                    onEdit(e._raw ?? e)
-                                                }
-                                                className="w-8 h-8 p-0 hover:bg-gray-100"
-                                            >
-                                                <Edit className="w-4 h-4" />
-                                            </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            onEdit(e._raw ?? e)
+                                        }
+                                        className="w-8 h-8 p-0 hover:bg-gray-100"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                    </Button>
 
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        className="w-8 h-8 p-0"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>
-                                                            Delete Encounter
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Are you sure you
-                                                            want to delete "
-                                                            {e.name}"? This
-                                                            cannot be undone.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>
-                                                            Cancel
-                                                        </AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() =>
-                                                                void handleDelete(
-                                                                    e.id
-                                                                )
-                                                            }
-                                                            className="bg-red-600 hover:bg-red-700"
-                                                        >
-                                                            Delete
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </>
-                                    )}
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                className="w-8 h-8 p-0"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                    Delete Encounter
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure you
+                                                    want to delete "
+                                                    {e.name}"? This
+                                                    cannot be undone.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>
+                                                    Cancel
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() =>
+                                                        void handleDelete(
+                                                            e.id
+                                                        )
+                                                    }
+                                                    className="bg-red-600 hover:bg-red-700"
+                                                >
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </div>
                         </CardHeader>

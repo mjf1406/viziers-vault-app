@@ -42,21 +42,13 @@ export default async function generateEncounter(
         userId,
     });
 
-    const ids: string[] = [];
-    const encountersPayload: Array<{
-        name?: string | null;
-        createdAt: Date;
-        encounterCount: number;
-        encounters: any[];
-        options: any;
-    }> = [];
+    // Combine all instances into a single encounter record
+    // Collect all generated encounters from all instances
+    const allGeneratedEncounters: any[] = [];
+    const allOptions: any[] = [];
 
-    // Batch all creates into a single transaction
-    const records: Array<{ id: string; record: any }> = [];
-
+    // Generate encounters for each instance and collect them
     for (const options of optionsArray) {
-        const encounterId = id();
-
         // Placeholder: Generate encounter data
         // This will be replaced with actual encounter generation logic
         const encounterCount = Math.floor(Math.random() * 3) + 1; // 1-3 encounters
@@ -71,53 +63,51 @@ export default async function generateEncounter(
             })
         );
 
-        const record: any = {
-            createdAt,
-            encounterCount,
-            encounters: generatedEncounters,
-            options: {
-                biome: options.biome ?? null,
-                travelPace: options.travelPace ?? null,
-                road: options.road ?? null,
-                travelMedium: options.travelMedium ?? null,
-                time: options.time ?? null,
-                season: options.season ?? null,
-                climate: options.climate ?? null,
-                quantity: optionsArray.length,
-            },
-        };
+        allGeneratedEncounters.push(...generatedEncounters);
+        allOptions.push({
+            biome: options.biome ?? null,
+            travelPace: options.travelPace ?? null,
+            road: options.road ?? null,
+            travelMedium: options.travelMedium ?? null,
+            time: options.time ?? null,
+            season: options.season ?? null,
+            climate: options.climate ?? null,
+        });
+    }
 
-        // Only include name if it's provided
-        if (name) {
-            record.name = name;
-        }
+    // Create a single record with all encounters combined
+    const encounterId = id();
+    const record: any = {
+        createdAt,
+        encounterCount: allGeneratedEncounters.length,
+        encounters: allGeneratedEncounters,
+        options: {
+            instances: allOptions,
+            quantity: optionsArray.length,
+        },
+    };
 
-        records.push({ id: encounterId, record });
+    // Only include name if it's provided
+    if (name) {
+        record.name = name;
     }
 
     if (canSave && userId) {
-        // Create each encounter in a separate transaction to avoid name uniqueness conflicts
-        // Even though name isn't marked as unique, InstantDB seems to enforce uniqueness within a single transaction
-        for (const { id: encounterId, record } of records) {
-            await db.transact(
-                db.tx.encounters[encounterId]
-                    .create(record)
-                    .link({ owner: userId })
-            );
-            ids.push(encounterId);
-        }
+        await db.transact(
+            db.tx.encounters[encounterId]
+                .create(record)
+                .link({ owner: userId })
+        );
+        return [encounterId];
     } else {
-        records.forEach(({ record }) => {
-            encountersPayload.push({
+        return {
+            encounters: [{
                 name: record.name,
                 createdAt: record.createdAt,
                 encounterCount: record.encounterCount,
                 encounters: record.encounters,
                 options: record.options,
-            });
-        });
+            }],
+        };
     }
-
-    if (canSave && ids.length) return ids;
-    return { encounters: encountersPayload };
 }

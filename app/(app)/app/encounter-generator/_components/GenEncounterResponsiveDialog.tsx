@@ -58,8 +58,6 @@ type EncounterInitial = {
 type EncounterGeneratorDialogProps = {
     mode?: "create" | "edit";
     initial?: EncounterInitial | null;
-    addPending?: (id: string) => void;
-    removePending?: (id: string) => void;
     open?: boolean;
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -71,8 +69,6 @@ type EncounterGeneratorDialogProps = {
 export default function EncounterGeneratorDialog({
     mode = "create",
     initial = null,
-    addPending,
-    removePending,
     open,
     defaultOpen,
     onOpenChange,
@@ -213,7 +209,7 @@ export default function EncounterGeneratorDialog({
                     await onGenerate(opts);
                 }
             } else {
-                // Batch generate all encounters in one call
+                // Batch generate all encounters in one call, combining all instances
                 const optsArray: GenerateEncounterOpts[] = instances.map(
                     (instance) => ({
                         name: name.trim() || undefined,
@@ -240,10 +236,7 @@ export default function EncounterGeneratorDialog({
                 }
             }
 
-            if (allResults.length > 0) {
-                allResults.forEach((id) => {
-                    addPending?.(id);
-                });
+            if (allResults.length > 0 || onGenerate) {
                 setDialogOpen(false);
                 // Reset form
                 setName("");

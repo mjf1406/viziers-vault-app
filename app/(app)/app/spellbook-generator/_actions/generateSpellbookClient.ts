@@ -74,9 +74,6 @@ type GenerateSpellbookClientInput = {
     allSpells: Dnd5eSpell[]; // Pre-loaded spells from db.useQuery
 };
 
-/**
- * Client-side spellbook generation
- */
 export async function generateSpellbookClient(
     input: GenerateSpellbookClientInput
 ): Promise<SpellbookGenerateResponse> {

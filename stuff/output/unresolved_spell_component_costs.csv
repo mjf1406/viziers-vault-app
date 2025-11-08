@@ -1,0 +1,33 @@
+id,name,materialComponents,reason
+929660ca-3a77-41d5-9526-e1d490dbc0e9,Planar Binding,"a jewel worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+47d7a892-5d2a-4f28-8b84-8636f584c0a0,Symbol,"powdered diamond worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+82e99f59-6969-4836-822b-77fbf1c6dea6,Drawmij's Instant Summons,"a sapphire worth 1,000+ GP",could not parse numeric cost
+03bd9eaa-09d2-4571-bd3f-46d2fc9424f0,Gate,"a diamond worth 5,000+ GP",could not parse numeric cost
+77d1a742-718b-4115-982c-234c5aa86971,Heroes' Feast,"a gem-encrusted bowl worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+79d8c3e5-be9f-4e85-bd21-440ac9079649,Detect Thoughts,1 Copper Piece,could not parse numeric cost
+efe05eac-0680-49f4-8d0e-a8dd8d87717a,Scrying,"a focus worth 1,000+ GP, such as a crystal ball, mirror, or water-filled font",could not parse numeric cost
+2b044a5f-fb32-4150-aa0c-a244c7cef8c7,Chain Lightning,three silver pins,could not parse numeric cost
+7374bd57-540e-4d04-ba0e-25b315427d43,Awaken,"an agate worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+ddb17f62-7e50-4c13-ab82-6b2039419c05,Chain Lightning,"a bit of fur; a piece of amber, glass, or a crystal rod; and three silver pins",could not parse numeric cost
+013ed3b2-e564-4c56-b514-52ef0b862ff5,Clone,"a diamond worth at least 1,000 gp and at least 1 cubic inch of flesh of the creature that is to be cloned, which the spell consumes, and a vessel worth at least 2,000 gp that has a sealable lid and is large enough to hold the creature being cloned, such as a huge urn, coffin, mud- filled cyst in the ground, or crystal container filled with salt water",could not parse numeric cost
+c8596a8a-e52a-4c89-89cf-a033e1d60af9,Forbiddance,"a sprinkling of holy water, rare incense, and powdered ruby worth at least 1,000 gp",could not parse numeric cost
+7057feb3-ba7d-4126-9375-97040e4670f3,Gate,"a diamond worth at least 5,000 gp",could not parse numeric cost
+d9c71cc0-ffcc-461e-94fb-184dbc03f4dc,Gentle Repose,"a pinch of salt and one copper piece placed on each of the corpse's eyes, which must remain there for the duration",could not parse numeric cost
+c4ed1f8a-2a86-4257-ab60-1ae3ad110986,Hallow,"herbs, oils, and incense worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+47f9834b-fadf-4bd8-8328-b4731e5f49ab,Heroes' Feast,"a gem-encrusted bowl worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+61e1eb30-4474-4d81-afad-3aa9299d65cc,Holy Aura,"a tiny reliquary worth at least 1,000 gp containing a sacred relic, such as a scrap of cloth from a saint's robe or a piece of parchment from a religious text",could not parse numeric cost
+f1e0298e-f3af-445b-9745-c2aa21fdd161,Planar Binding,"a jewel worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+5df466ac-f01c-4504-8dfb-c586ab505c7a,Reincarnate,"rare oils and unguents worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+3dde904c-d23f-4085-973e-d923df489c27,Resurrection,"a diamond worth at least 1,000 gp, which the spell consumes",could not parse numeric cost
+a203aab1-fa5e-4b77-ae74-751d16c2cbe8,Scrying,"a focus worth at least 1,000 gp, such as a crystal ball, a silver mirror, or a font filled with holy water",could not parse numeric cost
+aa893b93-f682-474c-aa4c-34e5ad695db6,Sequester,"a powder composed of diamond, emerald, ruby, and sapphire dust worth at least 5,000 gp, which the spell consumes",could not parse numeric cost
+a7886405-d369-42de-bb6d-7dcdd956cc43,Symbol,"mercury, phosphorus, and powdered diamond and opal with a total value of at least 1,000 gp, which the spell consumes",could not parse numeric cost
+2e11b3d5-4dd5-4cd8-b7f7-3b5df4e32b60,True Resurrection,"a sprinkle of holy water and diamonds worth at least 25,000 gp, which the spell consumes",could not parse numeric cost
+92b56dd3-08e0-46aa-aeba-011411b107bb,Instant Summons,"a sapphire worth 1,000 gp",could not parse numeric cost
+702d8f47-68cf-4833-9fc2-6baf1420ba6c,Clone,"a diamond worth 1,000+ GP, which the spell consumes, and a sealable vessel worth 2,000+ GP that is large enough to hold the creature being cloned",could not parse numeric cost
+aa1e956b-b9cd-4b82-be6b-a281b4717dfb,Gentle Repose,"2 Copper Pieces, which the spell consumes",could not parse numeric cost
+104f8868-90f3-4f58-a9ba-1c522cc1f1a0,Reincarnate,"rare oils worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+3f0785c5-8bd6-4479-bc0c-d265b45ada8c,Resurrection,"a diamond worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+193f6c46-bbba-474f-95e8-4ff36b6024a4,True Resurrection,"diamonds worth 25,000+ GP, which the spell consumes",could not parse numeric cost
+288c677e-4931-434b-8ebf-9c89f4077a78,Awaken,"an agate worth 1,000+ GP, which the spell consumes",could not parse numeric cost
+9038e0fa-e448-4813-8136-6ebc77ff732d,Sequester,"gem dust worth 5,000+ GP, which the spell consumes",could not parse numeric cost

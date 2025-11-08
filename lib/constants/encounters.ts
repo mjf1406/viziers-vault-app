@@ -51,3 +51,4 @@ export const ENCOUNTER_TYPES = ["combat", "non-combat", "hazard"] as const;
 export type EncounterType = (typeof ENCOUNTER_TYPES)[number];
 
 
+

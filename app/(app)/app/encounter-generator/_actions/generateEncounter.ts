@@ -94,20 +94,20 @@ export default async function generateEncounter(
 
     if (canSave && userId) {
         await db.transact(
-            db.tx.encounters[encounterId]
-                .create(record)
-                .link({ owner: userId })
+            db.tx.encounters[encounterId].create(record).link({ owner: userId })
         );
         return [encounterId];
     } else {
         return {
-            encounters: [{
-                name: record.name,
-                createdAt: record.createdAt,
-                encounterCount: record.encounterCount,
-                encounters: record.encounters,
-                options: record.options,
-            }],
+            encounters: [
+                {
+                    name: record.name,
+                    createdAt: record.createdAt,
+                    encounterCount: record.encounterCount,
+                    encounters: record.encounters,
+                    options: record.options,
+                },
+            ],
         };
     }
 }

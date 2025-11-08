@@ -27,7 +27,6 @@ function resolvePopulationFromSettlement(
     worlds: any
 ): number | null {
     if (settlementId.includes(":")) {
-        // Premade settlement id format: `${worldId}:${settlementName}`
         const [premadeWorldId, settlementName] = settlementId.split(":", 2);
         const world = PREMADE_WORLDS.find((w) => w.id === premadeWorldId);
         const premade = world?.settlements?.find(
@@ -37,7 +36,6 @@ function resolvePopulationFromSettlement(
             ? premade.population
             : null;
     } else {
-        // DB settlement by id from provided worlds snapshot
         const fromWorlds = Array.isArray(worlds) ? (worlds as any[]) : [];
         const match = fromWorlds
             .flatMap((w: any) => (w?.settlements ?? []) as any[])
@@ -219,7 +217,7 @@ export default async function generateMagicShop(
     const name = input?.name?.trim() || undefined;
     const options = buildOptions(input.options);
     const canSave = Boolean(userId);
-    
+
     console.log("generateMagicShop options:", {
         name,
         options,
@@ -245,7 +243,11 @@ export default async function generateMagicShop(
             options.settings
         );
 
-        const unified = await generateUnified(options, rarityDistribution, gameData);
+        const unified = await generateUnified(
+            options,
+            rarityDistribution,
+            gameData
+        );
 
         const record: any = {
             name,
@@ -271,9 +273,7 @@ export default async function generateMagicShop(
 
         if (canSave && userId) {
             await db.transact(
-                db.tx.magicShops[shopId]
-                    .create(record)
-                    .link({ owner: userId })
+                db.tx.magicShops[shopId].create(record).link({ owner: userId })
             );
             ids.push(shopId);
         } else {
@@ -289,8 +289,6 @@ export default async function generateMagicShop(
     if (canSave && ids.length) return ids;
     return { shops: shopsPayload };
 }
-
-// Game data is now passed as a parameter instead of being fetched here
 
 function filterUsableSpells(
     allSpells: any[],
@@ -606,15 +604,11 @@ async function generateItems(
         const typeStr =
             typeof item?.type === "string" ? item.type.toLowerCase() : "";
         const rarityStr = String(item?.rarity ?? "").toLowerCase();
-        // Always exclude artifacts from shop generations
         if (rarityStr.includes("artifact")) return false;
         if (typeStr === "scroll") return false;
         return selectedTypes.includes(typeStr);
     });
 
-    // Where do I get poisons from? https://5e.tools/items.html#wyvern%20poison_xdmg,flsttype:,flstcategory:,flstpoison%20type:ingested=1~injury=1~inhaled=1~contact=1
-
-    // Sample by rarity weight
     const byRarity = groupBy(filteredItems, (it: any) =>
         normalizeRarity(it?.rarity)
     );
@@ -683,9 +677,9 @@ async function generateItems(
 
 function fetchItems(stockTypes: string[], allItems: any[]): any[] {
     return allItems.filter((item: any) => {
-        const typeStr = typeof item?.type === "string" ? item.type.toLowerCase() : "";
+        const typeStr =
+            typeof item?.type === "string" ? item.type.toLowerCase() : "";
         const rarityStr = String(item?.rarity ?? "").toLowerCase();
-        // Defensive filter to exclude artifacts
         if (rarityStr.includes("artifact")) return false;
         return stockTypes.includes(typeStr);
     });

@@ -17,7 +17,52 @@ import {
     calculateXpBounds,
     filterMonsters,
     getXpFromCr,
+    mapBiomeToNonCombatTable,
 } from "@/app/(app)/app/encounter-generator/_utils/combat-encounter-helpers";
+import {
+    arctic_nc,
+    carousing_nc,
+    coastal_nc,
+    desert_nc,
+    dungeon_nc,
+    farmland_nc,
+    festivals_nc,
+    forest_nc,
+    grassland_nc,
+    hill_nc,
+    jungle_nc,
+    mountain_nc,
+    open_water_nc,
+    red_light_district_nc,
+    road_nc,
+    swamp_nc,
+    tavern_nc,
+    underdark_nc,
+    underwater_nc,
+    urban_nc,
+    wasteland_nc,
+    woodland_nc,
+    seedy_tavern_nc,
+} from "@/app/(app)/app/encounter-generator/_constants/nonCombatEncounters";
+
+// Verify tables are imported correctly (debug only - remove in production if needed)
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+    const tables = {
+        arctic_nc,
+        forest_nc,
+        grassland_nc,
+        road_nc,
+    };
+    const emptyTables = Object.entries(tables).filter(
+        ([_, table]) => !table || !Array.isArray(table) || table.length === 0
+    );
+    if (emptyTables.length > 0) {
+        console.warn(
+            "Some non-combat encounter tables appear to be empty or undefined:",
+            emptyTables
+        );
+    }
+}
 import {
     getLeader,
     generateLeaderFollowerEncounter,
@@ -122,17 +167,186 @@ function generateHazard(
     };
 }
 
-// Generate non-combat encounter (empty for now)
+// Helper function to get a random element from an array
+function getRandomElement<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+// Special case handlers for non-combat encounters
+function generateRandomShip(): string {
+    // Placeholder for Random Ship generation
+    // In the future, this could be expanded with detailed ship generation
+    return "The party encounters a random ship on the open water. The ship's purpose, crew, and disposition are left to the DM's discretion.";
+}
+
+function generateMysteriousIsland(): string {
+    // Placeholder for Mysterious Island generation
+    // In the future, this could be expanded with detailed island generation
+    return "The party discovers a mysterious island shrouded in fog. The island's theme, inhabitants, and secrets are left to the DM's discretion.";
+}
+
+function generateBlueHole(): string {
+    // Placeholder for Blue Hole generation
+    // In the future, this could be expanded with detailed blue hole generation
+    const diameter = Math.floor(Math.random() * 10 + 1) * 100;
+    const depth = Math.floor(Math.random() * 10 + 1) * 100;
+    return `The party comes across a Blue Hole that is ${diameter}ft in diameter and ${depth}ft deep. The contents and mysteries within are left to the DM's discretion.`;
+}
+
+function generateShipwreck(): string {
+    // Placeholder for Shipwreck generation
+    // In the future, this could be expanded with detailed shipwreck generation
+    return "The party discovers a shipwreck. The condition of the wreck, its cargo, and any survivors or dangers are left to the DM's discretion.";
+}
+
+// Map table name string to actual table array
+function getTableByName(tableName: string | null): string[] | null {
+    if (!tableName) return null;
+
+    const tableMap: Record<string, string[]> = {
+        arctic_nc,
+        carousing_nc,
+        coastal_nc,
+        desert_nc,
+        dungeon_nc,
+        farmland_nc,
+        festivals_nc,
+        forest_nc,
+        grassland_nc,
+        hill_nc,
+        jungle_nc,
+        mountain_nc,
+        open_water_nc,
+        red_light_district_nc,
+        road_nc,
+        swamp_nc,
+        tavern_nc,
+        underdark_nc,
+        underwater_nc,
+        urban_nc,
+        wasteland_nc,
+        woodland_nc,
+        seedy_tavern_nc,
+    };
+
+    const table = tableMap[tableName];
+
+    // Debug: Check if table exists and has content
+    if (!table) {
+        console.error(
+            `Table ${tableName} not found in tableMap. Available keys:`,
+            Object.keys(tableMap)
+        );
+    } else if (!Array.isArray(table)) {
+        console.error(
+            `Table ${tableName} is not an array:`,
+            typeof table,
+            table
+        );
+    } else if (table.length === 0) {
+        console.warn(`Table ${tableName} is empty`);
+    }
+
+    return table || null;
+}
+
+// Generate non-combat encounter
 function generateNonCombat(
-    difficulty: string,
     biome: Biome | null,
     options: GenerateEncounterOpts
 ): any {
-    // TODO: Implement non-combat generation
+    const road = options.road ?? null;
+    const travelMedium = options.travelMedium ?? null;
+
+    // Check if this is a road encounter
+    // Road encounters use road_nc table if road is one of: highway, byway, royalway, bridleway
+    const isRoadEncounter =
+        road &&
+        road !== "no road" &&
+        road !== "random" &&
+        (road === "highway" ||
+            road === "byway" ||
+            road === "royalway" ||
+            road === "bridleway");
+
+    let encounterTable: string[] | null = null;
+    let tableName: string | null = null;
+
+    if (isRoadEncounter) {
+        // Use road_nc table for road encounters
+        encounterTable = road_nc;
+        tableName = "road_nc";
+    } else if (travelMedium === "sea") {
+        // Use open_water_nc table for sea travel
+        encounterTable = open_water_nc;
+        tableName = "open_water_nc";
+    } else {
+        // Use biome-specific table
+        console.log("Mapping biome to table:", biome);
+        tableName = mapBiomeToNonCombatTable(biome);
+        console.log("Mapped table name:", tableName);
+        encounterTable = getTableByName(tableName);
+        console.log(
+            "Retrieved table:",
+            encounterTable ? `${encounterTable.length} entries` : "null"
+        );
+
+        // Fallback to forest_nc if no table found
+        if (!encounterTable) {
+            console.warn(
+                `No table found for biome: ${biome}, tableName: ${tableName}, falling back to forest_nc`
+            );
+            encounterTable = forest_nc;
+            tableName = "forest_nc";
+        }
+    }
+
+    // Debug logging
+    if (!encounterTable) {
+        console.error(
+            `No encounter table found. biome: ${biome}, road: ${road}, travelMedium: ${travelMedium}, tableName: ${tableName}`
+        );
+        return {
+            type: "non-combat",
+            description:
+                "Non-combat encounter (no encounters available for this biome)",
+            biome: biome ?? null,
+            road: isRoadEncounter ? road : null,
+        };
+    }
+
+    if (encounterTable.length === 0) {
+        console.error(
+            `Encounter table ${tableName} is empty. biome: ${biome}, road: ${road}`
+        );
+        return {
+            type: "non-combat",
+            description:
+                "Non-combat encounter (no encounters available for this biome)",
+            biome: biome ?? null,
+            road: isRoadEncounter ? road : null,
+        };
+    }
+
+    const selectedEncounter = getRandomElement(encounterTable);
+
+    // Handle special cases
+    let description = selectedEncounter;
+    if (selectedEncounter === "Random Ship") {
+        description = generateRandomShip();
+    } else if (selectedEncounter === "Mysterious Island") {
+        description = generateMysteriousIsland();
+    } else if (selectedEncounter === "Blue Hole") {
+        description = generateBlueHole();
+    } else if (selectedEncounter === "Shipwreck") {
+        description = generateShipwreck();
+    }
+
     return {
         type: "non-combat",
-        difficulty,
-        description: "Non-combat encounter (not yet implemented)",
+        description,
+        biome: biome ?? null,
+        road: isRoadEncounter ? road : null,
     };
 }
 
@@ -162,9 +376,10 @@ async function generateCombatEncounter(
         difficulty
     );
     const habitat = mapBiomeToHabitat(biome);
-    const timeOfDay: string | null = options.time === "random" 
-        ? null 
-        : (options.time ?? "day").toLowerCase();
+    const timeOfDay: string | null =
+        options.time === "random"
+            ? null
+            : (options.time ?? "day").toLowerCase();
 
     try {
         const filtered = filterMonsters(
@@ -313,41 +528,50 @@ export default async function generateEncounter(
         const encounterType = options.encounterType ?? null;
         const party = options.party ?? null;
 
-        // GUARANTEED MODE: If specific encounter type AND difficulty are specified,
-        // this is from GenerateEncounterDialog - skip probability and generate directly
-        // This guarantees the exact quantity of encounters with the specified difficulty
-        if (encounterType && options.difficultyLevel) {
-            const quantity = options.quantity ?? 1;
-            const difficulty = options.difficultyLevel;
+        // GUARANTEED MODE: If specific encounter type is specified, generate directly
+        // For non-combat encounters, difficulty is not needed, so allow generation without difficultyLevel
+        // For combat encounters, difficulty is required
+        if (encounterType) {
+            // For non-combat, always generate directly (no difficulty needed)
+            // For combat/hazard, require difficultyLevel
+            if (encounterType === "non-combat" || options.difficultyLevel) {
+                const quantity = options.quantity ?? 1;
+                const difficulty = options.difficultyLevel ?? "medium"; // Default for non-combat
 
-            for (let i = 0; i < quantity; i++) {
-                let encounter: any;
-                if (encounterType === "combat") {
-                    encounter = await generateCombatEncounter(
-                        party,
-                        difficulty,
-                        biome,
-                        options.travelMedium ?? null,
-                        options,
-                        allMonsters ?? []
-                    );
-                } else if (encounterType === "non-combat") {
-                    encounter = generateNonCombat(difficulty, biome, options);
-                } else {
-                    encounter = generateHazard(difficulty, biome, options);
+                for (let i = 0; i < quantity; i++) {
+                    let encounter: any;
+                    if (encounterType === "combat") {
+                        encounter = await generateCombatEncounter(
+                            party,
+                            difficulty,
+                            biome,
+                            options.travelMedium ?? null,
+                            options,
+                            allMonsters ?? []
+                        );
+                    } else if (encounterType === "non-combat") {
+                        console.log(
+                            "Generating non-combat encounter for biome:",
+                            biome
+                        );
+                        encounter = generateNonCombat(biome, options);
+                        console.log("Generated encounter:", encounter);
+                    } else {
+                        encounter = generateHazard(difficulty, biome, options);
+                    }
+                    allGeneratedEncounters.push(encounter);
                 }
-                allGeneratedEncounters.push(encounter);
-            }
 
-            allOptions.push({
-                biome: options.biome ?? null,
-                travelPace: options.travelPace ?? null,
-                road: options.road ?? null,
-                travelMedium: options.travelMedium ?? null,
-                time: options.time ?? null,
-                season: options.season ?? null,
-            });
-            continue;
+                allOptions.push({
+                    biome: options.biome ?? null,
+                    travelPace: options.travelPace ?? null,
+                    road: options.road ?? null,
+                    travelMedium: options.travelMedium ?? null,
+                    time: options.time ?? null,
+                    season: options.season ?? null,
+                });
+                continue;
+            }
         }
 
         // PROBABILITY MODE: This is from RollEncounterDialog - use probability tables
@@ -394,20 +618,30 @@ export default async function generateEncounter(
             ];
         const paceMod = paceModData?.[timeKey];
 
-        const roadModifier = roadMod
-            ? encounterType === "combat"
-                ? roadMod.combat
-                : encounterType === "non-combat"
-                ? roadMod.non_combat
-                : roadMod.hazard
-            : 0;
-        const paceModifier = paceMod
-            ? encounterType === "combat"
-                ? paceMod.combat
-                : encounterType === "non-combat"
-                ? paceMod.non_combat
-                : paceMod.hazard
-            : 0;
+        const getRoadModifier = (
+            mod: typeof roadMod,
+            type: "combat" | "non-combat" | "hazard" | null
+        ): number => {
+            if (!mod) return 0;
+            if (type === "combat") return mod.combat;
+            if (type === "non-combat") return mod.non_combat;
+            if (type === "hazard") return mod.hazard;
+            return 0;
+        };
+
+        const getPaceModifier = (
+            mod: typeof paceMod,
+            type: "combat" | "non-combat" | "hazard" | null
+        ): number => {
+            if (!mod) return 0;
+            if (type === "combat") return mod.combat;
+            if (type === "non-combat") return mod.non_combat;
+            if (type === "hazard") return mod.hazard;
+            return 0;
+        };
+
+        const roadModifier = getRoadModifier(roadMod, encounterType);
+        const paceModifier = getPaceModifier(paceMod, encounterType);
 
         // Calculate probability for each encounter type
         const combatProb = calculateEncounterProbability(
@@ -435,9 +669,17 @@ export default async function generateEncounter(
             if (encounterType) {
                 // Encounter type specified but no difficulty - roll for it
                 let prob = 0;
-                if (encounterType === "combat") prob = combatProb;
-                else if (encounterType === "non-combat") prob = nonCombatProb;
-                else if (encounterType === "hazard") prob = hazardProb;
+                const type = encounterType as
+                    | "combat"
+                    | "non-combat"
+                    | "hazard";
+                if (type === "combat") {
+                    prob = combatProb;
+                } else if (type === "non-combat") {
+                    prob = nonCombatProb;
+                } else if (type === "hazard") {
+                    prob = hazardProb;
+                }
 
                 if (rollForEncounter(prob)) {
                     // Encounter occurred
@@ -449,7 +691,11 @@ export default async function generateEncounter(
                           );
 
                     let encounter: any;
-                    if (encounterType === "combat") {
+                    const encounterTypeChecked = encounterType as
+                        | "combat"
+                        | "non-combat"
+                        | "hazard";
+                    if (encounterTypeChecked === "combat") {
                         encounter = await generateCombatEncounter(
                             party,
                             difficulty,
@@ -458,12 +704,8 @@ export default async function generateEncounter(
                             options,
                             allMonsters ?? []
                         );
-                    } else if (encounterType === "non-combat") {
-                        encounter = generateNonCombat(
-                            difficulty,
-                            biome,
-                            options
-                        );
+                    } else if (encounterTypeChecked === "non-combat") {
+                        encounter = generateNonCombat(biome, options);
                     } else {
                         encounter = generateHazard(difficulty, biome, options);
                     }
@@ -487,15 +729,7 @@ export default async function generateEncounter(
                     allGeneratedEncounters.push(encounter);
                 }
                 if (rollForEncounter(nonCombatProb)) {
-                    const difficulty = rollForDifficulty(
-                        probTables.difficultyProbabilities,
-                        timeKey
-                    );
-                    const encounter = generateNonCombat(
-                        difficulty,
-                        biome,
-                        options
-                    );
+                    const encounter = generateNonCombat(biome, options);
                     allGeneratedEncounters.push(encounter);
                 }
                 if (rollForEncounter(hazardProb)) {

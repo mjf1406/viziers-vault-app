@@ -35,44 +35,11 @@ s<!-- @format -->
 -   added a way to delete an account
 -   updated the subscription details on /account to be better
 
-### Encounter Generator
-
--   [ ] make sure each monster has a habitat in the db
--   [ ] make sure each monster has a travel medium in the db (land, air, water)
--   [ ] map D&D habitats to real-world biome list and have the D&D habitats in parentheses next to the real-world biome name
-
-    1. Boreal Forests/Taiga
-    2. Deserts & Xeric Shrublands
-    3. Flooded Grasslands & Savannas
-    4. Mangroves
-    5. Mediterranean Forests, Woodlands & Scrub
-    6. Montane Grasslands & Shrublands
-    7. Temperate Broadleaf & Mixed Forests
-    8. Temperate Conifer Forests
-    9. Temperate Grasslands, Savannas & Shrublands
-    10. Tropical & Subtropical Coniferous Forests
-    11. Tropical & Subtropical Dry Broadleaf Forests
-    12. Tropical & Subtropical Grasslands, Savannas & Shrublands
-    13. Tropical & Subtropical Moist Broadleaf Forests
-    14. Tundra
-
--   [ ] two modals
-
-    -   [ ] generate, which guarantees to get some type of encounter(s) and all these can be set to random or chosen with checkboxes/radios
-
-        -   [ ] add checkboxes to include different types of encounters (combat, non-combat, hazard)
-        -   [ ] add number of encounters to generate
-        -   [ ] add difficulty select (easy, medium, hard, deadly) as checkboxes
-
-    -   [ ] roll, which just rolls x number of times and all things are randomly determined
-        -   [ ] remove random inputs from
-
--   [ ] add party select dropdown, which the generator uses to generate the encounter
-
 ## Change Log
 
 ### 2025/11/08
 
+-   non-combat encounters are working now
 -   combat encounters can be generated or rolled
 
 ### 2025/11/04

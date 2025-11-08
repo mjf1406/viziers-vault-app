@@ -1,6 +1,6 @@
 ## Overview
 
-The Combat Encounter Generator creates balanced combat encounters for D&D 5th Edition based on your party composition and selected criteria. It follows official rules from the Dungeon Master's Guide to calculate encounter difficulty using Experience Point (XP) thresholds and multipliers.
+The Encounter Generator creates balanced combat encounters and generates non-combat encounters for D&D 5th Edition based on your party composition and selected criteria. Combat encounters follow official rules from the Dungeon Master's Guide to calculate encounter difficulty using Experience Point (XP) thresholds and multipliers. Non-combat encounters provide narrative and exploration opportunities without requiring combat resolution.
 
 ## How It Works
 
@@ -122,8 +122,10 @@ The generator operates in two distinct modes:
 
 #### Guaranteed Mode (Generate Encounter Dialog)
 
-- Used when both encounter type and difficulty are explicitly specified
-- Generates the exact number of encounters requested with the specified difficulty
+- Used when encounter type is explicitly specified
+- For combat encounters: requires both encounter type and difficulty to be specified
+- For non-combat encounters: only requires encounter type (difficulty is not needed)
+- Generates the exact number of encounters requested
 - Skips probability calculations
 - Guarantees encounters match your criteria
 
@@ -179,4 +181,83 @@ The adjusted XP should fall within the XP bounds for your selected difficulty le
 - Multiclass characters are treated as their primary level only
 - The generator doesn't account for party composition advantages (e.g., all spellcasters vs. all melee fighters)
 - Environmental factors beyond biome (e.g., weather, elevation) are not considered in monster filtering
+
+---
+
+## Non-Combat Encounters
+
+Non-combat encounters provide narrative, social, and exploration opportunities that don't require combat resolution. These encounters add flavor to your travel and exploration sequences.
+
+### How Non-Combat Encounters Work
+
+Non-combat encounters are generated differently from combat encounters:
+
+- **No Difficulty Required**: Unlike combat encounters, non-combat encounters don't require a difficulty level. They are generated directly when the encounter type is specified.
+- **No Party Balancing**: Non-combat encounters don't need to be balanced against party level or size, as they don't involve combat.
+- **Biome-Based Selection**: Encounters are selected from tables specific to the biome or environment.
+
+### Encounter Table Selection
+
+The generator selects encounters from specialized tables based on your criteria:
+
+1. **Road Encounters**: If traveling on a highway, byway, royalway, or bridleway, encounters are drawn from the road-specific table, which contains encounters common to well-traveled paths.
+
+2. **Sea Travel**: If the travel medium is "sea", encounters are drawn from the open water table, which includes maritime encounters like ships, islands, and sea creatures.
+
+3. **Biome-Specific**: For other situations, encounters are selected from tables matching your biome:
+   - Arctic/Tundra → Arctic encounters
+   - Desert → Desert encounters
+   - Forest → Forest encounters
+   - Grassland/Savanna → Grassland encounters
+   - Mountain → Mountain encounters
+   - Swamp/Mangrove → Swamp encounters
+   - Coastal/Flooded → Coastal encounters
+   - And more...
+
+4. **Fallback**: If no specific table is found for a biome, the generator falls back to the forest encounter table.
+
+### Special Encounter Types
+
+Some encounters in the open water table trigger special generation:
+
+- **Random Ship**: Generates a detailed ship encounter with crew, purpose, and disposition
+- **Mysterious Island**: Creates an island with theme, inhabitants, and story hooks
+- **Blue Hole**: Generates a mysterious underwater feature with dimensions and contents
+- **Shipwreck**: Creates a shipwreck with condition, cargo, and potential survivors
+
+These special encounters use placeholder generation that can be expanded with more detailed tables in the future.
+
+### Encounter Modes for Non-Combat
+
+Non-combat encounters work in both modes:
+
+#### Guaranteed Mode
+- When `encounterType` is set to "non-combat", encounters are generated directly
+- No difficulty level is required
+- Generates the exact quantity specified
+- Skips probability calculations
+
+#### Probability Mode
+- Non-combat encounters can occur based on probability tables
+- Probability is modified by road type and travel pace
+- Roads generally increase non-combat encounter probability
+- Each roll may result in 0 or more non-combat encounters
+
+### Understanding Non-Combat Results
+
+A generated non-combat encounter includes:
+
+- **Type**: Always "non-combat"
+- **Description**: The narrative text describing what the party encounters
+- **Biome**: The biome where the encounter occurs (for reference)
+- **Road**: The road type if applicable (for road encounters)
+
+Non-combat encounters are designed to be flexible and can be:
+- Social interactions with NPCs
+- Environmental discoveries
+- Mysterious locations
+- Travel complications
+- World-building moments
+
+The DM can use these encounters as written or adapt them to fit their campaign's needs.
 

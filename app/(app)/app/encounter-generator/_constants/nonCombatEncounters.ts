@@ -3509,3 +3509,30 @@ let seedy_tavern_nc = [
     "“One thousand for all the hatchlings. Take it or leave it.”",
     "If it wasn't for that horse, I never would have taken that year of study at the Mage's College. u/kayura77",
 ];
+
+// Export all non-combat encounter tables
+export {
+    arctic_nc,
+    carousing_nc,
+    coastal_nc,
+    desert_nc,
+    dungeon_nc,
+    farmland_nc,
+    festivals_nc,
+    forest_nc,
+    grassland_nc,
+    hill_nc,
+    jungle_nc,
+    mountain_nc,
+    open_water_nc,
+    red_light_district_nc,
+    road_nc,
+    swamp_nc,
+    tavern_nc,
+    underdark_nc,
+    underwater_nc,
+    urban_nc,
+    wasteland_nc,
+    woodland_nc,
+    seedy_tavern_nc,
+};

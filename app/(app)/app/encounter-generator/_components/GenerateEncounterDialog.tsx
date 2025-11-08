@@ -104,6 +104,19 @@ const createGenerateEncounterFormSchema = (habitat: DndHabitat | null) =>
         )
         .refine(
             (data) => {
+                // Hazard type is not yet available
+                if (data.encounterType === "hazard") {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Hazard encounters are coming soon",
+                path: ["encounterType"],
+            }
+        )
+        .refine(
+            (data) => {
                 // If encounterType is combat, difficultyLevel should be required
                 if (data.encounterType === "combat" && !data.difficultyLevel) {
                     return false;

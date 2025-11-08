@@ -251,3 +251,63 @@ export function filterMonsters(
 
     return filtered;
 }
+
+// Map Biome to non-combat encounter table name
+export function mapBiomeToNonCombatTable(
+    biome: Biome | null
+): string | null {
+    if (!biome) return null;
+
+    const biomeLower = biome.toLowerCase();
+
+    // Arctic biomes -> arctic_nc
+    if (
+        biomeLower.includes("tundra") ||
+        biomeLower.includes("boreal") ||
+        biomeLower.includes("taiga") ||
+        biomeLower.includes("rock and ice")
+    ) {
+        return "arctic_nc";
+    }
+
+    // Desert biomes -> desert_nc
+    if (biomeLower.includes("desert") || biomeLower.includes("xeric")) {
+        return "desert_nc";
+    }
+
+    // Forest biomes -> forest_nc or woodland_nc
+    if (biomeLower.includes("forest")) {
+        // Check for specific forest types
+        if (biomeLower.includes("tropical") || biomeLower.includes("subtropical")) {
+            return "jungle_nc"; // Tropical forests use jungle table
+        }
+        return "forest_nc";
+    }
+
+    // Grassland biomes -> grassland_nc
+    if (
+        biomeLower.includes("grassland") ||
+        biomeLower.includes("savanna") ||
+        biomeLower.includes("savannas")
+    ) {
+        return "grassland_nc";
+    }
+
+    // Mountain biomes -> mountain_nc
+    if (biomeLower.includes("montane") || biomeLower.includes("mountain")) {
+        return "mountain_nc";
+    }
+
+    // Swamp/Mangrove biomes -> swamp_nc
+    if (biomeLower.includes("mangrove")) {
+        return "swamp_nc";
+    }
+
+    // Coastal/Flooded biomes -> coastal_nc
+    if (biomeLower.includes("flooded")) {
+        return "coastal_nc";
+    }
+
+    // Default fallback to forest
+    return "forest_nc";
+}

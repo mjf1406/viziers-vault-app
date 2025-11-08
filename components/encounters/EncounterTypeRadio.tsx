@@ -42,26 +42,35 @@ export default function EncounterTypeRadio({
         >
             {ENCOUNTER_TYPES.map((opt) => {
                 const selected = value === opt;
+                const isDisabled = opt === "hazard";
                 return (
                     <Tooltip key={opt}>
                         <TooltipTrigger asChild>
                             <label
                                 className={
-                                    "h-8 min-w-8 px-2 inline-flex items-center justify-center rounded-md border text-xs cursor-pointer " +
-                                    (selected
-                                        ? "bg-primary text-primary-foreground border-primary"
-                                        : "bg-background")
+                                    "h-8 min-w-8 px-2 inline-flex items-center justify-center rounded-md border text-xs " +
+                                    (isDisabled
+                                        ? "opacity-50 cursor-not-allowed bg-muted"
+                                        : "cursor-pointer") +
+                                    (selected && !isDisabled
+                                        ? " bg-primary text-primary-foreground border-primary"
+                                        : !isDisabled
+                                          ? " bg-background"
+                                          : "")
                                 }
                             >
                                 <RadioGroupItem
                                     value={opt}
                                     className="sr-only"
+                                    disabled={isDisabled}
                                 />
                                 {ICONS[opt]}
                             </label>
                         </TooltipTrigger>
                         <TooltipContent className="capitalize">
-                            {LABELS[opt]}
+                            {isDisabled
+                                ? `${LABELS[opt]} - Coming Soon`
+                                : LABELS[opt]}
                         </TooltipContent>
                     </Tooltip>
                 );

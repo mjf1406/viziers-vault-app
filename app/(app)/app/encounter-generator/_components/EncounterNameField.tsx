@@ -36,6 +36,7 @@ export type EncounterNameFieldProps = {
     onAutoUpdateChange?: (enabled: boolean) => void;
     appendDateTime?: boolean;
     onAppendDateTimeChange?: (enabled: boolean) => void;
+    hideAutoUpdate?: boolean;
 };
 
 const ENCOUNTER_ADJECTIVES = [
@@ -201,6 +202,7 @@ export default function EncounterNameField({
     onAutoUpdateChange,
     appendDateTime = false,
     onAppendDateTimeChange,
+    hideAutoUpdate = false,
 }: EncounterNameFieldProps) {
     // Auto-update name when inputs change
     const prevInputsRef = React.useRef<string>("");
@@ -275,40 +277,42 @@ export default function EncounterNameField({
         <div className={className}>
             <div className="flex items-center justify-between mb-2">
                 <Label htmlFor={id}>{label}</Label>
-                <div className="flex items-center gap-3">
-                    <Label
-                        htmlFor="autoUpdate"
-                        className="text-xs font-normal cursor-pointer flex items-center gap-1"
-                    >
-                        <input
-                            type="checkbox"
-                            id="autoUpdate"
-                            checked={autoUpdate}
-                            onChange={(e) =>
-                                onAutoUpdateChange?.(e.target.checked)
-                            }
-                            className="w-3 h-3"
-                        />
-                        Auto-update
-                    </Label>
-                    {autoUpdate && (
+                {!hideAutoUpdate && (
+                    <div className="flex items-center gap-3">
                         <Label
-                            htmlFor="appendDateTime"
+                            htmlFor="autoUpdate"
                             className="text-xs font-normal cursor-pointer flex items-center gap-1"
                         >
                             <input
                                 type="checkbox"
-                                id="appendDateTime"
-                                checked={appendDateTime}
+                                id="autoUpdate"
+                                checked={autoUpdate}
                                 onChange={(e) =>
-                                    onAppendDateTimeChange?.(e.target.checked)
+                                    onAutoUpdateChange?.(e.target.checked)
                                 }
                                 className="w-3 h-3"
                             />
-                            Append datetime
+                            Auto-update
                         </Label>
-                    )}
-                </div>
+                        {autoUpdate && (
+                            <Label
+                                htmlFor="appendDateTime"
+                                className="text-xs font-normal cursor-pointer flex items-center gap-1"
+                            >
+                                <input
+                                    type="checkbox"
+                                    id="appendDateTime"
+                                    checked={appendDateTime}
+                                    onChange={(e) =>
+                                        onAppendDateTimeChange?.(e.target.checked)
+                                    }
+                                    className="w-3 h-3"
+                                />
+                                Append datetime
+                            </Label>
+                        )}
+                    </div>
+                )}
             </div>
             <div className="mt-1 flex items-center gap-2">
                 <Input

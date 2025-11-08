@@ -2,7 +2,7 @@
 
 "use client";
 
-import type { GenerateEncounterOpts } from "../_components/GenEncounterResponsiveDialog";
+import type { GenerateEncounterOpts } from "../_components/RollEncounterDialog";
 import db from "@/lib/db";
 import { id } from "@instantdb/react";
 

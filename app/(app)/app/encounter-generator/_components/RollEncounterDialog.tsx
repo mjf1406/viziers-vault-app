@@ -9,6 +9,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
     DialogClose,
 } from "@/components/ui/dialog";
@@ -42,6 +43,8 @@ export type GenerateEncounterOpts = {
     season?: Season | "random" | null;
     climate?: string | null; // TBD
     quantity?: number;
+    encounterType?: "combat" | "non-combat" | "hazard" | null;
+    difficultyLevel?: "trivial" | "easy" | "medium" | "hard" | "deadly" | null;
 };
 
 type EncounterInitial = {
@@ -55,7 +58,7 @@ type EncounterInitial = {
     season?: Season | "random" | null;
 };
 
-type EncounterGeneratorDialogProps = {
+type RollEncounterDialogProps = {
     mode?: "create" | "edit";
     initial?: EncounterInitial | null;
     open?: boolean;
@@ -66,7 +69,7 @@ type EncounterGeneratorDialogProps = {
     onGenerate?: (opts: GenerateEncounterOpts) => Promise<void> | void;
 };
 
-export default function EncounterGeneratorDialog({
+export default function RollEncounterDialog({
     mode = "create",
     initial = null,
     open,
@@ -75,7 +78,7 @@ export default function EncounterGeneratorDialog({
     onClose,
     hideTitleOnMobile = false,
     onGenerate,
-}: EncounterGeneratorDialogProps) {
+}: RollEncounterDialogProps) {
     const { plan, user } = useUser();
     const isPaid = Boolean(plan && plan.toLowerCase() !== "free");
     const [openLocal, setOpenLocal] = useState<boolean>(!!defaultOpen);
@@ -268,6 +271,15 @@ export default function EncounterGeneratorDialog({
                                 ? "Edit Encounter"
                                 : "Roll for Encounters"}
                         </DialogTitle>
+                        {mode !== "edit" && (
+                            <DialogDescription>
+                                Roll for random encounters based on travel
+                                conditions. Configure multiple instances with
+                                different parameters and see probability
+                                distributions before rolling. In this mode, it's
+                                possible that no encounter occurs.
+                            </DialogDescription>
+                        )}
                     </DialogHeader>
 
                     <div className="flex-1 flex overflow-hidden">

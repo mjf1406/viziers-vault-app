@@ -14,11 +14,12 @@ import { FaSun as FaSunIcon, FaSnowflake } from "react-icons/fa";
 import { LuFlower2 } from "react-icons/lu";
 import { GiPumpkin } from "react-icons/gi";
 import { SEASONS, type Season } from "@/lib/constants/encounters";
+import { Leaf } from "lucide-react";
 
 const ICONS: Record<Season, React.ReactNode> = {
     spring: <LuFlower2 />,
     summer: <FaSunIcon />,
-    fall: <GiPumpkin />,
+    fall: <Leaf className="size-4" />,
     winter: <FaSnowflake />,
 };
 
@@ -92,4 +93,3 @@ export default function SeasonRadio({
         </RadioGroup>
     );
 }
-

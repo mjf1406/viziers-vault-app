@@ -13,15 +13,30 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/Spellbook_Generator/methodology.md",
+                "file": "docs/Magic Shop Generator/Magic Shop Generator Methodology.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "methodology"
+              "title": "Magic Shop Generator Methodology"
+            }
+          },
+          {
+            "id": "d7b2d7fe7b2c2f2b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/Spellbook_Generator/Spellbook Generator Methodology.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Spellbook Generator Methodology"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -141,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/Spellbook_Generator/methodology.md",
+                "file": "docs/Spellbook_Generator/Spellbook Generator Methodology.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of methodology"
+              "title": "Outline of Spellbook Generator Methodology"
             }
           }
         ],
@@ -168,8 +183,11 @@
       "bases:Create new base": false
     }
   },
-  "active": "42d9a827466c7c29",
+  "active": "d7b2d7fe7b2c2f2b",
   "lastOpenFiles": [
+    "docs/Magic Shop Generator/Magic Shop Generator Methodology.md",
+    "docs/Spellbook_Generator/Spellbook Generator Methodology.md",
+    "docs/Magic Shop Generator",
     "blog/2025/September/We Do Stuff.md",
     "blog/2025/August/First Post.md",
     "blog/2025/September",

@@ -71,7 +71,7 @@ type GenerateSpellbookClientInput = {
     name?: string;
     userId?: string | null;
     userSettings?: { spellbookExtraSpellsDice?: string } | null;
-    allSpells: Dnd5eSpell[]; // Pre-loaded spells from db.useQuery
+    allSpells: Dnd5eSpell[];
 };
 
 export async function generateSpellbookClient(
@@ -119,7 +119,6 @@ export async function generateSpellbookClient(
             },
         };
 
-        // Save if user is authenticated
         if (input.userId) {
             const spellbookId = await saveSpellbookRecord({
                 userId: input.userId,
@@ -153,7 +152,6 @@ function filterSpells(
     leveled: Dnd5eSpell[];
     cantrips: Dnd5eSpell[];
 } {
-    // Filter leveled spells
     let leveledRaw = allSpells.filter((spell) => {
         const level = toNumber(spell.level);
         return (
@@ -169,7 +167,6 @@ function filterSpells(
         );
     });
 
-    // Filter cantrips
     let cantripsRaw = allSpells.filter((spell) => {
         const level = toNumber(spell.level);
         return (
@@ -226,9 +223,6 @@ function getUserOverrides(
     }
 }
 
-/**
- * Select spells for spellbook based on class rules and targets
- */
 function selectSpellsForSpellbook(
     cantrips: Dnd5eSpell[],
     leveledSpells: Dnd5eSpell[],

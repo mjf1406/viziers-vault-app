@@ -10,24 +10,14 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import EncountersGrid from "./_components/EncountersGrid";
 import RollEncounterDialog from "./_components/RollEncounterDialog";
 import GenerateEncounterDialog from "./_components/GenerateEncounterDialog";
+import EncounterUpsell from "./_components/EncounterUpsell";
 
 // Separate component for data-dependent content
 function EncounterContent({ onEdit }: { onEdit: (e: any) => void }) {
     const { plan, user } = useUser();
 
-    // For now, show grid for all users (no upsell yet)
-    // TODO: Add upsell component similar to MagicShopUpsell
     if (!user || plan === "Free") {
-        return (
-            <div className="py-12 text-center flex flex-col items-center justify-center w-full">
-                <div>
-                    <Swords className="text-muted-foreground w-20 h-20" />
-                </div>
-                <p className="text-lg text-muted-foreground/70">
-                    Upgrade to save encounters
-                </p>
-            </div>
-        );
+        return <EncounterUpsell />;
     }
 
     return <EncountersGrid onEdit={onEdit} />;

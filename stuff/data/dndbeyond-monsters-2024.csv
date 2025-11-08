@@ -1,0 +1,504 @@
+ID,NAME,CR,TYPE,SIZE,ALIGNMENT,HABITAT,SOURCE,URL
+5194864,Aarakocra Aeromancer,4,Elemental,Medium,Neutral,"Mountain, Planar (Elemental Plane of Air)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194864-aarakocra-aeromancer
+5194865,Aarakocra Skirmisher,1/4,Elemental,Medium,Neutral,"Mountain, Planar (Elemental Plane of Air)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194865-aarakocra-skirmisher
+5194866,Aberrant Cultist,8,Humanoid,Small,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194866-aberrant-cultist
+5194867,Aboleth,10,Aberration,Large,Lawful Evil,"Underdark, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194867-aboleth
+5194868,Abominable Yeti,9,Monstrosity,Huge,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194868-abominable-yeti
+5194869,Adult Black Dragon,14,Dragon,Huge,Chaotic Evil,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194869-adult-black-dragon
+5194870,Adult Blue Dragon,16,Dragon,Huge,Lawful Evil,"Coastal, Desert",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194870-adult-blue-dragon
+5194871,Adult Brass Dragon,13,Dragon,Huge,Chaotic Good,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194871-adult-brass-dragon
+5198155,Adult Bronze Dragon,15,Dragon,Huge,Lawful Good,Coastal,Monster Manual (2024),https://www.dndbeyond.com/monsters/5198155-adult-bronze-dragon
+5194872,Adult Copper Dragon,14,Dragon,Huge,Chaotic Good,Hill,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194872-adult-copper-dragon
+5194873,Adult Gold Dragon,17,Dragon,Huge,Lawful Good,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194873-adult-gold-dragon
+5194874,Adult Green Dragon,15,Dragon,Huge,Lawful Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194874-adult-green-dragon
+5194875,Adult Red Dragon,17,Dragon,Huge,Chaotic Evil,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194875-adult-red-dragon
+5194876,Adult Silver Dragon,16,Dragon,Huge,Lawful Good,"Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194876-adult-silver-dragon
+5194877,Adult White Dragon,13,Dragon,Huge,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194877-adult-white-dragon
+5194878,Air Elemental,5,Elemental,Large,Neutral,"Desert, Mountain, Planar (Elemental Plane of Air)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194878-air-elemental
+5194879,Allosaurus,2,Beast,Large,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194879-allosaurus
+5194880,Ancient Black Dragon,21,Dragon,Gargantuan,Chaotic Evil,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194880-ancient-black-dragon
+5194881,Ancient Blue Dragon,23,Dragon,Gargantuan,Lawful Evil,"Coastal, Desert",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194881-ancient-blue-dragon
+5194882,Ancient Brass Dragon,20,Dragon,Gargantuan,Chaotic Good,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194882-ancient-brass-dragon
+5194883,Ancient Bronze Dragon,22,Dragon,Gargantuan,Lawful Good,Coastal,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194883-ancient-bronze-dragon
+5194884,Ancient Copper Dragon,21,Dragon,Gargantuan,Chaotic Good,Hill,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194884-ancient-copper-dragon
+5194885,Ancient Gold Dragon,24,Dragon,Gargantuan,Lawful Good,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194885-ancient-gold-dragon
+5194886,Ancient Green Dragon,22,Dragon,Gargantuan,Lawful Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194886-ancient-green-dragon
+5194887,Ancient Red Dragon,24,Dragon,Gargantuan,Chaotic Evil,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194887-ancient-red-dragon
+5194888,Ancient Silver Dragon,23,Dragon,Gargantuan,Lawful Good,"Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194888-ancient-silver-dragon
+5194889,Ancient White Dragon,20,Dragon,Gargantuan,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194889-ancient-white-dragon
+5194892,Animal Lord,20,Celestial,Medium,Neutral,Planar (Beastlands),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194892-animal-lord
+5194893,Animated Armor,1,Construct,Medium,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194893-animated-armor
+5194894,Animated Broom,1/4,Construct,Small,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194894-animated-broom
+5194895,Animated Flying Sword,1/4,Construct,Small,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194895-animated-flying-sword
+5194896,Animated Rug of Smothering,2,Construct,Large,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194896-animated-rug-of-smothering
+5194897,Ankheg,2,Monstrosity,Large,Unaligned,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194897-ankheg
+5194898,Ankylosaurus,3,Beast,Huge,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194898-ankylosaurus
+4775801,Ape,1/2,Beast,Medium,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775801-ape
+5194899,Arcanaloth,12,Fiend,Medium,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194899-arcanaloth
+5194900,Arch-hag,21,Fey,Large,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194900-arch-hag
+5194901,Archelon,4,Beast,Huge,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194901-archelon
+5194902,Archmage,12,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194902-archmage
+5194903,Archpriest,12,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194903-archpriest
+5194904,Assassin,8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194904-assassin
+5194905,Awakened Shrub,0,Plant,Small,Neutral,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194905-awakened-shrub
+5194906,Awakened Tree,2,Plant,Huge,Neutral,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194906-awakened-tree
+5194907,Axe Beak,1/4,Monstrosity,Large,Unaligned,"Arctic, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194907-axe-beak
+5194908,Azer Pyromancer,6,Elemental,Medium,Lawful Neutral,"Mountain, Planar (Elemental Plane of Fire)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194908-azer-pyromancer
+5194909,Azer Sentinel,2,Elemental,Medium,Lawful Neutral,"Mountain, Planar (Elemental Plane of Fire)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194909-azer-sentinel
+5194910,Baboon,0,Beast,Small,Unaligned,"Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194910-baboon
+4775802,Badger,0,Beast,Tiny,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775802-badger
+5194911,Balor,19,Fiend,Huge,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194911-balor
+5194915,Bandit,1/8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194915-bandit
+5194912,Bandit Captain,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194912-bandit-captain
+5194913,Bandit Crime Lord,11,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194913-bandit-crime-lord
+5194914,Bandit Deceiver,7,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194914-bandit-deceiver
+5194916,Banshee,4,Undead,Medium,Chaotic Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194916-banshee
+5194917,Barbed Devil,5,Fiend,Medium,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194917-barbed-devil
+5194918,Barlgura,5,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194918-barlgura
+5194919,Basilisk,3,Monstrosity,Medium,Unaligned,"Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194919-basilisk
+4775803,Bat,0,Beast,Tiny,Unaligned,"Forest, Mountain, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775803-bat
+5194920,Bearded Devil,3,Fiend,Medium,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194920-bearded-devil
+5194921,Behir,11,Monstrosity,Huge,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194921-behir
+5194923,Beholder,13,Aberration,Large,Lawful Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194923-beholder
+5194922,Beholder Zombie,5,Undead,Large,Neutral Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194922-beholder-zombie
+4904621,Berserker,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904621-berserker
+5194924,Berserker Commander,8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194924-berserker-commander
+4775804,Black Bear,1/2,Beast,Medium,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775804-black-bear
+5198095,Black Dragon Wyrmling,2,Dragon,Medium,Chaotic Evil,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/5198095-black-dragon-wyrmling
+5194925,Black Pudding,4,Ooze,Large,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194925-black-pudding
+4830980,Blink Dog,1/4,Fey,Medium,Lawful Good,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/4830980-blink-dog
+5194926,Blob of Annihilation,23,Ooze,Gargantuan,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194926-blob-of-annihilation
+5194927,Blood Hawk,1/8,Beast,Small,Unaligned,"Arctic, Coastal, Forest, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194927-blood-hawk
+5194928,Blue Dragon Wyrmling,3,Dragon,Medium,Lawful Evil,"Coastal, Desert",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194928-blue-dragon-wyrmling
+5194929,Blue Slaad,7,Aberration,Large,Chaotic Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194929-blue-slaad
+4775805,Boar,1/4,Beast,Medium,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775805-boar
+5194930,Bone Devil,9,Fiend,Large,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194930-bone-devil
+5198080,Bone Naga,4,Undead,Large,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5198080-bone-naga
+5194931,Brass Dragon Wyrmling,1,Dragon,Medium,Chaotic Good,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194931-brass-dragon-wyrmling
+5194932,Brazen Gorgon,9,Construct,Large,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194932-brazen-gorgon
+5194933,Bronze Dragon Wyrmling,2,Dragon,Medium,Lawful Good,Coastal,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194933-bronze-dragon-wyrmling
+4775806,Brown Bear,1,Beast,Large,Unaligned,"Arctic, Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775806-brown-bear
+5194934,Bugbear Stalker,3,Fey,Medium,Chaotic Evil,"Forest, Grassland, Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194934-bugbear-stalker
+4831002,Bugbear Warrior,1,Fey,Medium,Chaotic Evil,"Forest, Grassland, Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/4831002-bugbear-warrior
+5194936,Bulette,5,Monstrosity,Large,Unaligned,"Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194936-bulette
+5194935,Bulette Pup,2,Monstrosity,Medium,Unaligned,"Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194935-bulette-pup
+4831048,Bullywug Bog Sage,4,Fey,Medium,Neutral,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/4831048-bullywug-bog-sage
+4831017,Bullywug Warrior,1/4,Fey,Medium,Neutral,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/4831017-bullywug-warrior
+5194937,Cambion,5,Fiend,Medium,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194937-cambion
+4775807,Camel,1/8,Beast,Large,Unaligned,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775807-camel
+5194938,Carrion Crawler,2,Monstrosity,Large,Unaligned,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194938-carrion-crawler
+4775808,Cat,0,Beast,Tiny,Unaligned,"Desert, Forest, Grassland, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775808-cat
+5194939,Centaur Trooper,2,Fey,Large,Neutral Good,"Forest, Grassland, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194939-centaur-trooper
+5194940,Centaur Warden,7,Fey,Large,Neutral Good,"Forest, Grassland, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194940-centaur-warden
+5194941,Chain Devil,8,Fiend,Medium,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194941-chain-devil
+5194942,Chasme,6,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194942-chasme
+5194943,Chimera,6,Monstrosity,Large,Chaotic Evil,"Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194943-chimera
+5194944,Chuul,4,Aberration,Large,Chaotic Evil,"Coastal, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194944-chuul
+5194945,Clay Golem,9,Construct,Large,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194945-clay-golem
+5194946,Cloaker,8,Aberration,Large,Chaotic Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194946-cloaker
+5194947,Cloud Giant,9,Giant,Huge,Neutral,Mountain,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194947-cloud-giant
+5194949,Cockatrice,1/2,Monstrosity,Small,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194949-cockatrice
+5194948,Cockatrice Regent,8,Monstrosity,Large,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194948-cockatrice-regent
+5194950,Colossus,25,Construct,Gargantuan,Unaligned,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194950-colossus
+5194951,Commoner,0,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194951-commoner
+4775809,Constrictor Snake,1/4,Beast,Large,Unaligned,"Desert, Forest, Swamp, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775809-constrictor-snake
+5194952,Copper Dragon Wyrmling,1,Dragon,Medium,Chaotic Good,Hill,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194952-copper-dragon-wyrmling
+5194953,Couatl,4,Celestial,Medium,Lawful Good,"Desert, Forest, Grassland, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194953-couatl
+4775810,Crab,0,Beast,Tiny,Unaligned,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775810-crab
+5194954,Crawling Claw,0,Undead,Tiny,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194954-crawling-claw
+4775811,Crocodile,1/2,Beast,Large,Unaligned,"Coastal, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775811-crocodile
+4904636,Cultist,1/8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904636-cultist
+4904746,Cultist Fanatic,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904746-cultist-fanatic
+5194955,Cultist Hierophant,10,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194955-cultist-hierophant
+5194956,Cyclops Oracle,10,Giant,Huge,Chaotic Neutral,"Coastal, Desert, Grassland, Hill, Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194956-cyclops-oracle
+5194957,Cyclops Sentry,6,Giant,Huge,Chaotic Neutral,"Coastal, Desert, Grassland, Hill, Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194957-cyclops-sentry
+5194958,Dao,11,Elemental,Large,Neutral,"Planar (Elemental Plane of Earth), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194958-dao
+5194959,Darkmantle,1/2,Aberration,Small,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194959-darkmantle
+5194960,Death Cultist,8,Humanoid,Small,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194960-death-cultist
+5194961,Death Dog,1,Monstrosity,Medium,Neutral Evil,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194961-death-dog
+5194963,Death Knight,17,Undead,Small,Chaotic Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194963-death-knight
+5194962,Death Knight Aspirant,11,Undead,Small,Chaotic Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194962-death-knight-aspirant
+5194964,Death Slaad,10,Aberration,Medium,Chaotic Evil,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194964-death-slaad
+5194965,Death Tyrant,14,Undead,Large,Lawful Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194965-death-tyrant
+5194966,Deer,0,Beast,Medium,Unaligned,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194966-deer
+5194967,Demilich,18,Undead,Tiny,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194967-demilich
+5194968,Deva,10,Celestial,Medium,Lawful Good,Planar (Upper Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194968-deva
+4775812,Dire Wolf,1,Beast,Large,Unaligned,"Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775812-dire-wolf
+5194969,Dire Worg,10,Fey,Huge,Neutral Evil,"Forest, Grassland, Hill, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194969-dire-worg
+5194970,Displacer Beast,3,Monstrosity,Large,Lawful Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194970-displacer-beast
+5194971,Djinni,11,Elemental,Large,Chaotic Good,"Coastal, Planar (Elemental Plane of Air)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194971-djinni
+5174955,Doppelganger,3,Monstrosity,Medium,Neutral,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5174955-doppelganger
+5194972,Dracolich,17,Undead,Huge,Lawful Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194972-dracolich
+4775813,Draft Horse,1/4,Beast,Large,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775813-draft-horse
+5194973,Dragon Turtle,17,Dragon,Gargantuan,Neutral,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194973-dragon-turtle
+5194974,Dretch,1/4,Fiend,Small,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194974-dretch
+5194975,Drider,6,Monstrosity,Large,Chaotic Evil,"Forest, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194975-drider
+5194976,Druid,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194976-druid
+5194977,Dryad,1,Fey,Medium,Neutral,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194977-dryad
+5194978,Dust Mephit,1/2,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194978-dust-mephit
+5194979,Eagle,0,Beast,Small,Unaligned,"Coastal, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194979-eagle
+5194980,Earth Elemental,5,Elemental,Large,Neutral,"Mountain, Planar (Elemental Plane of Earth), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194980-earth-elemental
+5194981,Efreeti,11,Elemental,Large,Neutral,"Desert, Planar (Elemental Plane of Fire)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194981-efreeti
+5194982,Elemental Cataclysm,22,Elemental,Gargantuan,Chaotic Neutral,Planar (Elemental Chaos),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194982-elemental-cataclysm
+5194983,Elemental Cultist,8,Humanoid,Small,Chaotic Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194983-elemental-cultist
+4775814,Elephant,4,Beast,Huge,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775814-elephant
+4775815,Elk,1/4,Beast,Large,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775815-elk
+17212,Empyrean,23,"{'choose': ['celestial', 'fiend']}",Huge,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/17212-empyrean
+5194988,Erinyes,12,Fiend,Medium,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5194988-erinyes
+5194989,Ettercap,2,Monstrosity,Medium,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194989-ettercap
+5194990,Ettin,4,Giant,Large,Chaotic Evil,"Hill, Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194990-ettin
+5194991,Faerie Dragon Adult,2,Dragon,Tiny,Chaotic Good,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194991-faerie-dragon-adult
+5194992,Faerie Dragon Youth,1,Dragon,Tiny,Chaotic Good,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194992-faerie-dragon-youth
+5194993,Fiend Cultist,8,Humanoid,Small,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194993-fiend-cultist
+4904758,Fire Elemental,5,Elemental,Large,Neutral,"Desert, Planar (Elemental Plane of Fire)",Monster Manual (2024),https://www.dndbeyond.com/monsters/4904758-fire-elemental
+5194994,Fire Giant,9,Giant,Huge,Lawful Evil,"Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194994-fire-giant
+5194995,Flameskull,4,Undead,Tiny,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194995-flameskull
+5194996,Flaming Skeleton,3,Undead,Medium,Lawful Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194996-flaming-skeleton
+5194997,Flesh Golem,5,Construct,Medium,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194997-flesh-golem
+5194998,Flumph,1/8,Aberration,Small,Lawful Good,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5194998-flumph
+5194999,Flying Snake,1/8,Monstrosity,Tiny,Unaligned,"Desert, Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5194999-flying-snake
+5195000,Fomorian,8,Giant,Huge,Chaotic Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195000-fomorian
+4775816,Frog,0,Beast,Tiny,Unaligned,"Forest, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775816-frog
+5195001,Frost Giant,8,Giant,Huge,Neutral Evil,"Arctic, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195001-frost-giant
+5195002,Galeb Duhr,6,Elemental,Medium,Neutral,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195002-galeb-duhr
+5195003,Gargoyle,2,Elemental,Medium,Chaotic Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195003-gargoyle
+5195004,Gas Spore Fungus,1/2,Plant,Large,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195004-gas-spore-fungus
+5195005,Gelatinous Cube,2,Ooze,Large,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195005-gelatinous-cube
+5195007,Ghast,2,Undead,Medium,Chaotic Evil,"Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195007-ghast
+5195006,Ghast Gravecaller,6,Undead,Medium,Chaotic Evil,"Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195006-ghast-gravecaller
+5195008,Ghost,4,Undead,Medium,Neutral,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195008-ghost
+5195009,Ghoul,1,Undead,Medium,Chaotic Evil,"Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195009-ghoul
+5195010,Giant Ape,7,Beast,Huge,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195010-giant-ape
+5195011,Giant Axe Beak,5,Monstrosity,Huge,Unaligned,"Arctic, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195011-giant-axe-beak
+4775817,Giant Badger,1/4,Beast,Medium,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775817-giant-badger
+5195012,Giant Bat,1/4,Beast,Large,Unaligned,"Forest, Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195012-giant-bat
+5195013,Giant Boar,2,Beast,Large,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195013-giant-boar
+5195014,Giant Centipede,1/4,Beast,Small,Unaligned,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195014-giant-centipede
+5195015,Giant Constrictor Snake,2,Beast,Huge,Unaligned,"Desert, Forest, Swamp, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195015-giant-constrictor-snake
+4775818,Giant Crab,1/8,Beast,Medium,Unaligned,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775818-giant-crab
+5195016,Giant Crocodile,5,Beast,Huge,Unaligned,"Coastal, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195016-giant-crocodile
+5195017,Giant Eagle,1,Celestial,Large,Neutral Good,"Coastal, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195017-giant-eagle
+5195018,Giant Elk,2,Celestial,Huge,Neutral Good,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195018-giant-elk
+5195019,Giant Fire Beetle,0,Beast,Small,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195019-giant-fire-beetle
+5195020,Giant Frog,1/4,Beast,Medium,Unaligned,"Forest, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195020-giant-frog
+4775819,Giant Goat,1/2,Beast,Large,Unaligned,"Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775819-giant-goat
+5195021,Giant Hyena,1,Beast,Large,Unaligned,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195021-giant-hyena
+5195022,Giant Lizard,1/4,Beast,Large,Unaligned,"Coastal, Desert, Forest, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195022-giant-lizard
+5195023,Giant Octopus,1,Beast,Large,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195023-giant-octopus
+5195024,Giant Owl,1/4,Celestial,Large,Neutral,"Arctic, Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195024-giant-owl
+5195025,Giant Rat,1/8,Beast,Small,Unaligned,"Forest, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195025-giant-rat
+5195026,Giant Scorpion,3,Beast,Large,Unaligned,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195026-giant-scorpion
+4775820,Giant Seahorse,1/2,Beast,Large,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775820-giant-seahorse
+5195027,Giant Shark,5,Beast,Huge,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195027-giant-shark
+4775821,Giant Spider,1,Beast,Large,Unaligned,"Desert, Forest, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775821-giant-spider
+5195028,Giant Squid,6,Beast,Huge,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195028-giant-squid
+5195029,Giant Toad,1,Beast,Large,Unaligned,"Coastal, Forest, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195029-giant-toad
+5195030,Giant Venomous Snake,1/4,Beast,Medium,Unaligned,"Coastal, Desert, Forest, Grassland, Hill, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195030-giant-venomous-snake
+5195031,Giant Vulture,1,Monstrosity,Large,Neutral Evil,"Desert, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195031-giant-vulture
+5195032,Giant Wasp,1/2,Beast,Medium,Unaligned,"Forest, Grassland, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195032-giant-wasp
+4775822,Giant Weasel,1/8,Beast,Medium,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775822-giant-weasel
+5195033,Giant Wolf Spider,1/4,Beast,Medium,Unaligned,"Coastal, Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195033-giant-wolf-spider
+5195034,Gibbering Mouther,2,Aberration,Medium,Chaotic Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195034-gibbering-mouther
+5195035,Githyanki Dracomancer,16,Aberration,Medium,Lawful Evil,Planar (Astral Plane),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195035-githyanki-dracomancer
+5195036,Githyanki Knight,8,Aberration,Medium,Lawful Evil,Planar (Astral Plane),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195036-githyanki-knight
+5195037,Githyanki Warrior,3,Aberration,Medium,Lawful Evil,Planar (Astral Plane),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195037-githyanki-warrior
+5195038,Githzerai Monk,2,Aberration,Medium,Lawful Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195038-githzerai-monk
+5195039,Githzerai Psion,12,Aberration,Medium,Lawful Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195039-githzerai-psion
+5195040,Githzerai Zerth,6,Aberration,Medium,Lawful Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195040-githzerai-zerth
+5195041,Glabrezu,9,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195041-glabrezu
+5195042,Gladiator,5,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195042-gladiator
+5195043,Gnoll Demoniac,8,Fiend,Medium,Chaotic Evil,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195043-gnoll-demoniac
+5195044,Gnoll Fang of Yeenoghu,4,Fiend,Medium,Chaotic Evil,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195044-gnoll-fang-of-yeenoghu
+5195045,Gnoll Pack Lord,2,Fiend,Medium,Chaotic Evil,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195045-gnoll-pack-lord
+5195046,Gnoll Warrior,1/2,Fiend,Medium,Chaotic Evil,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195046-gnoll-warrior
+4775823,Goat,0,Beast,Medium,Unaligned,"Grassland, Hill, Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775823-goat
+5195047,Goblin Boss,1,Fey,Small,Chaotic Neutral,"Forest, Grassland, Hill, Planar (Acheron), Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195047-goblin-boss
+5195048,Goblin Hexer,3,Fey,Small,Chaotic Neutral,"Forest, Grassland, Hill, Planar (Acheron), Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195048-goblin-hexer
+5195049,Goblin Minion,1/8,Fey,Small,Chaotic Neutral,"Forest, Grassland, Hill, Planar (Acheron), Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195049-goblin-minion
+5195050,Goblin Warrior,1/4,Fey,Small,Chaotic Neutral,"Forest, Grassland, Hill, Planar (Acheron), Planar (Feywild), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195050-goblin-warrior
+5195051,Gold Dragon Wyrmling,3,Dragon,Medium,Lawful Good,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195051-gold-dragon-wyrmling
+5195052,Gorgon,5,Construct,Large,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195052-gorgon
+5195053,Goristro,17,Fiend,Huge,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195053-goristro
+5195054,Graveyard Revenant,7,Undead,Huge,Neutral,"Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195054-graveyard-revenant
+4904776,Gray Ooze,1/2,Ooze,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904776-gray-ooze
+5195055,Gray Slaad,9,Aberration,Medium,Chaotic Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195055-gray-slaad
+5195056,Green Dragon Wyrmling,2,Dragon,Medium,Lawful Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195056-green-dragon-wyrmling
+5195057,Green Hag,3,Fey,Medium,Neutral Evil,"Forest, Hill, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195057-green-hag
+5195058,Green Slaad,8,Aberration,Large,Chaotic Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195058-green-slaad
+5195059,Grell,3,Aberration,Medium,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195059-grell
+5195061,Grick,2,Aberration,Medium,Unaligned,"Forest, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195061-grick
+5195060,Grick Ancient,7,Aberration,Large,Unaligned,"Forest, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195060-grick-ancient
+5195062,Griffon,2,Monstrosity,Large,Unaligned,"Arctic, Coastal, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195062-griffon
+5195063,Grimlock,1/4,Aberration,Medium,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195063-grimlock
+5195065,Guard,1/8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195065-guard
+5195064,Guard Captain,4,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195064-guard-captain
+5195066,Guardian Naga,10,Celestial,Large,Lawful Good,"Desert, Forest, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195066-guardian-naga
+5195067,Gulthias Blight,16,Plant,Gargantuan,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195067-gulthias-blight
+5195068,Half-Dragon,5,Dragon,Medium,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195068-half-dragon
+5195069,Harpy,1,Monstrosity,Medium,Chaotic Evil,"Coastal, Forest, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195069-harpy
+5195070,Haunting Revenant,10,Undead,Gargantuan,Neutral,"Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195070-haunting-revenant
+4775824,Hawk,0,Beast,Tiny,Unaligned,"Arctic, Coastal, Forest, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775824-hawk
+5195071,Hell Hound,3,Fiend,Medium,Lawful Evil,"Mountain, Planar (Lower Planes), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195071-hell-hound
+5195072,Helmed Horror,4,Construct,Medium,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195072-helmed-horror
+5195073,Hezrou,8,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195073-hezrou
+5195074,Hill Giant,5,Giant,Huge,Chaotic Evil,Hill,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195074-hill-giant
+5195075,Hippogriff,1,Monstrosity,Large,Unaligned,"Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195075-hippogriff
+5195076,Hippopotamus,4,Beast,Large,Unaligned,"Forest, Grassland, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195076-hippopotamus
+5195077,Hobgoblin Captain,3,Fey,Medium,Lawful Evil,"Desert, Forest, Grassland, Hill, Mountain, Planar (Acheron), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195077-hobgoblin-captain
+5195078,Hobgoblin Warlord,6,Fey,Medium,Lawful Evil,"Desert, Forest, Grassland, Hill, Mountain, Planar (Acheron), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195078-hobgoblin-warlord
+5195079,Hobgoblin Warrior,1/2,Fey,Medium,Lawful Evil,"Desert, Forest, Grassland, Hill, Mountain, Planar (Acheron), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195079-hobgoblin-warrior
+5195080,Homunculus,0,Construct,Tiny,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195080-homunculus
+5195081,Hook Horror,3,Monstrosity,Large,Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195081-hook-horror
+5195082,Horned Devil,11,Fiend,Large,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195082-horned-devil
+5195083,Hunter Shark,2,Beast,Large,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195083-hunter-shark
+5195084,Hydra,8,Monstrosity,Huge,Unaligned,"Coastal, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195084-hydra
+5195085,Hyena,0,Beast,Medium,Unaligned,"Desert, Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195085-hyena
+5195086,Ice Devil,14,Fiend,Large,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195086-ice-devil
+5195087,Ice Mephit,1/2,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195087-ice-mephit
+4775825,Imp,1,Fiend,Tiny,Lawful Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775825-imp
+4904793,Incubus,4,Fiend,Medium,Neutral Evil,"Planar (Lower Planes), Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4904793-incubus
+5195088,Intellect Devourer,2,Aberration,Tiny,Lawful Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195088-intellect-devourer
+5195089,Invisible Stalker,6,Elemental,Large,Neutral,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195089-invisible-stalker
+5195090,Iron Golem,16,Construct,Large,Unaligned,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195090-iron-golem
+5195091,Jackal,0,Beast,Small,Unaligned,"Desert, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195091-jackal
+5195092,Jackalwere,1/2,Fiend,Small,Chaotic Evil,"Desert, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195092-jackalwere
+5195093,Juvenile Shadow Dragon,4,Dragon,Medium,Chaotic Evil,"Planar (Shadowfell), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195093-juvenile-shadow-dragon
+5195094,Kenku,1/4,Monstrosity,Medium,Neutral,"Forest, Planar (Shadowfell), Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195094-kenku
+5195095,Killer Whale,3,Beast,Huge,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195095-killer-whale
+4904816,Knight,3,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904816-knight
+5195096,Kobold Warrior,1/8,Dragon,Small,Neutral,"Arctic, Coastal, Desert, Forest, Hill, Mountain, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195096-kobold-warrior
+5195097,Kraken,23,Monstrosity,Gargantuan,Chaotic Evil,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195097-kraken
+5195101,Kuo-toa,1/4,Aberration,Medium,Neutral Evil,"Coastal, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195101-kuo-toa
+5195098,Kuo-toa Archpriest,6,Aberration,Medium,Neutral Evil,"Coastal, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195098-kuo-toa-archpriest
+5195099,Kuo-toa Monitor,3,Aberration,Medium,Neutral Evil,"Coastal, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195099-kuo-toa-monitor
+5195100,Kuo-toa Whip,1,Aberration,Medium,Neutral Evil,"Coastal, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195100-kuo-toa-whip
+5195102,Lacedon Ghoul,1,Undead,Medium,Chaotic Evil,"Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195102-lacedon-ghoul
+5195103,Lamia,4,Fiend,Large,Chaotic Evil,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195103-lamia
+5195104,Larva,0,Fiend,Medium,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195104-larva
+5195105,Lemure,0,Fiend,Medium,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195105-lemure
+5195106,Lich,21,Undead,Medium,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195106-lich
+4775826,Lion,1,Beast,Large,Unaligned,"Desert, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775826-lion
+4775827,Lizard,0,Beast,Tiny,Unaligned,"Coastal, Desert, Forest, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775827-lizard
+5195107,Lizardfolk Geomancer,2,Elemental,Medium,Neutral,"Forest, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195107-lizardfolk-geomancer
+5195108,Lizardfolk Sovereign,4,Elemental,Medium,Neutral,"Forest, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195108-lizardfolk-sovereign
+4831023,Mage,6,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4831023-mage
+5195109,Mage Apprentice,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195109-mage-apprentice
+5195110,Magma Mephit,1/2,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195110-magma-mephit
+5195111,Magmin,1/2,Elemental,Small,Chaotic Neutral,Planar (Elemental Plane of Fire),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195111-magmin
+5195112,Mammoth,6,Beast,Huge,Unaligned,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195112-mammoth
+5195114,Manes,1/8,Fiend,Small,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195114-manes
+5195113,Manes Vaporspawn,1,Fiend,Medium,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195113-manes-vaporspawn
+5195115,Manticore,3,Monstrosity,Large,Lawful Evil,"Arctic, Coastal, Grassland, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195115-manticore
+5195116,Marid,11,Elemental,Large,Chaotic Neutral,"Coastal, Planar (Elemental Plane of Water), Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195116-marid
+5195117,Marilith,16,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195117-marilith
+4775828,Mastiff,1/8,Beast,Medium,Unaligned,"Forest, Hill, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775828-mastiff
+5195118,Medusa,6,Monstrosity,Medium,Lawful Evil,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195118-medusa
+5195119,Merfolk Skirmisher,1/8,Elemental,Medium,Neutral,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195119-merfolk-skirmisher
+5195120,Merfolk Wavebender,6,Elemental,Medium,Neutral,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195120-merfolk-wavebender
+5195121,Merrow,2,Monstrosity,Large,Chaotic Evil,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195121-merrow
+5195122,Mezzoloth,5,Fiend,Medium,Neutral Evil,Planar (Gehenna),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195122-mezzoloth
+5195123,Mimic,2,Monstrosity,Medium,Neutral,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195123-mimic
+5195125,Mind Flayer,7,Aberration,Medium,Lawful Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195125-mind-flayer
+5195124,Mind Flayer Arcanist,11,Aberration,Medium,Lawful Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195124-mind-flayer-arcanist
+5195126,Minotaur of Baphomet,3,Monstrosity,Large,Chaotic Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195126-minotaur-of-baphomet
+5195127,Minotaur Skeleton,2,Undead,Large,Lawful Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195127-minotaur-skeleton
+5195128,Modron Duodrone,1/4,Construct,Medium,Lawful Neutral,Planar (Mechanus),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195128-modron-duodrone
+5195129,Modron Monodrone,1/8,Construct,Medium,Lawful Neutral,Planar (Mechanus),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195129-modron-monodrone
+5195130,Modron Pentadrone,2,Construct,Large,Lawful Neutral,Planar (Mechanus),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195130-modron-pentadrone
+5195131,Modron Quadrone,1,Construct,Medium,Lawful Neutral,Planar (Mechanus),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195131-modron-quadrone
+5195132,Modron Tridrone,1/2,Construct,Medium,Lawful Neutral,Planar (Mechanus),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195132-modron-tridrone
+5195133,Mud Mephit,1/4,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195133-mud-mephit
+4775829,Mule,1/8,Beast,Medium,Unaligned,"Desert, Hill, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775829-mule
+5195135,Mummy,3,Undead,Small,Lawful Evil,"Desert, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195135-mummy
+5195134,Mummy Lord,15,Undead,Small,Lawful Evil,"Desert, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195134-mummy-lord
+5195136,Myconid Adult,1/2,Plant,Medium,Lawful Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195136-myconid-adult
+5195137,Myconid Sovereign,2,Plant,Large,Lawful Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195137-myconid-sovereign
+5195138,Myconid Spore Servant,1,Plant,Small,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195138-myconid-spore-servant
+5195139,Myconid Sprout,0,Plant,Small,Lawful Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195139-myconid-sprout
+5195140,Nalfeshnee,13,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195140-nalfeshnee
+5195141,Needle Blight,1/4,Plant,Medium,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195141-needle-blight
+5195142,Night Hag,5,Fiend,Medium,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195142-night-hag
+5195143,Nightmare,3,Fiend,Large,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195143-nightmare
+5195145,Noble,1/8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195145-noble
+5195144,Noble Prodigy,10,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195144-noble-prodigy
+5195146,Nothic,2,Aberration,Medium,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195146-nothic
+5195147,Nycaloth,9,Fiend,Large,Neutral Evil,Planar (Gehenna),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195147-nycaloth
+5195148,Ochre Jelly,2,Ooze,Large,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195148-ochre-jelly
+4775830,Octopus,0,Beast,Small,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775830-octopus
+4904825,Ogre,2,Giant,Large,Chaotic Evil,"Arctic, Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/4904825-ogre
+5174956,Ogre Zombie,2,Undead,Large,Neutral Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5174956-ogre-zombie
+5195149,Ogrillon Ogre,1,Giant,Large,Chaotic Evil,"Arctic, Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195149-ogrillon-ogre
+5195150,Oni,7,Fiend,Large,Lawful Evil,"Forest, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195150-oni
+5195151,Otyugh,5,Aberration,Large,Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195151-otyugh
+4775831,Owl,0,Beast,Tiny,Unaligned,"Arctic, Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775831-owl
+5195152,Owlbear,3,Monstrosity,Large,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195152-owlbear
+4775832,Panther,1/4,Beast,Medium,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775832-panther
+5195153,Pegasus,2,Celestial,Large,Chaotic Good,"Forest, Grassland, Hill, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195153-pegasus
+5195156,Performer,1/2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195156-performer
+5195154,Performer Legend,10,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195154-performer-legend
+5195155,Performer Maestro,6,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195155-performer-maestro
+5195157,Peryton,2,Monstrosity,Medium,Chaotic Evil,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195157-peryton
+5195158,Phase Spider,3,Monstrosity,Large,Unaligned,"Desert, Forest, Grassland, Hill, Planar (Ethereal Plane), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195158-phase-spider
+5195159,Piercer,1/2,Aberration,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195159-piercer
+5195160,Piranha,0,Beast,Tiny,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195160-piranha
+4904830,Pirate,1,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904830-pirate
+5195161,Pirate Admiral,12,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195161-pirate-admiral
+4904838,Pirate Captain,6,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904838-pirate-captain
+5195162,Pit Fiend,20,Fiend,Large,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195162-pit-fiend
+5195164,Pixie,1/4,Fey,Tiny,Neutral Good,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195164-pixie
+5195163,Pixie Wonderbringer,5,Fey,Tiny,Neutral Good,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195163-pixie-wonderbringer
+5195165,Planetar,16,Celestial,Large,Lawful Good,Planar (Upper Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195165-planetar
+5195166,Plesiosaurus,2,Beast,Large,Unaligned,"Arctic, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195166-plesiosaurus
+5195167,Polar Bear,2,Beast,Large,Unaligned,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195167-polar-bear
+5195168,Poltergeist,2,Undead,Small,Chaotic Neutral,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195168-poltergeist
+4775833,Pony,1/8,Beast,Medium,Unaligned,"Grassland, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775833-pony
+5195170,Priest,2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195170-priest
+5195169,Priest Acolyte,1/4,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195169-priest-acolyte
+5195171,Primeval Owlbear,7,Monstrosity,Huge,Unaligned,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195171-primeval-owlbear
+4775834,Pseudodragon,1/4,Dragon,Tiny,Neutral Good,"Coastal, Desert, Forest, Hill, Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775834-pseudodragon
+5195172,Psychic Gray Ooze,1,Ooze,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195172-psychic-gray-ooze
+5195173,Pteranodon,1/4,Beast,Medium,Unaligned,"Coastal, Grassland, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195173-pteranodon
+5195174,Purple Worm,15,Monstrosity,Gargantuan,Unaligned,"Desert, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195174-purple-worm
+5195176,Quaggoth,2,Monstrosity,Medium,Chaotic Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195176-quaggoth
+5195175,Quaggoth Thonot,3,Monstrosity,Medium,Chaotic Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195175-quaggoth-thonot
+4775835,Quasit,1,Fiend,Tiny,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/4775835-quasit
+5195177,Questing Knight,12,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195177-questing-knight
+5195178,Rakshasa,13,Fiend,Medium,Lawful Evil,"Planar (Nine Hells), Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195178-rakshasa
+4775836,Rat,0,Beast,Tiny,Unaligned,"Forest, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775836-rat
+4775837,Raven,0,Beast,Tiny,Unaligned,"Hill, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775837-raven
+5195179,Red Dragon Wyrmling,4,Dragon,Medium,Chaotic Evil,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195179-red-dragon-wyrmling
+5195180,Red Slaad,5,Aberration,Large,Chaotic Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195180-red-slaad
+4775838,Reef Shark,1/2,Beast,Medium,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775838-reef-shark
+5195181,Remorhaz,11,Monstrosity,Huge,Unaligned,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195181-remorhaz
+5195182,Revenant,5,Undead,Medium,Neutral,"Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195182-revenant
+5195183,Rhinoceros,2,Beast,Large,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195183-rhinoceros
+4775839,Riding Horse,1/4,Beast,Large,Unaligned,"Grassland, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775839-riding-horse
+5195184,Roc,11,Monstrosity,Gargantuan,Unaligned,"Arctic, Coastal, Desert, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195184-roc
+5195185,Roper,5,Aberration,Large,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195185-roper
+5195186,Rust Monster,1/2,Monstrosity,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195186-rust-monster
+5195187,Saber-Toothed Tiger,2,Beast,Large,Unaligned,"Arctic, Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195187-saber-toothed-tiger
+5195188,Sahuagin Baron,5,Fiend,Large,Lawful Evil,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195188-sahuagin-baron
+5195189,Sahuagin Priest,2,Fiend,Medium,Lawful Evil,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195189-sahuagin-priest
+5195190,Sahuagin Warrior,1/2,Fiend,Medium,Lawful Evil,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195190-sahuagin-warrior
+5195193,Salamander,5,Elemental,Large,Neutral Evil,"Planar (Elemental Plane of Fire), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195193-salamander
+5195191,Salamander Fire Snake,1,Elemental,Medium,Neutral Evil,"Planar (Elemental Plane of Fire), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195191-salamander-fire-snake
+5195192,Salamander Inferno Master,15,Elemental,Large,Neutral Evil,"Planar (Elemental Plane of Fire), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195192-salamander-inferno-master
+5195195,Satyr,1/2,Fey,Medium,Chaotic Neutral,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195195-satyr
+5195194,Satyr Revelmaster,6,Fey,Medium,Chaotic Neutral,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195194-satyr-revelmaster
+5195196,Scarecrow,1,Construct,Medium,Chaotic Evil,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195196-scarecrow
+4775840,Scorpion,0,Beast,Tiny,Unaligned,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775840-scorpion
+5174957,Scout,1/2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5174957-scout
+5195197,Scout Captain,3,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195197-scout-captain
+5195198,Sea Hag,2,Fey,Medium,Chaotic Evil,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195198-sea-hag
+5195199,Seahorse,0,Beast,Tiny,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195199-seahorse
+5174958,Shadow,1/2,Undead,Medium,Chaotic Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5174958-shadow
+5195200,Shadow Demon,4,Fiend,Medium,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195200-shadow-demon
+5195203,Shambling Mound,5,Plant,Large,Unaligned,"Forest, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195203-shambling-mound
+5195204,Shield Guardian,7,Construct,Large,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195204-shield-guardian
+5195205,Shrieker Fungus,0,Plant,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195205-shrieker-fungus
+5195206,Silver Dragon Wyrmling,2,Dragon,Medium,Lawful Good,"Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195206-silver-dragon-wyrmling
+4775841,Skeleton,1/4,Undead,Medium,Lawful Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775841-skeleton
+4775842,Slaad Tadpole,1/8,Aberration,Tiny,Chaotic Neutral,Planar (Limbo),Monster Manual (2024),https://www.dndbeyond.com/monsters/4775842-slaad-tadpole
+5195207,Smoke Mephit,1/4,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195207-smoke-mephit
+5195208,Solar,21,Celestial,Large,Lawful Good,Planar (Upper Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195208-solar
+5195209,Spectator,3,Aberration,Medium,Lawful Neutral,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195209-spectator
+5195210,Specter,1,Undead,Medium,Chaotic Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195210-specter
+5195211,Sphinx of Lore,11,Celestial,Large,Lawful Neutral,"Desert, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195211-sphinx-of-lore
+5195212,Sphinx of Secrets,8,Celestial,Large,Lawful Neutral,"Desert, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195212-sphinx-of-secrets
+5195213,Sphinx of Valor,17,Celestial,Large,Lawful Neutral,"Desert, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195213-sphinx-of-valor
+4775843,Sphinx of Wonder,1,Celestial,Tiny,Lawful Good,"Desert, Planar (Upper Planes)",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775843-sphinx-of-wonder
+4775844,Spider,0,Beast,Tiny,Unaligned,"Desert, Forest, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775844-spider
+5195214,Spined Devil,2,Fiend,Small,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195214-spined-devil
+5195215,Spirit Naga,8,Fiend,Large,Chaotic Evil,"Planar (Lower Planes), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195215-spirit-naga
+4775845,Sprite,1/4,Fey,Tiny,Neutral Good,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775845-sprite
+5195217,Spy,1,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195217-spy
+5195216,Spy Master,10,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195216-spy-master
+5195218,Steam Mephit,1/4,Elemental,Small,Neutral Evil,Planar (Elemental Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195218-steam-mephit
+5195219,Stirge,1/8,Monstrosity,Tiny,Unaligned,"Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195219-stirge
+5195220,Stone Giant,7,Giant,Huge,Neutral,"Mountain, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195220-stone-giant
+4904850,Stone Golem,10,Construct,Large,Unaligned,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904850-stone-golem
+5195221,Storm Giant,13,Giant,Huge,Chaotic Good,"Coastal, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195221-storm-giant
+4904865,Succubus,4,Fiend,Medium,Neutral Evil,"Planar (Lower Planes), Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4904865-succubus
+5195222,Swarm of Bats,1/4,Beast,Large,Unaligned,"Forest, Mountain, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195222-swarm-of-bats
+5174959,Swarm of Crawling Claws,3,Undead,Medium,Neutral Evil,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5174959-swarm-of-crawling-claws
+5195223,Swarm of Dretches,4,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195223-swarm-of-dretches
+5195224,Swarm of Insects,1/2,Beast,Medium,Unaligned,"Desert, Forest, Grassland, Hill, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195224-swarm-of-insects
+5195225,Swarm of Larvae,1,Fiend,Large,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195225-swarm-of-larvae
+5195226,Swarm of Lemures,3,Fiend,Large,Lawful Evil,Planar (Nine Hells),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195226-swarm-of-lemures
+5195227,Swarm of Piranhas,1,Beast,Medium,Unaligned,Underwater,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195227-swarm-of-piranhas
+5195228,Swarm of Rats,1/4,Beast,Medium,Unaligned,"Forest, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195228-swarm-of-rats
+5195229,Swarm of Ravens,1/4,Beast,Medium,Unaligned,"Hill, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195229-swarm-of-ravens
+5195230,Swarm of Stirges,2,Monstrosity,Medium,Unaligned,"Desert, Forest, Grassland, Hill, Mountain, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195230-swarm-of-stirges
+5195231,Swarm of Venomous Snakes,2,Beast,Medium,Unaligned,"Coastal, Desert, Forest, Grassland, Hill, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195231-swarm-of-venomous-snakes
+5195232,Tarrasque,30,Monstrosity,Gargantuan,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195232-tarrasque
+5195233,Thri-kreen Marauder,1,Monstrosity,Medium,Neutral,"Desert, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195233-thri-kreen-marauder
+5195234,Thri-kreen Psion,8,Monstrosity,Medium,Neutral,"Desert, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195234-thri-kreen-psion
+4775846,Tiger,1,Beast,Large,Unaligned,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775846-tiger
+5195235,Tough,1/2,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195235-tough
+4904883,Tough Boss,4,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/4904883-tough-boss
+5195236,Treant,9,Plant,Huge,Chaotic Good,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195236-treant
+5195237,Tree Blight,7,Plant,Huge,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195237-tree-blight
+5195238,Triceratops,5,Beast,Huge,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195238-triceratops
+5195239,Troglodyte,1/4,Monstrosity,Medium,Chaotic Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195239-troglodyte
+5195241,Troll,5,Giant,Large,Chaotic Evil,"Arctic, Forest, Hill, Mountain, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195241-troll
+5195240,Troll Limb,1/2,Giant,Small,Chaotic Evil,"Arctic, Forest, Hill, Mountain, Swamp, Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195240-troll-limb
+5195242,Twig Blight,1/8,Plant,Small,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195242-twig-blight
+5195243,Tyrannosaurus Rex,8,Beast,Huge,Unaligned,Grassland,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195243-tyrannosaurus-rex
+5195244,Ultroloth,13,Fiend,Medium,Neutral Evil,Planar (Lower Planes),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195244-ultroloth
+5195245,Umber Hulk,5,Monstrosity,Large,Chaotic Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195245-umber-hulk
+5195246,Unicorn,5,Celestial,Large,Lawful Good,"Forest, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195246-unicorn
+5195251,Vampire,13,Undead,Small,Lawful Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195251-vampire
+5195247,Vampire Familiar,3,Humanoid,Small,Neutral Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195247-vampire-familiar
+5195248,Vampire Nightbringer,8,Undead,Small,Neutral Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195248-vampire-nightbringer
+5195249,Vampire Spawn,5,Undead,Small,Neutral Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195249-vampire-spawn
+5195250,Vampire Umbral Lord,15,Undead,Small,Lawful Evil,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195250-vampire-umbral-lord
+4775847,Venomous Snake,1/8,Beast,Tiny,Unaligned,"Coastal, Desert, Forest, Grassland, Hill, Swamp",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775847-venomous-snake
+5195252,Vine Blight,1/2,Plant,Medium,Neutral Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195252-vine-blight
+5195254,Violet Fungus,1/4,Plant,Medium,Unaligned,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195254-violet-fungus
+5195253,Violet Fungus Necrohulk,7,Plant,Large,Neutral Evil,Underdark,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195253-violet-fungus-necrohulk
+5195255,Vrock,6,Fiend,Large,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195255-vrock
+5195256,Vulture,0,Beast,Medium,Unaligned,"Desert, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195256-vulture
+4775848,Warhorse,1/2,Beast,Large,Unaligned,Urban,Monster Manual (2024),https://www.dndbeyond.com/monsters/4775848-warhorse
+5195257,Warhorse Skeleton,1/2,Undead,Large,Lawful Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195257-warhorse-skeleton
+5195258,Warrior Commander,10,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195258-warrior-commander
+5195259,Warrior Infantry,1/8,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195259-warrior-infantry
+5195260,Warrior Veteran,3,Humanoid,Small,Neutral,Any,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195260-warrior-veteran
+5195261,Water Elemental,5,Elemental,Large,Neutral,"Coastal, Planar (Elemental Plane of Water), Swamp, Underwater",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195261-water-elemental
+5195262,Water Weird,3,Elemental,Large,Neutral,"Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195262-water-weird
+4775849,Weasel,0,Beast,Tiny,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775849-weasel
+5195263,Werebear,5,Monstrosity,Small,Neutral Good,"Arctic, Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195263-werebear
+5195264,Wereboar,4,Monstrosity,Small,Neutral Evil,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195264-wereboar
+5195265,Wererat,2,Monstrosity,Small,Lawful Evil,"Forest, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195265-wererat
+5195266,Weretiger,4,Monstrosity,Small,Neutral,"Desert, Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195266-weretiger
+5195267,Werewolf,3,Monstrosity,Small,Chaotic Evil,"Forest, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195267-werewolf
+5195268,White Dragon Wyrmling,2,Dragon,Medium,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195268-white-dragon-wyrmling
+5195269,Wight,3,Undead,Medium,Neutral Evil,"Desert, Planar (Shadowfell), Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195269-wight
+5195270,Will-o'-Wisp,2,Undead,Tiny,Chaotic Evil,"Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195270-will-o-wisp
+5195271,Winged Kobold,1/4,Dragon,Small,Neutral,"Arctic, Coastal, Desert, Forest, Hill, Mountain, Swamp, Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195271-winged-kobold
+5195272,Winter Wolf,3,Monstrosity,Large,Neutral Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195272-winter-wolf
+4775850,Wolf,1/4,Beast,Medium,Unaligned,"Forest, Grassland, Hill",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775850-wolf
+4831031,Worg,1/2,Fey,Large,Neutral Evil,"Forest, Grassland, Hill, Planar (Feywild)",Monster Manual (2024),https://www.dndbeyond.com/monsters/4831031-worg
+5174960,Wraith,5,Undead,Small,Neutral Evil,"Planar (Shadowfell), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5174960-wraith
+5195273,Wyvern,6,Dragon,Large,Unaligned,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195273-wyvern
+5195274,Xorn,5,Elemental,Medium,Neutral,"Planar (Elemental Plane of Earth), Underdark",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195274-xorn
+5195275,Yeti,3,Monstrosity,Large,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195275-yeti
+5195276,Yochlol,10,Fiend,Medium,Chaotic Evil,Planar (Abyss),Monster Manual (2024),https://www.dndbeyond.com/monsters/5195276-yochlol
+5195277,Young Black Dragon,7,Dragon,Large,Chaotic Evil,Swamp,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195277-young-black-dragon
+5195278,Young Blue Dragon,9,Dragon,Large,Lawful Evil,"Coastal, Desert",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195278-young-blue-dragon
+5195279,Young Brass Dragon,6,Dragon,Large,Chaotic Good,Desert,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195279-young-brass-dragon
+5195280,Young Bronze Dragon,8,Dragon,Large,Lawful Good,Coastal,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195280-young-bronze-dragon
+5195281,Young Copper Dragon,7,Dragon,Large,Chaotic Good,Hill,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195281-young-copper-dragon
+5195282,Young Gold Dragon,10,Dragon,Large,Lawful Good,"Forest, Grassland",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195282-young-gold-dragon
+5195283,Young Green Dragon,8,Dragon,Large,Lawful Evil,Forest,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195283-young-green-dragon
+5195284,Young Red Dragon,10,Dragon,Large,Chaotic Evil,"Hill, Mountain",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195284-young-red-dragon
+5195285,Young Remorhaz,5,Monstrosity,Large,Unaligned,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195285-young-remorhaz
+5195286,Young Silver Dragon,9,Dragon,Large,Lawful Good,"Mountain, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195286-young-silver-dragon
+5195287,Young White Dragon,6,Dragon,Large,Chaotic Evil,Arctic,Monster Manual (2024),https://www.dndbeyond.com/monsters/5195287-young-white-dragon
+5195288,Yuan-ti Abomination,7,Monstrosity,Large,Neutral Evil,"Desert, Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195288-yuan-ti-abomination
+5195289,Yuan-ti Infiltrator,1,Monstrosity,Medium,Neutral Evil,"Desert, Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195289-yuan-ti-infiltrator
+5195290,Yuan-ti Malison (Type 1),3,Monstrosity,Medium,Neutral Evil,"Desert, Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195290-yuan-ti-malison-type-1
+5195291,Yuan-ti Malison (Type 2),3,Monstrosity,Medium,Neutral Evil,"Desert, Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195291-yuan-ti-malison-type-2
+5195292,Yuan-ti Malison (Type 3),3,Monstrosity,Medium,Neutral Evil,"Desert, Forest, Swamp, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/5195292-yuan-ti-malison-type-3
+4775851,Zombie,1/4,Undead,Medium,Neutral Evil,"Planar (Shadowfell), Underdark, Urban",Monster Manual (2024),https://www.dndbeyond.com/monsters/4775851-zombie
+27734,Avatar of Death,,Undead,Medium,Neutral Evil,,Dungeon Master's Guide (2024),https://www.dndbeyond.com/monsters/27734-avatar-of-death
+27750,Giant Fly,0,Beast,Large,Unaligned,,Dungeon Master's Guide (2024),https://www.dndbeyond.com/monsters/27750-giant-fly

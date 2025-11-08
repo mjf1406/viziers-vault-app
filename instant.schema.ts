@@ -110,7 +110,9 @@ const _schema = i.schema({
             type: i.string().optional().indexed(), // e.g. "Giant"
             size: i.string().optional().indexed(), // e.g. "Large"
             alignment: i.string().optional().indexed(),
-            habitat: i.string().optional().indexed(),
+            habitat: i.string().optional().indexed(), // D&D habitat (e.g. "Arctic", "Forest")
+            biome: i.json().optional().indexed(), // Array of biome strings
+            travelMedium: i.json().optional().indexed(), // Array of "land", "water", "air"
 
             // Provenance
             source: i.string().optional().indexed(),

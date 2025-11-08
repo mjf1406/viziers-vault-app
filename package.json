@@ -10,7 +10,12 @@
         "pp": "npx instant-cli@latest push perms",
         "pps": "npx instant-cli@latest push schema && npx instant-cli@latest push perms",
         "bs": "npm run build && npm run start",
-        "update:spell-costs": "tsx stuff/scripts/updateSpellComponentCosts.ts"
+        "usc": "tsx stuff/scripts/updateSpellComponentCosts.ts",
+        "im": "tsx stuff/scripts/insertMonsters.ts",
+        "is": "tsx stuff/scripts/insertSpells.ts",
+        "imi": "tsx stuff/scripts/insertMagicItems.ts",
+        "um": "tsx stuff/scripts/updateMonsters.ts",
+        "um:update": "tsx stuff/scripts/updateMonsters.ts update"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.913.0",

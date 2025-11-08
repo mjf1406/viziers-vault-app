@@ -12,7 +12,7 @@ import {
 import { FaDice, FaPersonCane } from "react-icons/fa6";
 import { FaRunning } from "react-icons/fa";
 import { GiTurtle } from "react-icons/gi";
-import { TRAVEL_PACES, type TravelPace } from "@/lib/constants/encounters";
+import { TRAVEL_PACES, type TravelPace } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 const ICONS: Record<TravelPace, React.ReactNode> = {
     slow: <FaPersonCane />,

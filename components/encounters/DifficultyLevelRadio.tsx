@@ -12,6 +12,7 @@ export const DIFFICULTY_LEVELS = [
     "medium",
     "hard",
     "deadly",
+    "absurd",
 ] as const;
 
 export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];
@@ -22,6 +23,7 @@ const LABELS: Record<DifficultyLevel, string> = {
     medium: "Medium",
     hard: "Hard",
     deadly: "Deadly",
+    absurd: "Absurd",
 };
 
 export default function DifficultyLevelRadio({

@@ -71,6 +71,10 @@ s<!-- @format -->
 
 ## Change Log
 
+### 2025/11/08
+
+-   combat encounters can be generated or rolled
+
 ### 2025/11/04
 
 -   UI: added encounter generator UI

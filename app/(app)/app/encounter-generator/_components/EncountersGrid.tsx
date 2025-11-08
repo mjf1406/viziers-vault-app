@@ -22,9 +22,7 @@ import {
 import { toast } from "sonner";
 import { tx } from "@instantdb/react";
 import Link from "next/link";
-import {
-    BIOMES,
-} from "@/lib/constants/encounters";
+import { mapBiomeToHabitat } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 export default function EncountersGrid({
     onEdit,
@@ -55,7 +53,9 @@ export default function EncountersGrid({
             options: e.options ?? {},
             _raw: e,
         }))
-        .sort((a, b) => ((b.createdAt as any) || 0) - ((a.createdAt as any) || 0));
+        .sort(
+            (a, b) => ((b.createdAt as any) || 0) - ((a.createdAt as any) || 0)
+        );
 
     if (isLoading) {
         return <div className="py-12 text-center">Loading encounters…</div>;
@@ -115,12 +115,12 @@ export default function EncountersGrid({
             {encounters.map((e) => {
                 const opts = e?.options ?? {};
                 // Handle both old format (options directly) and new format (options.instances array)
-                const instances = Array.isArray(opts?.instances) ? opts.instances : [opts];
+                const instances = Array.isArray(opts?.instances)
+                    ? opts.instances
+                    : [opts];
                 const firstInstance = instances[0] ?? {};
-                const biome =
-                    (firstInstance?.biome && BIOMES.includes(firstInstance.biome))
-                        ? firstInstance.biome
-                        : null;
+                const biome = firstInstance?.biome ?? null;
+                const habitat = mapBiomeToHabitat(biome);
                 const travelPace = firstInstance?.travelPace ?? null;
                 const road = firstInstance?.road ?? null;
                 const travelMedium = firstInstance?.travelMedium ?? null;
@@ -177,9 +177,7 @@ export default function EncountersGrid({
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() =>
-                                            onEdit(e._raw ?? e)
-                                        }
+                                        onClick={() => onEdit(e._raw ?? e)}
                                         className="w-8 h-8 p-0 hover:bg-gray-100"
                                     >
                                         <Edit className="w-4 h-4" />
@@ -201,9 +199,8 @@ export default function EncountersGrid({
                                                     Delete Encounter
                                                 </AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Are you sure you
-                                                    want to delete "
-                                                    {e.name}"? This
+                                                    Are you sure you want to
+                                                    delete "{e.name}"? This
                                                     cannot be undone.
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
@@ -213,9 +210,7 @@ export default function EncountersGrid({
                                                 </AlertDialogCancel>
                                                 <AlertDialogAction
                                                     onClick={() =>
-                                                        void handleDelete(
-                                                            e.id
-                                                        )
+                                                        void handleDelete(e.id)
                                                     }
                                                     className="bg-red-600 hover:bg-red-700"
                                                 >
@@ -231,12 +226,12 @@ export default function EncountersGrid({
                         <CardContent>
                             <div className="space-y-2">
                                 <div className="flex flex-wrap gap-1">
-                                    {biome && (
+                                    {habitat && (
                                         <Badge
                                             variant="secondary"
                                             className="text-xs"
                                         >
-                                            Biome: {biome}
+                                            Biome: {habitat}
                                         </Badge>
                                     )}
                                     {travelPace && travelPace !== "random" && (
@@ -303,4 +298,3 @@ export default function EncountersGrid({
         </div>
     );
 }
-

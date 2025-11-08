@@ -17,7 +17,7 @@ import {
     FaHorse,
     FaBan,
 } from "react-icons/fa";
-import { ROADS, type Road } from "@/lib/constants/encounters";
+import { ROADS, type Road } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 const ICONS: Record<Road, React.ReactNode> = {
     "no road": <FaBan />,

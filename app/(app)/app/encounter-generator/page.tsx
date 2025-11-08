@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Swords, Dices, Sigma } from "lucide-react";
+import { Swords, Dices, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { parseAsBoolean, useQueryState } from "nuqs";
@@ -94,7 +94,7 @@ export default function EncounterGeneratorPage() {
                         className="hidden sm:inline-flex"
                         onClick={() => handleGenerateOpenChange(true)}
                     >
-                        <Sigma className="w-4 h-4" />
+                        <Plus className="w-4 h-4" />
                         Generate Encounter(s)
                     </Button>
                     <Button
@@ -112,7 +112,7 @@ export default function EncounterGeneratorPage() {
                         variant="default"
                         className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
                     >
-                        <Sigma
+                        <Plus
                             className="!w-7 !h-7"
                             size={36}
                         />

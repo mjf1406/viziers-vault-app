@@ -22,9 +22,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Sigma } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser } from "@/hooks/useUser";
+import db from "@/lib/db";
 import EncounterNameField from "./EncounterNameField";
 import EncounterTypeRadio from "@/components/encounters/EncounterTypeRadio";
 import DifficultyLevelRadio, {
@@ -33,14 +34,157 @@ import DifficultyLevelRadio, {
 import TravelMediumRadio from "@/components/encounters/TravelMediumRadio";
 import SeasonRadio from "@/components/encounters/SeasonRadio";
 import {
-    BIOMES,
+    DND_HABITATS,
+    TRAVEL_MEDIUMS,
+    SEASONS,
+    ENCOUNTER_TYPES,
+    mapHabitatToBiome,
     type Biome,
     type TravelMedium,
     type Season,
     type EncounterType,
-} from "@/lib/constants/encounters";
+    type DndHabitat,
+} from "@/app/(app)/app/encounter-generator/_constants/encounters";
 import generateEncounter from "../_actions/generateEncounter";
 import type { GenerateEncounterOpts } from "./RollEncounterDialog";
+import PartySelector, { type PartyData } from "./PartySelector";
+import { z } from "zod";
+
+// Zod schema for validation - takes habitat as a parameter
+const createGenerateEncounterFormSchema = (habitat: DndHabitat | null) =>
+    z
+        .object({
+            name: z.string().optional(),
+            encounterType: z
+                .enum([...ENCOUNTER_TYPES] as [EncounterType, ...EncounterType[]])
+                .nullable()
+                .optional(),
+            quantity: z.number().int().min(1, "Quantity must be at least 1"),
+            difficultyLevel: z
+                .enum(["trivial", "easy", "medium", "hard", "deadly", "absurd"])
+                .nullable()
+                .optional(),
+            habitat: z
+                .enum([...DND_HABITATS] as [DndHabitat, ...DndHabitat[]])
+                .nullable()
+                .optional(),
+            travelMedium: z
+                .enum([...TRAVEL_MEDIUMS] as [TravelMedium, ...TravelMedium[]])
+                .nullable()
+                .optional(),
+            season: z
+                .enum([...SEASONS] as [Season, ...Season[]])
+                .nullable()
+                .optional(),
+            party: z
+                .object({
+                    pcs: z.array(
+                        z.object({
+                            level: z.number().int().min(1).max(20),
+                            quantity: z.number().int().min(1),
+                        })
+                    ),
+                })
+                .nullable()
+                .optional(),
+            partyTab: z.enum(["select", "manual"]).optional(), // Track which tab is active
+        })
+        .refine(
+            (data) => {
+                // Encounter type is required
+                if (!data.encounterType) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please select an encounter type",
+                path: ["encounterType"],
+            }
+        )
+        .refine(
+            (data) => {
+                // If encounterType is combat, difficultyLevel should be required
+                if (data.encounterType === "combat" && !data.difficultyLevel) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Difficulty level is required for combat encounters",
+                path: ["difficultyLevel"],
+            }
+        )
+        .refine(
+            (data) => {
+                // If on select party tab, party must be selected
+                if (data.partyTab === "select" && !data.party) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please select a party",
+                path: ["party"],
+            }
+        )
+        .refine(
+            (data) => {
+                // If on manual tab, party data must be provided
+                if (
+                    data.partyTab === "manual" &&
+                    (!data.party ||
+                        !data.party.pcs ||
+                        data.party.pcs.length === 0)
+                ) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please enter party data",
+                path: ["party"],
+            }
+        )
+        .refine(
+            (data) => {
+                // Habitat is required
+                if (!data.habitat) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please select a biome",
+                path: ["habitat"],
+            }
+        )
+        .refine(
+            (data) => {
+                // Travel medium is required
+                if (!data.travelMedium) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please select a travel medium",
+                path: ["travelMedium"],
+            }
+        )
+        .refine(
+            (data) => {
+                // Season is required
+                if (!data.season) {
+                    return false;
+                }
+                return true;
+            },
+            {
+                message: "Please select a season",
+                path: ["season"],
+            }
+        );
 
 type GenerateEncounterDialogProps = {
     open?: boolean;
@@ -60,6 +204,11 @@ export default function GenerateEncounterDialog({
     onGenerate,
 }: GenerateEncounterDialogProps) {
     const { user } = useUser();
+    // Fetch settings and monsters data
+    const { data: settingsData } = db.useQuery({ settings: {} });
+    const { data: monstersData } = db.useQuery({ dnd5e_bestiary: {} });
+    const settings = (settingsData as any)?.settings?.[0];
+    const allMonsters = ((monstersData as any)?.dnd5e_bestiary ?? []) as any[];
     const [openLocal, setOpenLocal] = useState<boolean>(!!defaultOpen);
     const isControlled = typeof open !== "undefined";
     const dialogOpen = isControlled ? open : openLocal;
@@ -82,18 +231,66 @@ export default function GenerateEncounterDialog({
     const [quantity, setQuantity] = useState<number>(1);
     const [difficultyLevel, setDifficultyLevel] =
         useState<DifficultyLevel | null>(null);
-    const [biome, setBiome] = useState<Biome | null>(null);
+    const [habitat, setHabitat] = useState<DndHabitat | null>(null);
     const [travelMedium, setTravelMedium] = useState<TravelMedium | null>(null);
-    const [season, setSeason] = useState<Season | null>(null);
+    const [season, setSeason] = useState<Season | null>("summer");
+    const [party, setParty] = useState<PartyData>(null);
+    const [partyTab, setPartyTab] = useState<"select" | "manual">("select");
 
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Validate form with Zod
+        const formData = {
+            name: name.trim() || undefined,
+            encounterType: encounterType,
+            quantity: quantity,
+            difficultyLevel: difficultyLevel,
+            habitat: habitat,
+            travelMedium: travelMedium,
+            season: season,
+            party: party,
+            partyTab: partyTab,
+        };
+
+        const validationResult =
+            createGenerateEncounterFormSchema(habitat).safeParse(formData);
+
+        if (!validationResult.success) {
+            const fieldErrors: Record<string, string> = {};
+            // Zod uses 'issues' not 'errors'
+            validationResult.error.issues.forEach((err) => {
+                const path = err.path.join(".");
+                // If there's already an error for this path, append it
+                if (fieldErrors[path]) {
+                    fieldErrors[path] += `; ${err.message}`;
+                } else {
+                    fieldErrors[path] = err.message;
+                }
+            });
+            setErrors(fieldErrors);
+            // Scroll to first error
+            setTimeout(() => {
+                const firstErrorField =
+                    document.querySelector("[data-error-field]");
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }
+            }, 100);
+            return;
+        }
+
+        // Clear errors on successful validation
+        setErrors({});
         setIsGenerating(true);
 
         try {
+            const biome = mapHabitatToBiome(habitat);
             const opts: GenerateEncounterOpts = {
                 name: name.trim() || undefined,
                 biome: biome,
@@ -102,6 +299,7 @@ export default function GenerateEncounterDialog({
                 quantity: quantity,
                 encounterType: encounterType ?? undefined,
                 difficultyLevel: difficultyLevel ?? undefined,
+                party: party,
             };
 
             if (onGenerate) {
@@ -112,7 +310,9 @@ export default function GenerateEncounterDialog({
                         name: name.trim() || undefined,
                         options: opts,
                     },
-                    user?.id ?? null
+                    user?.id ?? null,
+                    settings,
+                    allMonsters
                 );
 
                 if (Array.isArray(result) && result.length > 0) {
@@ -126,9 +326,11 @@ export default function GenerateEncounterDialog({
             setEncounterType(null);
             setQuantity(1);
             setDifficultyLevel(null);
-            setBiome(null);
+            setHabitat(null);
             setTravelMedium(null);
-            setSeason(null);
+            setSeason("summer");
+            setParty(null);
+            setPartyTab("select");
         } catch (err: any) {
             console.error("Encounter generation failed", err);
             setErrors({ form: String(err?.message || "Generation failed") });
@@ -155,8 +357,41 @@ export default function GenerateEncounterDialog({
                         </DialogDescription>
                     </DialogHeader>
 
+                    {/* Display form-level errors prominently */}
+                    {errors.form && (
+                        <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                            <p className="text-sm font-medium text-red-800">
+                                {errors.form}
+                            </p>
+                        </div>
+                    )}
+
                     <ScrollArea className="max-h-[60vh] pr-4">
                         <div className="space-y-6 py-4">
+                            {/* Party Selector */}
+                            <div
+                                className="space-y-2"
+                                data-error-field={
+                                    errors.party ? "true" : undefined
+                                }
+                            >
+                                <PartySelector
+                                    value={party}
+                                    onChange={(p) => {
+                                        setParty(p);
+                                        clearFieldError("party");
+                                    }}
+                                    onTabChange={(tab) => {
+                                        setPartyTab(tab);
+                                        clearFieldError("party");
+                                    }}
+                                />
+                                {errors.party ? (
+                                    <p className="text-sm text-red-600 font-medium">
+                                        {errors.party}
+                                    </p>
+                                ) : null}
+                            </div>
                             {/* Name Field */}
                             <div className="space-y-2">
                                 <EncounterNameField
@@ -168,7 +403,7 @@ export default function GenerateEncounterDialog({
                                     id="name"
                                     nameAttr="name"
                                     placeholder="e.g., Perilous Encounter"
-                                    biome={biome}
+                                    biome={mapHabitatToBiome(habitat)}
                                     travelMedium={travelMedium}
                                     season={season}
                                     hideAutoUpdate={true}
@@ -203,8 +438,16 @@ export default function GenerateEncounterDialog({
                             </div>
 
                             {/* Encounter Type */}
-                            <div className="space-y-2">
-                                <Label>Encounter Type</Label>
+                            <div
+                                className="space-y-2"
+                                data-error-field={
+                                    errors.encounterType ? "true" : undefined
+                                }
+                            >
+                                <Label>
+                                    Encounter Type{" "}
+                                    <span className="text-red-600">*</span>
+                                </Label>
                                 <EncounterTypeRadio
                                     value={encounterType ?? undefined}
                                     onChange={(v) => {
@@ -213,7 +456,7 @@ export default function GenerateEncounterDialog({
                                     }}
                                 />
                                 {errors.encounterType ? (
-                                    <p className="text-sm text-red-600">
+                                    <p className="text-sm text-red-600 font-medium">
                                         {errors.encounterType}
                                     </p>
                                 ) : null}
@@ -221,8 +464,18 @@ export default function GenerateEncounterDialog({
 
                             {/* Difficulty Level */}
                             {encounterType === "combat" && (
-                                <div className="space-y-2">
-                                    <Label>Difficulty Level</Label>
+                                <div
+                                    className="space-y-2"
+                                    data-error-field={
+                                        errors.difficultyLevel
+                                            ? "true"
+                                            : undefined
+                                    }
+                                >
+                                    <Label>
+                                        Difficulty Level{" "}
+                                        <span className="text-red-600">*</span>
+                                    </Label>
                                     <DifficultyLevelRadio
                                         value={difficultyLevel ?? undefined}
                                         onChange={(v) => {
@@ -231,21 +484,38 @@ export default function GenerateEncounterDialog({
                                         }}
                                     />
                                     {errors.difficultyLevel ? (
-                                        <p className="text-sm text-red-600">
+                                        <p className="text-sm text-red-600 font-medium">
                                             {errors.difficultyLevel}
                                         </p>
                                     ) : null}
                                 </div>
                             )}
+                            {/* Show difficulty level error even when field is hidden */}
+                            {errors.difficultyLevel &&
+                                encounterType !== "combat" && (
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-red-600 font-medium">
+                                            {errors.difficultyLevel}
+                                        </p>
+                                    </div>
+                                )}
 
                             {/* Biome */}
-                            <div className="space-y-2">
-                                <Label htmlFor="biome">Biome</Label>
+                            <div
+                                className="space-y-2"
+                                data-error-field={
+                                    errors.habitat ? "true" : undefined
+                                }
+                            >
+                                <Label htmlFor="biome">
+                                    Biome{" "}
+                                    <span className="text-red-600">*</span>
+                                </Label>
                                 <Select
-                                    value={biome ?? undefined}
+                                    value={habitat ?? undefined}
                                     onValueChange={(v) => {
-                                        setBiome(v as Biome);
-                                        clearFieldError("biome");
+                                        setHabitat(v as DndHabitat);
+                                        clearFieldError("habitat");
                                     }}
                                 >
                                     <SelectTrigger
@@ -255,26 +525,34 @@ export default function GenerateEncounterDialog({
                                         <SelectValue placeholder="Select a biome" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {BIOMES.map((b) => (
+                                        {DND_HABITATS.map((h) => (
                                             <SelectItem
-                                                key={b}
-                                                value={b}
+                                                key={h}
+                                                value={h}
                                             >
-                                                {b}
+                                                {h}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                {errors.biome ? (
-                                    <p className="text-sm text-red-600">
-                                        {errors.biome}
+                                {errors.habitat ? (
+                                    <p className="text-sm text-red-600 font-medium">
+                                        {errors.habitat}
                                     </p>
                                 ) : null}
                             </div>
 
                             {/* Travel Medium */}
-                            <div className="space-y-2">
-                                <Label>Travel Medium</Label>
+                            <div
+                                className="space-y-2"
+                                data-error-field={
+                                    errors.travelMedium ? "true" : undefined
+                                }
+                            >
+                                <Label>
+                                    Travel Medium{" "}
+                                    <span className="text-red-600">*</span>
+                                </Label>
                                 <TravelMediumRadio
                                     value={travelMedium ?? undefined}
                                     onChange={(v) => {
@@ -286,15 +564,23 @@ export default function GenerateEncounterDialog({
                                     includeRandom={false}
                                 />
                                 {errors.travelMedium ? (
-                                    <p className="text-sm text-red-600">
+                                    <p className="text-sm text-red-600 font-medium">
                                         {errors.travelMedium}
                                     </p>
                                 ) : null}
                             </div>
 
                             {/* Season */}
-                            <div className="space-y-2">
-                                <Label>Season</Label>
+                            <div
+                                className="space-y-2"
+                                data-error-field={
+                                    errors.season ? "true" : undefined
+                                }
+                            >
+                                <Label>
+                                    Season{" "}
+                                    <span className="text-red-600">*</span>
+                                </Label>
                                 <SeasonRadio
                                     value={season ?? undefined}
                                     onChange={(v) => {
@@ -306,17 +592,11 @@ export default function GenerateEncounterDialog({
                                     includeRandom={false}
                                 />
                                 {errors.season ? (
-                                    <p className="text-sm text-red-600">
+                                    <p className="text-sm text-red-600 font-medium">
                                         {errors.season}
                                     </p>
                                 ) : null}
                             </div>
-
-                            {errors.form ? (
-                                <div className="text-sm text-red-600">
-                                    {errors.form}
-                                </div>
-                            ) : null}
                         </div>
                     </ScrollArea>
 
@@ -340,7 +620,7 @@ export default function GenerateEncounterDialog({
                                 </>
                             ) : (
                                 <>
-                                    <Sigma className="h-4 w-4" />
+                                    <Plus className="h-4 w-4" />
                                     Generate Encounter
                                 </>
                             )}

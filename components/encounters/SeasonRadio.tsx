@@ -13,7 +13,10 @@ import { FaDice } from "react-icons/fa6";
 import { FaSun as FaSunIcon, FaSnowflake } from "react-icons/fa";
 import { LuFlower2 } from "react-icons/lu";
 import { GiPumpkin } from "react-icons/gi";
-import { SEASONS, type Season } from "@/lib/constants/encounters";
+import {
+    SEASONS,
+    type Season,
+} from "@/app/(app)/app/encounter-generator/_constants/encounters";
 import { Leaf } from "lucide-react";
 
 const ICONS: Record<Season, React.ReactNode> = {

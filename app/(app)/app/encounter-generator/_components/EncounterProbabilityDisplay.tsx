@@ -5,7 +5,7 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { EncounterType } from "@/lib/constants/encounters";
+import type { EncounterType } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 type ProbabilityData = {
     cumulative: Array<{ count: number; probability: number }>;
@@ -109,7 +109,7 @@ export default function EncounterProbabilityDisplay({
                                                     />
                                                 </div>
                                                 <div className="w-16 text-sm text-muted-foreground text-right">
-                                                    {(item.probability * 100).toFixed(1)}%
+                                                    {(item.probability * 100).toFixed(2)}%
                                                 </div>
                                             </div>
                                         </div>

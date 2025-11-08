@@ -10,7 +10,10 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Swords, Handshake, OctagonAlert } from "lucide-react";
-import { ENCOUNTER_TYPES, type EncounterType } from "@/lib/constants/encounters";
+import {
+    ENCOUNTER_TYPES,
+    type EncounterType,
+} from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 const ICONS: Record<EncounterType, React.ReactNode> = {
     combat: <Swords className="size-4" />,
@@ -66,4 +69,3 @@ export default function EncounterTypeRadio({
         </RadioGroup>
     );
 }
-

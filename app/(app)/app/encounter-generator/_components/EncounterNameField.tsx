@@ -14,7 +14,7 @@ import type {
     TravelPace,
     Road,
     TravelMedium,
-} from "@/lib/constants/encounters";
+} from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 export type EncounterNameFieldProps = {
     value: string;
@@ -304,7 +304,9 @@ export default function EncounterNameField({
                                     id="appendDateTime"
                                     checked={appendDateTime}
                                     onChange={(e) =>
-                                        onAppendDateTimeChange?.(e.target.checked)
+                                        onAppendDateTimeChange?.(
+                                            e.target.checked
+                                        )
                                     }
                                     className="w-3 h-3"
                                 />

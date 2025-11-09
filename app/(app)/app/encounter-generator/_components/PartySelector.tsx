@@ -19,6 +19,8 @@ import db from "@/lib/db";
 
 export type PartyData = {
     pcs: Array<{ level: number; quantity: number }>;
+    name?: string | null;
+    id?: string | null;
 } | null;
 
 type PartySelectorProps = {
@@ -53,7 +55,11 @@ export default function PartySelector({
                           quantity: pc.quantity ?? pc.q ?? 1,
                       }))
                     : [];
-                onChange({ pcs });
+                onChange({ 
+                    pcs,
+                    name: party.name ?? null,
+                    id: partyId,
+                });
             } else {
                 onChange(null);
             }
@@ -71,7 +77,11 @@ export default function PartySelector({
         if (manualLevels.length > 1) {
             const updated = manualLevels.filter((_, i) => i !== index);
             setManualLevels(updated);
-            onChange({ pcs: updated });
+            onChange({ 
+                pcs: updated,
+                name: null,
+                id: null,
+            });
         }
     };
 
@@ -83,7 +93,11 @@ export default function PartySelector({
         const updated = [...manualLevels];
         updated[index] = { ...updated[index], [field]: val };
         setManualLevels(updated);
-        onChange({ pcs: updated });
+        onChange({ 
+            pcs: updated,
+            name: null,
+            id: null,
+        });
     };
 
     // Notify parent of initial tab state

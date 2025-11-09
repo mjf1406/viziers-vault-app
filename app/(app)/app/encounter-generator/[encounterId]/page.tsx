@@ -16,8 +16,9 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { Swords, ExternalLink } from "lucide-react";
+import { Swords, ExternalLink, Users } from "lucide-react";
 import { mapBiomeToHabitat } from "@/app/(app)/app/encounter-generator/_constants/encounters";
+import { calculatePartyStats } from "@/app/(app)/app/encounter-generator/_utils/combat-encounter-generation";
 
 export default function EncounterDetailPage() {
     const params = useParams();
@@ -52,6 +53,8 @@ export default function EncounterDetailPage() {
     const instances = Array.isArray(options?.instances)
         ? options.instances
         : [options];
+    const party = options?.party ?? null;
+    const partyStats = calculatePartyStats(party);
 
     const renderCombatEncounter = (enc: any, index: number) => {
         const monsters = Array.isArray(enc?.monsters) ? enc.monsters : [];
@@ -247,6 +250,48 @@ export default function EncounterDetailPage() {
                     />
                 </div>
             </div>
+
+            {/* Party Info */}
+            {party && party.pcs && party.pcs.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Users className="w-5 h-5" />
+                            {party.name ? party.name : "Party Information"}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3">
+                            <div className="flex flex-wrap gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                    Party Size: {partyStats.partySize}
+                                </Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                    Average Level: {partyStats.averageLevel.toFixed(1)}
+                                </Badge>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="font-medium text-sm">Party Composition:</h4>
+                                <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                                    {party.pcs.map((pc: any, idx: number) => (
+                                        <div
+                                            key={idx}
+                                            className="border rounded p-2 text-sm"
+                                        >
+                                            <div className="font-medium">
+                                                Level {pc.level}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {pc.quantity} {pc.quantity === 1 ? "PC" : "PCs"}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Options/Instances Info */}
             {instances.length > 0 && (

@@ -582,6 +582,7 @@ export default async function generateEncounter(
                     travelMedium: options.travelMedium ?? null,
                     time: options.time ?? null,
                     season: options.season ?? null,
+                    party: options.party ?? null,
                 });
                 continue;
             }
@@ -767,8 +768,12 @@ export default async function generateEncounter(
             travelMedium: options.travelMedium ?? null,
             time: options.time ?? null,
             season: options.season ?? null,
+            party: options.party ?? null,
         });
     }
+
+    // Get party info from first instance (assuming all instances use same party)
+    const party = optionsArray[0]?.party ?? null;
 
     // Create a single record with all encounters combined
     const encounterId = id();
@@ -779,6 +784,7 @@ export default async function generateEncounter(
         options: {
             instances: allOptions,
             quantity: optionsArray.length,
+            party: party,
         },
     };
 

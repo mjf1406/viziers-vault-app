@@ -156,7 +156,11 @@ export type GenerateEncounterOpts = {
         | "deadly"
         | "absurd"
         | null;
-    party?: { pcs: Array<{ level: number; quantity: number }> } | null;
+    party?: { 
+        pcs: Array<{ level: number; quantity: number }>;
+        name?: string | null;
+        id?: string | null;
+    } | null;
 };
 
 type EncounterInitial = {

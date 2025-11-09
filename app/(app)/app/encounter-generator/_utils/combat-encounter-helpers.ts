@@ -6,6 +6,7 @@ import {
     MONSTER_STATS,
 } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 import type { Biome } from "@/app/(app)/app/encounter-generator/_constants/encounters";
+import { oaEncounterDistance } from "@/app/(app)/app/encounter-generator/_constants/combatEncounters";
 
 // Map biome directly to D&D habitat string for monster filtering
 export function mapBiomeToHabitat(biome: Biome | null): string | null {
@@ -310,4 +311,52 @@ export function mapBiomeToNonCombatTable(
 
     // Default fallback to forest
     return "forest_nc";
+}
+
+// Roll encounter distance based on biome
+export function rollEncounterDistance(biome: Biome | null, travelMedium: string | null): number {
+    if (!biome) {
+        // Default fallback: 2d6 × 10 feet
+        return (Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1) * 10;
+    }
+
+    // Map biome to habitat for distance lookup
+    const habitat = mapBiomeToHabitat(biome);
+    
+    // For sea travel, use Waterborne or Open Water
+    let lookupBiome = habitat;
+    if (travelMedium === "sea") {
+        // Try Waterborne first, then Open Water
+        const waterborneEntry = oaEncounterDistance.find(
+            (entry) => entry.biome === "Waterborne"
+        );
+        if (waterborneEntry) {
+            lookupBiome = "Waterborne";
+        } else {
+            const openWaterEntry = oaEncounterDistance.find(
+                (entry) => entry.biome === "Open Water"
+            );
+            if (openWaterEntry) {
+                lookupBiome = "Open Water";
+            }
+        }
+    }
+
+    // Find the distance entry for this biome/habitat
+    const distanceEntry = oaEncounterDistance.find(
+        (entry) => entry.biome === lookupBiome
+    );
+
+    if (!distanceEntry) {
+        // Default fallback: 2d6 × 10 feet
+        return (Math.floor(Math.random() * 6) + 1 + Math.floor(Math.random() * 6) + 1) * 10;
+    }
+
+    // Roll the dice
+    let total = 0;
+    for (let i = 0; i < distanceEntry.number_of_dice; i++) {
+        total += Math.floor(Math.random() * distanceEntry.number_of_sides) + 1;
+    }
+
+    return total * distanceEntry.multiplier;
 }

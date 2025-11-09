@@ -70,6 +70,11 @@ export default function EncounterDetailPage() {
                                 Difficulty: {String(enc.difficulty).charAt(0).toUpperCase() + String(enc.difficulty).slice(1)}
                             </Badge>
                         )}
+                        {typeof enc.distance === "number" && (
+                            <Badge variant="secondary" className="text-xs">
+                                Distance: {enc.distance.toLocaleString()} ft
+                            </Badge>
+                        )}
                         {typeof enc.numberOfCreatures === "number" && (
                             <Badge variant="secondary" className="text-xs">
                                 Creatures: {enc.numberOfCreatures}
@@ -157,7 +162,12 @@ export default function EncounterDetailPage() {
                 <CardHeader>
                     <CardTitle>Non-Combat Encounter {index + 1}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-2">
+                    {typeof enc.distance === "number" && (
+                        <Badge variant="secondary" className="text-xs">
+                            Distance: {enc.distance.toLocaleString()} ft
+                        </Badge>
+                    )}
                     <div className="text-sm whitespace-pre-wrap">
                         {enc.description || "No description available"}
                     </div>
@@ -173,11 +183,18 @@ export default function EncounterDetailPage() {
                     <CardTitle>Hazard Encounter {index + 1}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                    {enc.difficulty && (
-                        <Badge variant="secondary" className="text-xs">
-                            Difficulty: {String(enc.difficulty).charAt(0).toUpperCase() + String(enc.difficulty).slice(1)}
-                        </Badge>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                        {enc.difficulty && (
+                            <Badge variant="secondary" className="text-xs">
+                                Difficulty: {String(enc.difficulty).charAt(0).toUpperCase() + String(enc.difficulty).slice(1)}
+                            </Badge>
+                        )}
+                        {typeof enc.distance === "number" && (
+                            <Badge variant="secondary" className="text-xs">
+                                Distance: {enc.distance.toLocaleString()} ft
+                            </Badge>
+                        )}
+                    </div>
                     <div className="text-sm whitespace-pre-wrap">
                         {enc.description || "No description available"}
                     </div>

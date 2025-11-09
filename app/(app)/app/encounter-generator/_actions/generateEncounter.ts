@@ -18,6 +18,7 @@ import {
     filterMonsters,
     getXpFromCr,
     mapBiomeToNonCombatTable,
+    rollEncounterDistance,
 } from "@/app/(app)/app/encounter-generator/_utils/combat-encounter-helpers";
 import {
     arctic_nc,
@@ -159,11 +160,13 @@ function generateHazard(
     biome: Biome | null,
     options: GenerateEncounterOpts
 ): any {
+    const distance = rollEncounterDistance(biome, options.travelMedium ?? null);
     // TODO: Implement hazard generation
     return {
         type: "hazard",
         difficulty,
         description: "Hazard encounter (not yet implemented)",
+        distance,
     };
 }
 
@@ -342,11 +345,13 @@ function generateNonCombat(
         description = generateShipwreck();
     }
 
+    const distance = rollEncounterDistance(biome, travelMedium);
     return {
         type: "non-combat",
         description,
         biome: biome ?? null,
         road: isRoadEncounter ? road : null,
+        distance,
     };
 }
 
@@ -361,12 +366,15 @@ async function generateCombatEncounter(
 ): Promise<any> {
     const { averageLevel, partySize } = calculatePartyStats(party);
 
+    const distance = rollEncounterDistance(biome, travelMedium);
+    
     if (partySize === 1 && averageLevel === 1) {
         return {
             type: "combat",
             difficulty,
             description: "Combat encounter (no party specified)",
             monsters: [],
+            distance,
         };
     }
 
@@ -397,6 +405,7 @@ async function generateCombatEncounter(
                 difficulty,
                 description: "Combat encounter (no suitable monsters found)",
                 monsters: [],
+                distance,
             };
         }
 
@@ -443,6 +452,7 @@ async function generateCombatEncounter(
                     totalXP: getXpFromCr(selectedMonster.cr),
                     xpPerPC: getXpFromCr(selectedMonster.cr) / partySize,
                     numberOfCreatures: 1,
+                    distance,
                 };
             }
 
@@ -458,6 +468,7 @@ async function generateCombatEncounter(
                 type: "combat",
                 difficulty,
                 ...result,
+                distance,
             };
         } else {
             console.warn(
@@ -475,6 +486,7 @@ async function generateCombatEncounter(
                 type: "combat",
                 difficulty,
                 ...result,
+                distance,
             };
         }
     } catch (error) {
@@ -484,6 +496,7 @@ async function generateCombatEncounter(
             difficulty,
             description: "Combat encounter (generation failed)",
             monsters: [],
+            distance,
         };
     }
 }

@@ -3,7 +3,12 @@
 // Define the Encounter Distance Dictionary
 let oaEncounterDistance = [
     { biome: "Arctic", number_of_dice: 6, number_of_sides: 6, multiplier: 10 },
-    { biome: "Coastal", number_of_dice: 6, number_of_sides: 6, multiplier: 10 },
+    {
+        biome: "Coastal",
+        number_of_dice: 2,
+        number_of_sides: 10,
+        multiplier: 10,
+    },
     { biome: "Desert", number_of_dice: 6, number_of_sides: 6, multiplier: 10 },
     { biome: "Dungeon", number_of_dice: 2, number_of_sides: 6, multiplier: 10 },
     {
@@ -29,8 +34,14 @@ let oaEncounterDistance = [
     },
     {
         biome: "Open Water",
-        number_of_dice: 5,
-        number_of_sides: 10,
+        number_of_dice: 6,
+        number_of_sides: 6,
+        multiplier: 10,
+    },
+    {
+        biome: "Waterborne",
+        number_of_dice: 6,
+        number_of_sides: 6,
         multiplier: 10,
     },
     { biome: "Swamp", number_of_dice: 2, number_of_sides: 8, multiplier: 10 },
@@ -13675,3 +13686,5 @@ let dungeon = [
     { Encounter: "1 dao or 1 stone giant", d100: 99, Level: "5-10" },
     { Encounter: "1 beholder", d100: 100, Level: "5-10" },
 ];
+
+export { oaEncounterDistance };

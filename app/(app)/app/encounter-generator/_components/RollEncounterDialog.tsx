@@ -37,7 +37,7 @@ import {
     type Season,
 } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 import generateEncounter from "../_actions/generateEncounter";
-import { id } from "@instantdb/react";
+import { id, tx } from "@instantdb/react";
 import PartySelector, { type PartyData } from "./PartySelector";
 import { z } from "zod";
 import { calculateEncounterProbabilityDistribution } from "@/app/(app)/app/encounter-generator/_utils/encounter-probabilities";
@@ -305,9 +305,27 @@ export default function RollEncounterDialog({
         e.preventDefault();
 
         if (mode === "edit") {
-            // Edit mode: only update the name and exit early
-            // TODO: Implement edit functionality
-            setDialogOpen(false);
+            // Edit mode: only update the name
+            if (!initial?.id) {
+                setErrors({ form: "Encounter ID is required" });
+                return;
+            }
+
+            setIsGenerating(true);
+            try {
+                await db.transact(
+                    tx.encounters[initial.id].update({
+                        name: name.trim() || undefined,
+                        updatedAt: new Date(),
+                    })
+                );
+                setDialogOpen(false);
+            } catch (err: any) {
+                console.error("Update encounter failed:", err);
+                setErrors({ form: String(err?.message || "Update failed") });
+            } finally {
+                setIsGenerating(false);
+            }
             return;
         }
 
@@ -435,7 +453,11 @@ export default function RollEncounterDialog({
                                 ? "Edit Encounter"
                                 : "Roll for Encounters"}
                         </DialogTitle>
-                        {mode !== "edit" && (
+                        {mode === "edit" ? (
+                            <DialogDescription>
+                                Edit the encounter name. Other properties cannot be modified.
+                            </DialogDescription>
+                        ) : (
                             <DialogDescription>
                                 Roll for random encounters based on travel
                                 conditions. Configure multiple instances with
@@ -455,35 +477,21 @@ export default function RollEncounterDialog({
                         </div>
                     )}
 
-                    <div className="flex-1 flex overflow-hidden">
-                        {/* Left side: Instances (70%) */}
-                        <div className="w-[70%] border-r flex flex-col overflow-hidden">
-                            <div className="p-4 border-b shrink-0">
-                                {mode === "edit" || (isPaid && user?.id) ? (
-                                    <EncounterNameField
-                                        value={name}
-                                        onChange={(v) => {
-                                            setName(v);
-                                            clearFieldError("form");
-                                            clearFieldError("name");
-                                        }}
-                                        id="name"
-                                        nameAttr="name"
-                                        placeholder="e.g., Perilous Encounter"
-                                        biome={instances[0]?.biome ?? null}
-                                        time={instances[0]?.time ?? null}
-                                        season={instances[0]?.season ?? null}
-                                        travelPace={instances[0]?.travelPace ?? null}
-                                        road={instances[0]?.road ?? null}
-                                        travelMedium={instances[0]?.travelMedium ?? null}
-                                        autoUpdate={autoUpdateName}
-                                        onAutoUpdateChange={setAutoUpdateName}
-                                        appendDateTime={appendDateTime}
-                                        onAppendDateTimeChange={
-                                            setAppendDateTime
-                                        }
-                                    />
-                                ) : null}
+                    {mode === "edit" ? (
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            <div className="p-6 flex-1 overflow-y-auto">
+                                <EncounterNameField
+                                    value={name}
+                                    onChange={(v) => {
+                                        setName(v);
+                                        clearFieldError("form");
+                                        clearFieldError("name");
+                                    }}
+                                    id="name"
+                                    nameAttr="name"
+                                    placeholder="e.g., Perilous Encounter"
+                                    hideAutoUpdate={true}
+                                />
                                 {errors.name ? (
                                     <p className="text-sm text-red-600 mt-1">
                                         {errors.name}
@@ -494,142 +502,185 @@ export default function RollEncounterDialog({
                                         {errors.form}
                                     </div>
                                 ) : null}
-
-                                {/* Party Selector */}
-                                <div
-                                    className="mt-4 space-y-2"
-                                    data-error-field={
-                                        errors.party ? "true" : undefined
-                                    }
-                                >
-                                    <PartySelector
-                                        value={party}
-                                        onChange={(p) => {
-                                            setParty(p);
-                                            clearFieldError("party");
-                                        }}
-                                    />
-                                    {errors.party ? (
-                                        <p className="text-sm text-red-600 font-medium">
-                                            {errors.party}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex overflow-hidden">
+                            {/* Left side: Instances (70%) */}
+                            <div className="w-[70%] border-r flex flex-col overflow-hidden">
+                                <div className="p-4 border-b shrink-0">
+                                    {isPaid && user?.id ? (
+                                        <EncounterNameField
+                                            value={name}
+                                            onChange={(v) => {
+                                                setName(v);
+                                                clearFieldError("form");
+                                                clearFieldError("name");
+                                            }}
+                                            id="name"
+                                            nameAttr="name"
+                                            placeholder="e.g., Perilous Encounter"
+                                            biome={instances[0]?.biome ?? null}
+                                            time={instances[0]?.time ?? null}
+                                            season={instances[0]?.season ?? null}
+                                            travelPace={instances[0]?.travelPace ?? null}
+                                            road={instances[0]?.road ?? null}
+                                            travelMedium={instances[0]?.travelMedium ?? null}
+                                            autoUpdate={autoUpdateName}
+                                            onAutoUpdateChange={setAutoUpdateName}
+                                            appendDateTime={appendDateTime}
+                                            onAppendDateTimeChange={
+                                                setAppendDateTime
+                                            }
+                                        />
+                                    ) : null}
+                                    {errors.name ? (
+                                        <p className="text-sm text-red-600 mt-1">
+                                            {errors.name}
                                         </p>
                                     ) : null}
+                                    {errors.form ? (
+                                        <div className="text-sm text-red-600 mt-2">
+                                            {errors.form}
+                                        </div>
+                                    ) : null}
+
+                                    {/* Party Selector */}
+                                    <div
+                                        className="mt-4 space-y-2"
+                                        data-error-field={
+                                            errors.party ? "true" : undefined
+                                        }
+                                    >
+                                        <PartySelector
+                                            value={party}
+                                            onChange={(p) => {
+                                                setParty(p);
+                                                clearFieldError("party");
+                                            }}
+                                        />
+                                        {errors.party ? (
+                                            <p className="text-sm text-red-600 font-medium">
+                                                {errors.party}
+                                            </p>
+                                        ) : null}
+                                    </div>
                                 </div>
+
+                                <ScrollArea className="flex-1 overflow-hidden min-h-0">
+                                    <div className="p-4 space-y-4">
+                                        {errors.instances && (
+                                            <div
+                                                className="text-sm text-red-600 p-2 bg-red-50 rounded border border-red-200 font-medium"
+                                                data-error-field="true"
+                                            >
+                                                {errors.instances}
+                                            </div>
+                                        )}
+                                        {instances.map((instance, index) => (
+                                            <div
+                                                key={instance.id}
+                                                data-error-field={
+                                                    errors[`instances.${index}`] ||
+                                                    errors[`instances.${index}.biome`] ||
+                                                    errors[`instances.${index}.travelPace`] ||
+                                                    errors[`instances.${index}.road`] ||
+                                                    errors[`instances.${index}.travelMedium`] ||
+                                                    errors[`instances.${index}.time`] ||
+                                                    errors[`instances.${index}.season`] ||
+                                                    errors[`instances.${index}.quantity`]
+                                                        ? "true"
+                                                        : undefined
+                                                }
+                                            >
+                                                <EncounterInstance
+                                                    instance={instance}
+                                                    index={index}
+                                                    onChange={updateInstance}
+                                                    onDelete={() =>
+                                                        removeInstance(instance.id)
+                                                    }
+                                                    canDelete={instances.length > 1}
+                                                    onFieldChange={(fieldName) =>
+                                                        handleFieldChange(instance.id, fieldName)
+                                                    }
+                                                />
+                                                {(errors[`instances.${index}`] ||
+                                                    errors[`instances.${index}.biome`] ||
+                                                    errors[`instances.${index}.travelPace`] ||
+                                                    errors[`instances.${index}.road`] ||
+                                                    errors[`instances.${index}.travelMedium`] ||
+                                                    errors[`instances.${index}.time`] ||
+                                                    errors[`instances.${index}.season`] ||
+                                                    errors[`instances.${index}.quantity`]) && (
+                                                    <div className="mt-2 space-y-1">
+                                                        {errors[`instances.${index}`] && (
+                                                            <p className="text-sm text-red-600 font-medium">
+                                                                {errors[`instances.${index}`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.biome`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Biome: {errors[`instances.${index}.biome`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.travelPace`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Travel Pace: {errors[`instances.${index}.travelPace`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.road`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Road: {errors[`instances.${index}.road`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.travelMedium`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Travel Medium: {errors[`instances.${index}.travelMedium`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.time`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Time: {errors[`instances.${index}.time`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.season`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Season: {errors[`instances.${index}.season`]}
+                                                            </p>
+                                                        )}
+                                                        {errors[`instances.${index}.quantity`] && (
+                                                            <p className="text-sm text-red-600">
+                                                                Quantity: {errors[`instances.${index}.quantity`]}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+
+                                        {/* Add Instance button - inside scrollable area */}
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={addInstance}
+                                            className="w-full"
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Instance
+                                        </Button>
+                                    </div>
+                                </ScrollArea>
                             </div>
 
-                            <ScrollArea className="flex-1 overflow-hidden min-h-0">
-                                <div className="p-4 space-y-4">
-                                    {errors.instances && (
-                                        <div
-                                            className="text-sm text-red-600 p-2 bg-red-50 rounded border border-red-200 font-medium"
-                                            data-error-field="true"
-                                        >
-                                            {errors.instances}
-                                        </div>
-                                    )}
-                                    {instances.map((instance, index) => (
-                                        <div
-                                            key={instance.id}
-                                            data-error-field={
-                                                errors[`instances.${index}`] ||
-                                                errors[`instances.${index}.biome`] ||
-                                                errors[`instances.${index}.travelPace`] ||
-                                                errors[`instances.${index}.road`] ||
-                                                errors[`instances.${index}.travelMedium`] ||
-                                                errors[`instances.${index}.time`] ||
-                                                errors[`instances.${index}.season`] ||
-                                                errors[`instances.${index}.quantity`]
-                                                    ? "true"
-                                                    : undefined
-                                            }
-                                        >
-                                            <EncounterInstance
-                                                instance={instance}
-                                                index={index}
-                                                onChange={updateInstance}
-                                                onDelete={() =>
-                                                    removeInstance(instance.id)
-                                                }
-                                                canDelete={instances.length > 1}
-                                                onFieldChange={(fieldName) =>
-                                                    handleFieldChange(instance.id, fieldName)
-                                                }
-                                            />
-                                            {(errors[`instances.${index}`] ||
-                                                errors[`instances.${index}.biome`] ||
-                                                errors[`instances.${index}.travelPace`] ||
-                                                errors[`instances.${index}.road`] ||
-                                                errors[`instances.${index}.travelMedium`] ||
-                                                errors[`instances.${index}.time`] ||
-                                                errors[`instances.${index}.season`] ||
-                                                errors[`instances.${index}.quantity`]) && (
-                                                <div className="mt-2 space-y-1">
-                                                    {errors[`instances.${index}`] && (
-                                                        <p className="text-sm text-red-600 font-medium">
-                                                            {errors[`instances.${index}`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.biome`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Biome: {errors[`instances.${index}.biome`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.travelPace`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Travel Pace: {errors[`instances.${index}.travelPace`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.road`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Road: {errors[`instances.${index}.road`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.travelMedium`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Travel Medium: {errors[`instances.${index}.travelMedium`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.time`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Time: {errors[`instances.${index}.time`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.season`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Season: {errors[`instances.${index}.season`]}
-                                                        </p>
-                                                    )}
-                                                    {errors[`instances.${index}.quantity`] && (
-                                                        <p className="text-sm text-red-600">
-                                                            Quantity: {errors[`instances.${index}.quantity`]}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-
-                                    {/* Add Instance button - inside scrollable area */}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={addInstance}
-                                        className="w-full"
-                                    >
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Add Instance
-                                    </Button>
-                                </div>
-                            </ScrollArea>
+                            {/* Right side: Probabilities (30%) */}
+                            <div className="w-[30%] p-4 overflow-y-auto">
+                                <EncounterProbabilityDisplay
+                                    data={probabilityData}
+                                />
+                            </div>
                         </div>
-
-                        {/* Right side: Probabilities (30%) */}
-                        <div className="w-[30%] p-4 overflow-y-auto">
-                            <EncounterProbabilityDisplay
-                                data={probabilityData}
-                            />
-                        </div>
-                    </div>
+                    )}
 
                     <DialogFooter className="px-6 py-4 border-t shrink-0">
                         <DialogClose asChild>
@@ -647,12 +698,18 @@ export default function RollEncounterDialog({
                             {isGenerating ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    Generating...
+                                    {mode === "edit" ? "Saving..." : "Generating..."}
                                 </>
                             ) : (
                                 <>
-                                    <Dices className="h-4 w-4 mr-2" />
-                                    Roll for Encounters
+                                    {mode === "edit" ? (
+                                        "Save Changes"
+                                    ) : (
+                                        <>
+                                            <Dices className="h-4 w-4 mr-2" />
+                                            Roll for Encounters
+                                        </>
+                                    )}
                                 </>
                             )}
                         </Button>

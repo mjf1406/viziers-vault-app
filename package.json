@@ -10,7 +10,12 @@
         "pp": "npx instant-cli@latest push perms",
         "pps": "npx instant-cli@latest push schema && npx instant-cli@latest push perms",
         "bs": "npm run build && npm run start",
-        "update:spell-costs": "tsx stuff/scripts/updateSpellComponentCosts.ts"
+        "usc": "tsx stuff/scripts/updateSpellComponentCosts.ts",
+        "im": "tsx stuff/scripts/insertMonsters.ts",
+        "is": "tsx stuff/scripts/insertSpells.ts",
+        "imi": "tsx stuff/scripts/insertMagicItems.ts",
+        "um": "tsx stuff/scripts/updateMonsters.ts",
+        "um:update": "tsx stuff/scripts/updateMonsters.ts update"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.913.0",
@@ -45,7 +50,7 @@
         "input-otp": "^1.4.2",
         "katex": "^0.16.22",
         "lucide-react": "^0.540.0",
-        "next": "15.5.0",
+        "next": "^16.0.7",
         "next-themes": "^0.4.6",
         "nuqs": "^2.5.1",
         "react": "19.1.0",

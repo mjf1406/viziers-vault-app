@@ -3,30 +3,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Swords, Dices } from "lucide-react";
+import { Swords, Dices, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import EncountersGrid from "./_components/EncountersGrid";
-import EncounterGeneratorDialog from "./_components/GenEncounterResponsiveDialog";
+import RollEncounterDialog from "./_components/RollEncounterDialog";
+import GenerateEncounterDialog from "./_components/GenerateEncounterDialog";
+import EncounterUpsell from "./_components/EncounterUpsell";
 
 // Separate component for data-dependent content
 function EncounterContent({ onEdit }: { onEdit: (e: any) => void }) {
     const { plan, user } = useUser();
 
-    // For now, show grid for all users (no upsell yet)
-    // TODO: Add upsell component similar to MagicShopUpsell
     if (!user || plan === "Free") {
-        return (
-            <div className="py-12 text-center flex flex-col items-center justify-center w-full">
-                <div>
-                    <Swords className="text-muted-foreground w-20 h-20" />
-                </div>
-                <p className="text-lg text-muted-foreground/70">
-                    Upgrade to save encounters
-                </p>
-            </div>
-        );
+        return <EncounterUpsell />;
     }
 
     return <EncountersGrid onEdit={onEdit} />;
@@ -34,26 +25,47 @@ function EncounterContent({ onEdit }: { onEdit: (e: any) => void }) {
 
 export default function EncounterGeneratorPage() {
     const [createOpen, setCreateOpen] = useState(false);
+    const [generateOpen, setGenerateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const [editingEncounter, setEditingEncounter] = useState<any | null>(null);
-    const [modalOpen, setModalOpen] = useQueryState(
-        "modalOpen",
-        parseAsInteger.withDefault(0)
+    const [rollDialogOpen, setRollDialogOpen] = useQueryState(
+        "roll",
+        parseAsBoolean.withDefault(false)
+    );
+    const [generateDialogOpen, setGenerateDialogOpen] = useQueryState(
+        "generate",
+        parseAsBoolean.withDefault(false)
     );
     const { isLoading } = useUser();
 
+    // Sync roll dialog with query parameter
     useEffect(() => {
-        if (modalOpen === 1 && !createOpen) {
+        if (rollDialogOpen && !createOpen) {
             setCreateOpen(true);
         }
-        if (modalOpen !== 1 && createOpen) {
+        if (!rollDialogOpen && createOpen) {
             setCreateOpen(false);
         }
-    }, [modalOpen, createOpen]);
+    }, [rollDialogOpen, createOpen]);
+
+    // Sync generate dialog with query parameter
+    useEffect(() => {
+        if (generateDialogOpen && !generateOpen) {
+            setGenerateOpen(true);
+        }
+        if (!generateDialogOpen && generateOpen) {
+            setGenerateOpen(false);
+        }
+    }, [generateDialogOpen, generateOpen]);
 
     const handleCreateOpenChange = (v: boolean) => {
         setCreateOpen(v);
-        setModalOpen(v ? 1 : 0);
+        setRollDialogOpen(v);
+    };
+
+    const handleGenerateOpenChange = (v: boolean) => {
+        setGenerateOpen(v);
+        setGenerateDialogOpen(v);
     };
 
     const openForEdit = (e: any) => {
@@ -80,20 +92,27 @@ export default function EncounterGeneratorPage() {
                 <div className="flex items-center gap-3">
                     <Button
                         className="hidden sm:inline-flex"
+                        onClick={() => handleGenerateOpenChange(true)}
+                    >
+                        <Plus className="w-4 h-4" />
+                        Generate Encounter(s)
+                    </Button>
+                    <Button
+                        className="hidden sm:inline-flex"
                         onClick={() => handleCreateOpenChange(true)}
                     >
                         <Dices className="w-4 h-4" />
-                        Roll for Encounter
+                        Roll for Encounter(s)
                     </Button>
 
                     <Button
-                        onClick={() => handleCreateOpenChange(true)}
-                        aria-label="Roll for Encounter"
+                        onClick={() => handleGenerateOpenChange(true)}
+                        aria-label="Generate Encounter"
                         size="icon"
                         variant="default"
                         className="sm:hidden fixed bottom-12 right-6 z-50 w-12 h-12 rounded-full p-0 flex items-center justify-center shadow-lg"
                     >
-                        <Dices
+                        <Plus
                             className="!w-7 !h-7"
                             size={36}
                         />
@@ -101,16 +120,23 @@ export default function EncounterGeneratorPage() {
                 </div>
 
                 {!isLoading && (
-                    <EncounterGeneratorDialog
-                        mode="create"
-                        open={createOpen}
-                        onOpenChange={handleCreateOpenChange}
-                        hideTitleOnMobile={true}
-                    />
+                    <>
+                        <GenerateEncounterDialog
+                            open={generateOpen}
+                            onOpenChange={handleGenerateOpenChange}
+                            hideTitleOnMobile={true}
+                        />
+                        <RollEncounterDialog
+                            mode="create"
+                            open={createOpen}
+                            onOpenChange={handleCreateOpenChange}
+                            hideTitleOnMobile={true}
+                        />
+                    </>
                 )}
 
                 {!isLoading && editingEncounter && (
-                    <EncounterGeneratorDialog
+                    <RollEncounterDialog
                         key={
                             "encounter-edit-" +
                             (editingEncounter.id ??

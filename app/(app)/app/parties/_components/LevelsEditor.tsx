@@ -4,9 +4,9 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import { NumberInputWithStepper } from "@/components/ui/NumberInputWithStepper";
 
 export default function LevelsEditor({
     levels,
@@ -30,36 +30,38 @@ export default function LevelsEditor({
                 >
                     <div className="flex-1">
                         <Label className="text-xs">Level</Label>
-                        <Input
-                            type="number"
-                            min={1}
-                            max={20}
-                            value={levelData.level}
-                            onChange={(e) =>
-                                updateLevel(
-                                    idx,
-                                    "level",
-                                    parseInt(e.target.value, 10) || 1
-                                )
-                            }
-                            className="mt-1"
-                        />
+                        <div className="mt-1">
+                            <NumberInputWithStepper
+                                value={levelData.level}
+                                min={1}
+                                max={20}
+                                step={1}
+                                onChange={(newVal) =>
+                                    updateLevel(
+                                        idx,
+                                        "level",
+                                        newVal ?? 1
+                                    )
+                                }
+                            />
+                        </div>
                     </div>
                     <div className="flex-1">
                         <Label className="text-xs">Quantity</Label>
-                        <Input
-                            type="number"
-                            min={1}
-                            value={levelData.quantity}
-                            onChange={(e) =>
-                                updateLevel(
-                                    idx,
-                                    "quantity",
-                                    parseInt(e.target.value, 10) || 1
-                                )
-                            }
-                            className="mt-1"
-                        />
+                        <div className="mt-1">
+                            <NumberInputWithStepper
+                                value={levelData.quantity}
+                                min={1}
+                                step={1}
+                                onChange={(newVal) =>
+                                    updateLevel(
+                                        idx,
+                                        "quantity",
+                                        newVal ?? 1
+                                    )
+                                }
+                            />
+                        </div>
                     </div>
                     <Button
                         type="button"

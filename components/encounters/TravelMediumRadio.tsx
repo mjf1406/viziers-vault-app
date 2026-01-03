@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { FaDice } from "react-icons/fa6";
 import { FaShoePrints, FaShip, FaPlane } from "react-icons/fa";
-import { TRAVEL_MEDIUMS, type TravelMedium } from "@/lib/constants/encounters";
+import { TRAVEL_MEDIUMS, type TravelMedium } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 const ICONS: Record<TravelMedium, React.ReactNode> = {
     ground: <FaShoePrints />,

@@ -292,13 +292,13 @@ export const tools: Tool[] = [
         title: "Region Generator",
         header: "My Regions",
         description:
-            "Generate smaller hexcrawl regions, like islands, peninsulas, bays, inland areas, and coastal regions.",
+            "Generate smaller hexcrawl regions with 1-mile hexes, like islands, peninsulas, bays, inland areas, and coastal regions.",
         status: "Alpha 3",
         icon: "MapPinned",
         philosophy:
             "I wanted a focused tool for compact hexcrawls that sit between a single encounter map and a full world hexmap. This produces playable regions that are easy to drop into campaigns, adventure hooks, and quick sandbox setups for session-length exploration.",
         features: [
-            "Hex-scale region generation (coastal, island, inland, peninsula, bay)",
+            "1-mile hex-scale region generation (coastal, island, inland, peninsula, bay)",
             "Terrain and biome tiling",
             "Settlement and POI placement with descriptions",
             "Local weather and tide influences for coastal regions",
@@ -343,17 +343,75 @@ export const tools: Tool[] = [
         ],
     },
     {
+        id: "continent-generator",
+        title: "Continent Generator",
+        header: "My Continents",
+        description:
+            "Generate continent-scale hexcrawl maps with up to 3-mile hexes, featuring multiple regions, kingdoms, and large-scale terrain features.",
+        status: "Alpha 4",
+        icon: "Map",
+        philosophy:
+            "Between the focused detail of region maps and the grand scale of world maps, continents provide the perfect middle ground for extended campaigns. This generator creates continent-scale hexcrawls that can span multiple kingdoms, diverse biomes, and large-scale geographical features while maintaining enough detail for meaningful exploration.",
+        features: [
+            "Up to 3-mile hex-scale continent generation",
+            "Zoom into specific regions to view that specific map scale",
+            "Multiple region and kingdom placement",
+            "Large-scale terrain and biome generation",
+            "Mountain ranges, river systems, and coastlines",
+            "Settlement networks and trade routes",
+            "Climate zones and weather patterns",
+            "VTT export and CSV of hex data",
+        ],
+        integrations: [
+            "Region Generator",
+            "Battle Map Generator",
+            "Encounter Generator",
+            "Party Management",
+        ],
+        category: "Generator",
+        order: 6,
+        url: "/app/continent-generator",
+        mockCount: 6,
+        mockRecentGenerations: [
+            {
+                id: 34,
+                title: "Aetheria",
+                generatedAt: "2024-01-17T10:00:00Z",
+                lastAccessedAt: "2024-01-17T15:30:00Z",
+            },
+            {
+                id: 35,
+                title: "Dragon's Reach",
+                generatedAt: "2024-01-16T14:20:00Z",
+                lastAccessedAt: "2024-01-16T19:45:00Z",
+            },
+            {
+                id: 36,
+                title: "Frostwind Expanse",
+                generatedAt: "2024-01-15T09:15:00Z",
+                lastAccessedAt: "2024-01-15T16:20:00Z",
+            },
+            {
+                id: 37,
+                title: "Emerald Coast",
+                generatedAt: "2024-01-14T11:30:00Z",
+                lastAccessedAt: "2024-01-14T18:10:00Z",
+            },
+        ],
+    },
+    {
         id: "world-generator",
         title: "World Generator",
         header: "My Worlds",
         description:
-            "Generate complete hex worlds with weather simulation, fog of war, and party tracking.",
+            "Generate complete hex worlds with up to 24-mile hexes, weather simulation, fog of war, and party tracking.",
         status: "Alpha 5",
         icon: "Globe",
         philosophy:
             "When I started brainstorming for this after creating the above generators, I discovered HexRoll, which is an AMAZING tool. Go give it a try now, please. It's fabulous. While it is fabulous, it doesn't work exactly how I run my hexcrawls and has some missing features, so I'm building this to generate entire worlds, both 2D and 3D with party tracking, simulated weather, detailed edit options with stamps and brushes and automatic rolls minimizing the friction as much as possible for game masters. Note that HexRoll has wonderful options for solo hexcrawlers and I do not intend on supporting solo hexcrawlers at all in the future, so if you're interested in playing on your own in a random hexworld, go use HexRoll. It's superb!",
         features: [
-            "Hex-based world exploration",
+            "Up to 24-mile hex-based world exploration",
+            "Zoom into specific continents and regions to view those specific map scales",
             "Weather simulation",
             "Fog of war system",
             "Party tracking",
@@ -361,11 +419,12 @@ export const tools: Tool[] = [
             "Automatic encounter generation",
         ],
         integrations: [
+            "Continent Generator",
+            "Region Generator",
             "Battle Map Generator",
             "Encounter Generator",
             "Magic Shop Generator",
             "Party Management",
-            "Region Generator",
         ],
         category: "Generator",
         order: 7,

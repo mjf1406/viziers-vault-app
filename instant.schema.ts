@@ -110,7 +110,9 @@ const _schema = i.schema({
             type: i.string().optional().indexed(), // e.g. "Giant"
             size: i.string().optional().indexed(), // e.g. "Large"
             alignment: i.string().optional().indexed(),
-            habitat: i.string().optional().indexed(),
+            habitat: i.string().optional().indexed(), // D&D habitat (e.g. "Arctic", "Forest")
+            biome: i.json().optional().indexed(), // Array of biome strings
+            travelMedium: i.json().optional().indexed(), // Array of "land", "water", "air"
 
             // Provenance
             source: i.string().optional().indexed(),
@@ -126,7 +128,7 @@ const _schema = i.schema({
         // ----------------------
         settings: i.entity({
             urlPreferences: i.json().optional(),
-            // Generator settings (Magic Shop, etc.)
+            // Magic Shop Generator settings
             slotBeta: i.number().optional(),
             slotScale: i.number().optional(),
             wealthInfluence: i.number().optional(),
@@ -137,8 +139,13 @@ const _schema = i.schema({
             basePrices: i.json().optional(),
             rarityThresholds: i.json().optional(),
             spellScrollPrices: i.json().optional(),
-            // Spellbook generator settings
+            // Spellbook Generator settings
             spellbookExtraSpellsDice: i.string().optional(),
+            // Encounter Generator settings
+            encounterProbabilities: i.json().optional(), // Object: {[biome]: {day: {non_combat, combat, hazard, total}, night: {...}}}
+            roadModifiers: i.json().optional(), // Object: {[roadType]: {day: {non_combat, combat, hazard, percent_type}, night: {...}}}
+            paceModifiers: i.json().optional(), // Object: {[pace]: {day: {non_combat, combat, hazard, percent_type}, night: {...}}}
+            difficultyProbabilities: i.json().optional(), // Object: {[difficulty]: {day: probability, night: probability}}
         }),
         parties: i.entity({
             name: i.string(),

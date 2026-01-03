@@ -19,24 +19,29 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    BIOMES,
+    DND_HABITATS,
+    mapHabitatToBiome,
+    mapBiomeToHabitat,
     type Biome,
     type TravelPace,
     type Road,
     type TravelMedium,
     type Time,
     type Season,
-} from "@/lib/constants/encounters";
+    type DndHabitat,
+} from "@/app/(app)/app/encounter-generator/_constants/encounters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NumberInputWithStepper } from "@/components/ui/NumberInputWithStepper";
 
 export type EncounterInstanceData = {
     id: string;
     biome?: Biome | null;
-    travelPace?: TravelPace | "random" | null;
-    road?: Road | "random" | null;
-    travelMedium?: TravelMedium | "random" | null;
-    time?: Time | "random" | null;
-    season?: Season | "random" | null;
+    travelPace?: TravelPace | null;
+    road?: Road | null;
+    travelMedium?: TravelMedium | null;
+    time?: Time | null;
+    season?: Season | null;
+    quantity?: number;
 };
 
 type EncounterInstanceProps = {
@@ -45,6 +50,7 @@ type EncounterInstanceProps = {
     onChange: (instance: EncounterInstanceData) => void;
     onDelete: () => void;
     canDelete: boolean;
+    onFieldChange?: (fieldName: string) => void;
 };
 
 export default function EncounterInstance({
@@ -53,12 +59,15 @@ export default function EncounterInstance({
     onChange,
     onDelete,
     canDelete,
+    onFieldChange,
 }: EncounterInstanceProps) {
     const updateField = <K extends keyof EncounterInstanceData>(
         field: K,
         value: EncounterInstanceData[K]
     ) => {
         onChange({ ...instance, [field]: value });
+        // Clear error for this specific field
+        onFieldChange?.(field);
     };
 
     return (
@@ -83,18 +92,26 @@ export default function EncounterInstance({
             </CardHeader>
             <CardContent className="flex flex-row flex-wrap gap-4">
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel htmlFor={`biome-${instance.id}`}>Biome</FieldLabel>
+                    <FieldLabel htmlFor={`biome-${instance.id}`}>
+                        Biome <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <Select
-                        value={instance.biome ?? undefined}
-                        onValueChange={(v) => updateField("biome", v as Biome)}
+                        value={mapBiomeToHabitat(instance.biome ?? null) ?? undefined}
+                        onValueChange={(v) => {
+                            const biome = mapHabitatToBiome(v);
+                            updateField("biome", biome);
+                        }}
                     >
                         <SelectTrigger id={`biome-${instance.id}`}>
                             <SelectValue placeholder="Select biome" />
                         </SelectTrigger>
                         <SelectContent>
-                            {BIOMES.map((b) => (
-                                <SelectItem key={b} value={b}>
-                                    {b}
+                            {DND_HABITATS.map((h) => (
+                                <SelectItem
+                                    key={h}
+                                    value={h}
+                                >
+                                    {h}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -102,51 +119,92 @@ export default function EncounterInstance({
                 </Field>
 
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel>Travel Pace</FieldLabel>
+                    <FieldLabel>
+                        Travel Pace <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <TravelPaceRadio
-                        value={instance.travelPace ?? "random"}
-                        onChange={(v) => updateField("travelPace", v as any)}
-                        includeRandom
+                        value={instance.travelPace ?? undefined}
+                        onChange={(v) => {
+                            if (v !== "random") {
+                                updateField("travelPace", v as any);
+                            }
+                        }}
+                        includeRandom={false}
                     />
                 </Field>
 
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel>Road</FieldLabel>
+                    <FieldLabel>
+                        Road <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <RoadRadio
-                        value={instance.road ?? "random"}
-                        onChange={(v) => updateField("road", v as any)}
-                        includeRandom
+                        value={instance.road ?? undefined}
+                        onChange={(v) => {
+                            if (v !== "random") {
+                                updateField("road", v as any);
+                            }
+                        }}
+                        includeRandom={false}
                     />
                 </Field>
 
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel>Travel Medium</FieldLabel>
+                    <FieldLabel>
+                        Travel Medium <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <TravelMediumRadio
-                        value={instance.travelMedium ?? "random"}
-                        onChange={(v) => updateField("travelMedium", v as any)}
-                        includeRandom
+                        value={instance.travelMedium ?? undefined}
+                        onChange={(v) => {
+                            if (v !== "random") {
+                                updateField("travelMedium", v as any);
+                            }
+                        }}
+                        includeRandom={false}
                     />
                 </Field>
 
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel>Time</FieldLabel>
+                    <FieldLabel>
+                        Time <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <TimeRadio
-                        value={instance.time ?? "random"}
-                        onChange={(v) => updateField("time", v as any)}
-                        includeRandom
+                        value={instance.time ?? undefined}
+                        onChange={(v) => {
+                            if (v !== "random") {
+                                updateField("time", v as any);
+                            }
+                        }}
+                        includeRandom={false}
                     />
                 </Field>
 
                 <Field className="min-w-[200px] flex-1">
-                    <FieldLabel>Season</FieldLabel>
+                    <FieldLabel>
+                        Season <span className="text-red-600">*</span>
+                    </FieldLabel>
                     <SeasonRadio
-                        value={instance.season ?? "random"}
-                        onChange={(v) => updateField("season", v as any)}
-                        includeRandom
+                        value={instance.season ?? undefined}
+                        onChange={(v) => {
+                            if (v !== "random") {
+                                updateField("season", v as any);
+                            }
+                        }}
+                        includeRandom={false}
+                    />
+                </Field>
+
+                <Field className="min-w-[200px] flex-1">
+                    <FieldLabel>
+                        Quantity <span className="text-red-600">*</span>
+                    </FieldLabel>
+                    <NumberInputWithStepper
+                        value={instance.quantity ?? 1}
+                        min={1}
+                        step={1}
+                        onChange={(val) => updateField("quantity", val ?? 1)}
                     />
                 </Field>
             </CardContent>
         </Card>
     );
 }
-

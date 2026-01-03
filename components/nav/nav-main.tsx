@@ -161,7 +161,13 @@ export function NavMain({ handleLinkClick }: NavMainProps) {
                                                     </div>
                                                 ) : (
                                                     <Link
-                                                        href={`${href}?modalOpen=1`}
+                                                        href={
+                                                            href.includes(
+                                                                "encounter-generator"
+                                                            )
+                                                                ? `${href}?roll=true`
+                                                                : `${href}?modalOpen=1`
+                                                        }
                                                         prefetch={true}
                                                     >
                                                         <Plus className="w-4 h-4" />

@@ -4,7 +4,7 @@
 
 import db from "@/lib/db";
 import PublicLanding from "@/components/PublicLanding";
-import UserDashboard from "./components/UserDashboard";
+import UserDashboard from "./_components/UserDashboard";
 
 export default function DashboardPage() {
     return (

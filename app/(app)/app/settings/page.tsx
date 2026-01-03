@@ -8,6 +8,7 @@ import UrlLinkSettings from "./_components/UrlLinkSettings";
 import SettingsUpsell from "./_components/SettingsUpsell";
 import MagicShopSettings from "./_components/MagicShopSettings";
 import SpellbookSettings from "./_components/SpellbookSettings";
+import EncounterSettings from "./_components/EncounterSettings";
 
 export default function SettingsPage() {
     const { plan, isLoading } = useUser();
@@ -38,6 +39,7 @@ export default function SettingsPage() {
                     <>
                         <MagicShopSettings />
                         <SpellbookSettings />
+                        <EncounterSettings />
                         <UrlLinkSettings />
                     </>
                 )}

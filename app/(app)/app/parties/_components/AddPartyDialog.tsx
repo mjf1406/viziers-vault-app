@@ -12,9 +12,9 @@ import db from "@/lib/db";
 import { uploadImage } from "@/lib/storage";
 import { id as genId } from "@instantdb/react";
 import Link from "next/link";
-import usePartyForm from "../hooks/usePartyForm";
+import usePartyForm from "../_utils/usePartyForm";
 import { makeUploadCandidate } from "@/lib/image";
-import { buildCreatePartyOps, buildUpdatePartyOps } from "../tx/partyTx";
+import { buildCreatePartyOps, buildUpdatePartyOps } from "../_utils/partyTx";
 import IconPicker from "./IconPicker";
 import LevelsEditor from "./LevelsEditor";
 import {

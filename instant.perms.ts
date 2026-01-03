@@ -139,7 +139,7 @@ const rules = {
     },
     encounters: {
         allow: {
-            view: "isOwner || isGuestOwner",
+            view: "true",
             create: "isAuthenticated && (size(data.ref('owner.encounters.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
@@ -148,7 +148,7 @@ const rules = {
     },
     spellbooks: {
         allow: {
-            view: "isOwner || isGuestOwner",
+            view: "true",
             create: "isAuthenticated && (size(data.ref('owner.spellbooks.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",
@@ -157,7 +157,7 @@ const rules = {
     },
     magicShops: {
         allow: {
-            view: "isOwner || isGuestOwner",
+            view: "true",
             create: "isAuthenticated && (size(data.ref('owner.magicShops.id')) < 1 || isPremium)",
             update: "isOwner || isGuestOwner",
             delete: "isOwner || isGuestOwner",

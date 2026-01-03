@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { FaDice } from "react-icons/fa6";
 import { FaSun, FaMoon } from "react-icons/fa";
-import { TIMES, type Time } from "@/lib/constants/encounters";
+import { TIMES, type Time } from "@/app/(app)/app/encounter-generator/_constants/encounters";
 
 const ICONS: Record<Time, React.ReactNode> = {
     day: <FaSun />,
@@ -86,6 +86,9 @@ export default function TimeRadio({
         </RadioGroup>
     );
 }
+
+
+
 
 
 
